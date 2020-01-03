@@ -109,9 +109,9 @@ func (rs *RServer) LoadJSONFile(path string) bool {
 			return false
 		}
 
-		var rserver RServer
+		rserver := RServer{}
 
-		err2 := json.Unmarshal(bytes, rserver)
+		err2 := json.Unmarshal(bytes, &rserver)
 
 		if err2 != nil {
 			rs.Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", filepath, err2.Error())
