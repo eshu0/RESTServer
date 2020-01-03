@@ -17,7 +17,7 @@ import (
 type RServer struct {
 		Port string `json:"port"`
 		Handlers []RESTHandler `json:"handlers"`
-		Log slinterfaces.ISimpleLogger	`json:"_"`
+		Log slinterfaces.ISimpleLogger	`json:"-"`
 }
 
 func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
