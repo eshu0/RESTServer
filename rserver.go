@@ -91,7 +91,7 @@ func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) 
 		if ok {
 			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
 		}else{
-			rs.Log.LogErrorf("MapFunctionsToHandlers","Handlers Error: %v", err)
+			rs.Log.LogError("MapFunctionsToHandlers","Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)
 		}
 	}
 
@@ -104,10 +104,12 @@ func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) 
 
 func (rs *RServer) ShutDown() {
 	if rs.Server != nil {
+
+		if(rs.Server.)
 		backg := context.Background()
 
 		if backg != nil {
-		
+
 			if err := rs.Server.Shutdown(backg); err != nil {
 				// Error from closing listeners, or context timeout:
 				rs.Log.LogDebugf("Shutdown","HTTP server Shutdown: %v", err)
