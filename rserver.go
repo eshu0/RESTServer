@@ -9,6 +9,7 @@ import (
 	"os"
 	"github.com/gorilla/mux"
 	"github.com/eshu0/simplelogger/interfaces"
+	"github.com/eshu0/simplelogger"	
 )
 
 // The new router function creates the router and
@@ -19,6 +20,22 @@ type RServer struct {
 		Handlers []RESTHandler `json:"handlers"`
 		Log slinterfaces.ISimpleLogger	`json:"-"`
 }
+
+func NewRServer() (RServer, *os.File){
+
+	server := RServer{}
+
+	// this is the dummy logger object
+	logger := &simplelogger.SimpleLogger{}
+
+	// lets open a flie log using the session
+	f1 := logger.OpenSessionFileLog("restserver.log", "123")
+
+	server.Log = logger
+
+	return server,f1
+}
+
 
 func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
 
