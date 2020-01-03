@@ -15,12 +15,15 @@ import (
 // The new router function creates the router and
 // returns it to us. We can now use this function
 // to instantiate and test the router outside of the main function
+
+var Server *http.Server
+
 type RServer struct {
 		Port string `json:"port"`
 		Handlers []RESTHandler `json:"handlers"`
 		DefaultHandlers []DefaultRESTHandler `json:"defaulthandlers"`
 		Log slinterfaces.ISimpleLogger	`json:"-"`
-		Server *http.Server	`json:"-"`
+		//Server *http.Server	`json:"-"`
 }
 
 func NewRServer() (RServer, *os.File){
@@ -103,12 +106,12 @@ func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) 
 }
 
 func (rs *RServer) ShutDown() {
-	if rs.Server != nil {
+	if Server != nil {
 		backg := context.Background()
 
 		if backg != nil {
 
-			if err := rs.Server.Shutdown(backg); err != nil {
+			if err := Server.Shutdown(backg); err != nil {
 				// Error from closing listeners, or context timeout:
 				rs.Log.LogDebugf("Shutdown","HTTP server Shutdown: %v", err)
 			}
@@ -125,7 +128,7 @@ func (rs *RServer) ShutDown() {
 func (rs *RServer) ListenAndServe(FunctionalMap map[string]interface{}) {
 	r := rs.MapFunctionsToHandlers(FunctionalMap)
 
-	rs.Server =  &http.Server{Addr: ":"+rs.Port, Handler: r}
+	Server =  &http.Server{Addr: ":"+rs.Port, Handler: r}
 	//http.ListenAndServe(":"+rs.Port, r)
 /*
 	idleConnsClosed := make(chan struct{})
@@ -147,7 +150,7 @@ func (rs *RServer) ListenAndServe(FunctionalMap map[string]interface{}) {
 		handl.MappedClass.Server = rs
 	}
 
-	if err := rs.Server.ListenAndServe(); err != http.ErrServerClosed {
+	if err := Server.ListenAndServe(); err != http.ErrServerClosed {
 		// Error starting or closing listener:
 		rs.Log.LogErrorf("HTTP server ListenAndServe", "%v", err)
 	}
