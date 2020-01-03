@@ -9,5 +9,9 @@ type RServerCommand struct {
 }
 
 func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
-	rsc.Server.ShutDown()
+	if(rsc.Server != nil){
+		rsc.Server.Log.LogDebug("RServerCommand","HTTP server Shutdown: ")
+		rsc.Server.ShutDown()
+	}
+
 }
