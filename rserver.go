@@ -87,8 +87,14 @@ func (rs *RServer) SaveJSONFile(path string) bool {
 		return true
 
 	} else {
-		rs.Log.LogErrorf("SaveToFile()", "'%s' was not found to save with error: %s", filepath, err.Error())
-				return false
+
+		if(err != nil){
+			rs.Log.LogErrorf("SaveToFile()", "'%s' was not found to save with error: %s", filepath, err.Error())
+		}else{
+			rs.Log.LogErrorf("SaveToFile()", "'%s' was not found to save", filepath)
+		}
+
+		return false
 	}
 }
 
@@ -117,7 +123,13 @@ func (rs *RServer) LoadJSONFile(path string) bool {
 
 		return true
 	} else {
-		rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", filepath, err.Error())
+
+		if(err != nil){
+			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", filepath, err.Error())
+		}else{
+			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load", filepath)
+		}
+
 		return false
 	}
 }
