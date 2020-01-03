@@ -33,8 +33,7 @@ func NewRServer() (RServer, *os.File){
 	drh.MethodName = "ShutDown"
 	drh.HTTPMethod = "GET"
 	drh.FunctionalClass = "RServerCommand"
-	drh.MappedClass = RServerCommand{}
-	drh.MappedClass.Server = &server
+	drh.MappedClass = RServerCommand{ Server : &server }
 	server.DefaultHandlers = append(server.DefaultHandlers, drh)
 
 
