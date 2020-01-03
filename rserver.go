@@ -105,13 +105,17 @@ func (rs *RServer) LoadFile(path string) {
 			return
 		}
 
-		err = json.Unmarshal(bytes, rs)
+		var rserver RServer
+
+		err = json.Unmarshal(bytes, rserver)
 
 		if err != nil {
 			rs.Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", filepath, err.Error())
 			return
 		}
 
+		rs.Port = rserver.Port
+		rs.Handlers = rserver.Handlers
 	} else {
 		rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load", path)
 	}
