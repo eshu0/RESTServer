@@ -6,3 +6,9 @@ type RESTHandler struct {
 	HTTPMethod string `json:"httpmethod"`
 	FunctionalClass   string `json:"functionalclass"`
 }
+
+
+type DefaultRESTHandler struct {
+	RESTHandler
+	MappedClass interface{} `json:"-"`
+}

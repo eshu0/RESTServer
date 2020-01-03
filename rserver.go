@@ -1,7 +1,7 @@
 package RESTServer
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 	"reflect"
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"os"
 	"github.com/gorilla/mux"
 	"github.com/eshu0/simplelogger/interfaces"
-	"github.com/eshu0/simplelogger"	
+	"github.com/eshu0/simplelogger"
 )
 
 // The new router function creates the router and
@@ -18,12 +18,26 @@ import (
 type RServer struct {
 		Port string `json:"port"`
 		Handlers []RESTHandler `json:"handlers"`
+		DefaultHandlers []DefaultRESTHandler `json:"defaulthandlers"`
 		Log slinterfaces.ISimpleLogger	`json:"-"`
+		Server *http.Server	`json:"-"`
 }
 
 func NewRServer() (RServer, *os.File){
 
 	server := RServer{}
+	server.DefaultHandlers = []DefaultRESTHandler{}
+
+	drh := DefaultRESTHandler{}
+	drh.URL = "/Admin/Shutdown"
+	drh.MethodName = "ShutDown"
+	drh.HTTPMethod = "GET"
+	drh.FunctionalClass = "RServerCommand"
+	drh.MappedClass = RServerCommand{}
+
+	server.DefaultHandlers = append(server.DefaultHandlers, drh)
+
+
 
 	// this is the dummy logger object
 	logger := &simplelogger.SimpleLogger{}
@@ -39,7 +53,7 @@ func NewRServer() (RServer, *os.File){
 
 func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
 
-	fmt.Println(fmt.Sprintf("Invoke - Method: Looking up %s ", name))
+	rs.Log.LogDebugf("Invoke","Method: Looking up %s ", name)
 
 	inputs := make([]reflect.Value, len(args))
 	for i, _ := range args {
@@ -52,7 +66,7 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
 	if !meth.IsZero() && !meth.IsNil() {
 		meth.Call(inputs)
 	} else {
-		fmt.Println(fmt.Sprintf("Invoke - Method: %s could not be found ", name))
+		rs.Log.LogDebugf("Invoke","Method: %s could not be found ", name)
 	}
 	//} else {
 	//	fmt.Println(fmt.Sprintf("Invoke - Value: %s could not be found ", any))
@@ -78,12 +92,47 @@ func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) 
 			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
 		}
 	}
+
+	for _, handl := range rs.DefaultHandlers {
+		r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, handl.MappedClass)).Methods(handl.HTTPMethod)
+	}
+
 	return r
+}
+
+func (rs *RServer) ShutDown() {
+	if err := rs.Server.Shutdown(context.Background()); err != nil {
+		// Error from closing listeners, or context timeout:
+		rs.Log.LogDebugf("Shutdown","HTTP server Shutdown: %v", err)
+	}
 }
 
 func (rs *RServer) ListenAndServe(FunctionalMap map[string]interface{}) {
 	r := rs.MapFunctionsToHandlers(FunctionalMap)
-	http.ListenAndServe(":"+rs.Port, r)
+
+	rs.Server =  &http.Server{Addr: ":"+rs.Port, Handler: r}
+	//http.ListenAndServe(":"+rs.Port, r)
+/*
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		<-sigint
+
+		// We received an interrupt signal, shut down.
+		if err := rs.Server.Shutdown(context.Background()); err != nil {
+			// Error from closing listeners, or context timeout:
+			rs.Log.LogDebugf("Shutdown","HTTP server Shutdown: %v", err)
+		}
+		close(idleConnsClosed)
+	}()
+*/
+
+
+	if err := rs.Server.ListenAndServe(); err != http.ErrServerClosed {
+		// Error starting or closing listener:
+		rs.Log.LogErrorf("HTTP server ListenAndServe", "%v", err)
+	}
 }
 
 func (rs *RServer) SaveJSONFile(path string) bool {
