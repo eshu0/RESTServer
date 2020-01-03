@@ -96,13 +96,13 @@ func (rs *RServer) SaveToFile(path string) {
 	}
 }
 
-func (rs *RServer) LoadFile(path string) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		filepath := path + ".json"
+func (rs *RServer) LoadFile(path string) bool {
+	filepath := path + ".json"
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		bytes, err := ioutil.ReadFile(filepath) //ReadAll(jsonFile)
 		if err != nil {
 			rs.Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", filepath, err.Error())
-			return
+			return false
 		}
 
 		var rserver RServer
@@ -111,12 +111,15 @@ func (rs *RServer) LoadFile(path string) {
 
 		if err != nil {
 			rs.Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", filepath, err.Error())
-			return
+			return false
 		}
 
 		rs.Port = rserver.Port
 		rs.Handlers = rserver.Handlers
+
+		return true
 	} else {
-		rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load", path)
+		rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load", filepath)
+		return false
 	}
 }
