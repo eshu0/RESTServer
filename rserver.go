@@ -60,16 +60,6 @@ func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) 
 		if ok {
 			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
 		}
-		/*
-			switch handl.FunctionalClass {
-			case "type1":
-				r.HandleFunc(handl.URL, makeHandler(handl.MethodName, handl.Data)).Methods(handl.HTTPMethod)
-				break
-			case "type2":
-				r.HandleFunc(handl.URL, makeHandler(handl.MethodName, handl.Data)).Methods(handl.HTTPMethod)
-				break
-			}
-		*/
 	}
 	return r
 }
@@ -79,47 +69,55 @@ func (rs *RServer) ListenAndServe(FunctionalMap map[string]interface{}) {
 	http.ListenAndServe(":"+rs.Port, r)
 }
 
-func (rs *RServer) SaveToFile(path string) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		bytes, err := json.MarshalIndent(rs, "", "\t") //json.Marshal(p)
-		if err != nil {
-			rs.Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", path, err.Error())
-			return
+func (rs *RServer) SaveJSONFile(path string) bool {
+	filepath := path + ".json"
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+		bytes, err1 := json.MarshalIndent(rs, "", "\t") //json.Marshal(p)
+		if err1 != nil {
+			rs.Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", path, err1.Error())
+			return false
 		}
 
-		err = ioutil.WriteFile(path+".json", bytes, 0644)
-		if err != nil {
-			rs.Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", path, err.Error())
+		err2 := ioutil.WriteFile(filepath, bytes, 0644)
+		if err2 != nil {
+			rs.Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", path, err2.Error())
+			return false
 		}
+
+		return true
+
 	} else {
-		rs.Log.LogErrorf("SaveToFile()", "'%s' was not found to save", path)
+		rs.Log.LogErrorf("SaveToFile()", "'%s' was not found to save with error: %s", filepath, err.Error())
+				return false
 	}
 }
 
-func (rs *RServer) LoadFile(path string) bool {
+func (rs *RServer) LoadJSONFile(path string) bool {
 	filepath := path + ".json"
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
-		bytes, err := ioutil.ReadFile(filepath) //ReadAll(jsonFile)
-		if err != nil {
-			rs.Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", filepath, err.Error())
+		bytes, err1 := ioutil.ReadFile(filepath) //ReadAll(jsonFile)
+		if err1 != nil {
+			rs.Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", filepath, err1.Error())
 			return false
 		}
 
 		var rserver RServer
 
-		err = json.Unmarshal(bytes, rserver)
+		err2 := json.Unmarshal(bytes, rserver)
 
-		if err != nil {
-			rs.Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", filepath, err.Error())
+		if err2 != nil {
+			rs.Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", filepath, err2.Error())
 			return false
 		}
 
 		rs.Port = rserver.Port
+		rs.Log.LogDebugf("LoadFile()", "Read Port %s ", rserver.Port)
+
 		rs.Handlers = rserver.Handlers
 
 		return true
 	} else {
-		rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load", filepath)
+		rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", filepath, err.Error())
 		return false
 	}
 }
