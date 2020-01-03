@@ -143,6 +143,9 @@ func (rs *RServer) ListenAndServe(FunctionalMap map[string]interface{}) {
 	}()
 */
 
+	for _, handl := range rs.DefaultHandlers {
+		handl.MappedClass.Server = rs
+	}
 
 	if err := rs.Server.ListenAndServe(); err != http.ErrServerClosed {
 		// Error starting or closing listener:

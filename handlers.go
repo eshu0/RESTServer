@@ -10,5 +10,5 @@ type RESTHandler struct {
 
 type DefaultRESTHandler struct {
 	RESTHandler
-	MappedClass interface{} `json:"-"`
+	MappedClass RServerCommand `json:"-"`
 }
