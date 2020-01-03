@@ -71,7 +71,8 @@ func (rs *RServer) ListenAndServe(FunctionalMap map[string]interface{}) {
 
 func (rs *RServer) SaveJSONFile(path string) bool {
 	filepath := path + ".json"
-	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+	ok, err := rs.CheckFileExists(filepath)
+	if  ok {
 		bytes, err1 := json.MarshalIndent(rs, "", "\t") //json.Marshal(p)
 		if err1 != nil {
 			rs.Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", path, err1.Error())
@@ -100,7 +101,8 @@ func (rs *RServer) SaveJSONFile(path string) bool {
 
 func (rs *RServer) LoadJSONFile(path string) bool {
 	filepath := path + ".json"
-	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+	ok, err := rs.CheckFileExists(filepath)
+	if  ok {
 		bytes, err1 := ioutil.ReadFile(filepath) //ReadAll(jsonFile)
 		if err1 != nil {
 			rs.Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", filepath, err1.Error())
@@ -132,4 +134,12 @@ func (rs *RServer) LoadJSONFile(path string) bool {
 
 		return false
 	}
+}
+
+func (rs *RServer)  CheckFileExists(filename string) (bool, error) {
+    info, err := os.Stat(filename)
+    if os.IsNotExist(err) {
+        return false, err
+    }
+    return !info.IsDir(), nil
 }
