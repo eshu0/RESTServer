@@ -29,13 +29,14 @@ func NewRServer() (RServer, *os.File){
 	server.DefaultHandlers = []DefaultRESTHandler{}
 
 	drh := DefaultRESTHandler{}
+
 	drh.URL = "/Admin/Shutdown"
 	drh.MethodName = "ShutDown"
 	drh.HTTPMethod = "GET"
 	drh.FunctionalClass = "RServerCommand"
 	drh.MappedClass = RServerCommand{ Server : &server }
-	server.DefaultHandlers = append(server.DefaultHandlers, drh)
 
+	server.DefaultHandlers = append(server.DefaultHandlers, drh)
 
 
 	// this is the dummy logger object
@@ -89,6 +90,8 @@ func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) 
 
 		if ok {
 			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
+		}else{
+			rs.Log.LogErrorf("MapFunctionsToHandlers","Handlers Error: %v", err)
 		}
 	}
 
@@ -100,10 +103,23 @@ func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) 
 }
 
 func (rs *RServer) ShutDown() {
-	if err := rs.Server.Shutdown(context.Background()); err != nil {
-		// Error from closing listeners, or context timeout:
-		rs.Log.LogDebugf("Shutdown","HTTP server Shutdown: %v", err)
+	if rs.Server != nil {
+		backg := context.Background()
+
+		if backg != nil {
+		
+			if err := rs.Server.Shutdown(backg); err != nil {
+				// Error from closing listeners, or context timeout:
+				rs.Log.LogDebugf("Shutdown","HTTP server Shutdown: %v", err)
+			}
+		}else{
+			rs.Log.LogError("Shutdown","Called but context.Background() was nil")
+		}
+
+	}else{
+		rs.Log.LogError("Shutdown","Called but server was nil")
 	}
+
 }
 
 func (rs *RServer) ListenAndServe(FunctionalMap map[string]interface{}) {
