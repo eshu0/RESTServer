@@ -104,8 +104,6 @@ func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) 
 
 func (rs *RServer) ShutDown() {
 	if rs.Server != nil {
-
-		if(rs.Server.)
 		backg := context.Background()
 
 		if backg != nil {
