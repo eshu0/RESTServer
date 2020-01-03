@@ -16,3 +16,12 @@ func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func (rsc RServerCommand) Restart(w http.ResponseWriter, r *http.Request) {
+	if(rsc.Server != nil){
+		rsc.Server.Log.LogDebug("RServerCommand","HTTP server restart called")
+		rsc.Server.Restart()
+
+	}
+
+}

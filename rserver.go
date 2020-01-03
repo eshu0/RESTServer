@@ -23,6 +23,7 @@ type RServer struct {
 		Handlers []RESTHandler `json:"handlers"`
 		DefaultHandlers []DefaultRESTHandler `json:"defaulthandlers"`
 		Log slinterfaces.ISimpleLogger	`json:"-"`
+		FunctionalMap map[string]interface{} `json:"-"`
 		//Server *http.Server	`json:"-"`
 }
 
@@ -30,16 +31,27 @@ func NewRServer() (RServer, *os.File){
 
 	server := RServer{}
 	server.DefaultHandlers = []DefaultRESTHandler{}
+	server.FunctionalMap = make(map[string]interface{})
 
-	drh := DefaultRESTHandler{}
+	drhs := DefaultRESTHandler{}
 
-	drh.URL = "/Admin/Shutdown"
-	drh.MethodName = "ShutDown"
-	drh.HTTPMethod = "GET"
-	drh.FunctionalClass = "RServerCommand"
-	drh.MappedClass = RServerCommand{ Server : &server }
+	drhs.URL = "/Admin/Shutdown"
+	drhs.MethodName = "ShutDown"
+	drhs.HTTPMethod = "GET"
+	drhs.FunctionalClass = "RServerCommand"
+	drhs.MappedClass = RServerCommand{ Server : &server }
 
-	server.DefaultHandlers = append(server.DefaultHandlers, drh)
+	server.DefaultHandlers = append(server.DefaultHandlers, drhs)
+
+	drhr := DefaultRESTHandler{}
+
+	drhr.URL = "/Admin/Restart"
+	drhr.MethodName = "Restart"
+	drhr.HTTPMethod = "GET"
+	drhr.FunctionalClass = "RServerCommand"
+	drhr.MappedClass = RServerCommand{ Server : &server }
+
+	server.DefaultHandlers = append(server.DefaultHandlers, drhr)
 
 
 	// this is the dummy logger object
@@ -83,13 +95,13 @@ func (rs *RServer) MakeHandler(MethodName string, any interface{}) http.HandlerF
 	}
 }
 
-func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) *mux.Router {
+func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	r := mux.NewRouter()
 
 	for _, handl := range rs.Handlers {
 
-		funcclass, ok := FunctionalMap[handl.FunctionalClass]
+		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
 		if ok {
 			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
@@ -103,6 +115,12 @@ func (rs *RServer) MapFunctionsToHandlers(FunctionalMap map[string]interface{}) 
 	}
 
 	return r
+}
+
+func (rs *RServer) Restart() {
+ rs.ShutDown()
+ rs.ListenAndServe()
+
 }
 
 func (rs *RServer) ShutDown() {
@@ -125,8 +143,8 @@ func (rs *RServer) ShutDown() {
 
 }
 
-func (rs *RServer) ListenAndServe(FunctionalMap map[string]interface{}) {
-	r := rs.MapFunctionsToHandlers(FunctionalMap)
+func (rs *RServer) ListenAndServe() {
+	r := rs.MapFunctionsToHandlers()
 
 	Server =  &http.Server{Addr: ":"+rs.Port, Handler: r}
 	//http.ListenAndServe(":"+rs.Port, r)
