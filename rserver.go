@@ -2,14 +2,15 @@ package RESTServer
 
 import (
 	"context"
-	"net/http"
-	"reflect"
 	"encoding/json"
 	"io/ioutil"
+	"net/http"
 	"os"
-	"github.com/gorilla/mux"
-	"github.com/eshu0/simplelogger/interfaces"
+	"reflect"
+
 	"github.com/eshu0/simplelogger"
+	"github.com/eshu0/simplelogger/interfaces"
+	"github.com/gorilla/mux"
 )
 
 // The new router function creates the router and
@@ -18,41 +19,26 @@ import (
 
 var Server *http.Server
 
-type RServer struct {
-		Port string `json:"port"`
-		Handlers []RESTHandler `json:"handlers"`
-		DefaultHandlers []DefaultRESTHandler `json:"defaulthandlers"`
-		Log slinterfaces.ISimpleLogger	`json:"-"`
-		FunctionalMap map[string]interface{} `json:"-"`
-		//Server *http.Server	`json:"-"`
+type RServerConfig struct {
+	Port            string        `json:"port"`
+	Handlers        []RESTHandler `json:"handlers"`
+	DefaultHandlers []RESTHandler `json:"defaulthandlers"`
 }
 
-func NewRServer() (RServer, *os.File){
+type RServer struct {
+	Config         RServerConfig              `json:"-"`
+	Log            slinterfaces.ISimpleLogger `json:"-"`
+	FunctionalMap  map[string]interface{}     `json:"-"`
+	ConfigFilePath string                     `json:"-"`
+	//Server *http.Server	`json:"-"`
+}
+
+func NewRServer() (*RServer, *os.File) {
 
 	server := RServer{}
-	server.DefaultHandlers = []DefaultRESTHandler{}
+	server.Config = RServerConfig{}
+	server.Config.DefaultHandlers = []RESTHandler{}
 	server.FunctionalMap = make(map[string]interface{})
-
-	drhs := DefaultRESTHandler{}
-
-	drhs.URL = "/Admin/Shutdown"
-	drhs.MethodName = "ShutDown"
-	drhs.HTTPMethod = "GET"
-	drhs.FunctionalClass = "RServerCommand"
-	drhs.MappedClass = RServerCommand{ Server : &server }
-
-	server.DefaultHandlers = append(server.DefaultHandlers, drhs)
-
-	drhr := DefaultRESTHandler{}
-
-	drhr.URL = "/Admin/Restart"
-	drhr.MethodName = "Restart"
-	drhr.HTTPMethod = "GET"
-	drhr.FunctionalClass = "RServerCommand"
-	drhr.MappedClass = RServerCommand{ Server : &server }
-
-	server.DefaultHandlers = append(server.DefaultHandlers, drhr)
-
 
 	// this is the dummy logger object
 	logger := &simplelogger.SimpleLogger{}
@@ -62,13 +48,30 @@ func NewRServer() (RServer, *os.File){
 
 	server.Log = logger
 
-	return server,f1
+	return &server, f1
 }
 
+func (server *RServer) AddDefaults() {
+
+	// Default commands for server
+	// These should be removed if not required
+	rsc := RServerCommand{Server: server}
+
+	server.FunctionalMap["RServerCommand"] = rsc
+
+	server.Config.DefaultHandlers = append(server.Config.DefaultHandlers, rsc.CreateShutDownHandler())
+	server.Config.DefaultHandlers = append(server.Config.DefaultHandlers, rsc.CreateListHandler())
+	server.Config.DefaultHandlers = append(server.Config.DefaultHandlers, rsc.CreateLoadConfigHandler())
+	server.Config.DefaultHandlers = append(server.Config.DefaultHandlers, rsc.CreateSaveConfigHandler())
+
+	for _, handl := range server.Config.DefaultHandlers {
+		server.Log.LogDebugf("NewRServerWithDefaults", "Default Handler: Added %s", handl.MethodName)
+	}
+}
 
 func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
 
-	rs.Log.LogDebugf("Invoke","Method: Looking up %s ", name)
+	rs.Log.LogDebugf("Invoke", "Method: Looking up %s ", name)
 
 	inputs := make([]reflect.Value, len(args))
 	for i, _ := range args {
@@ -76,16 +79,12 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
 	}
 	val := reflect.ValueOf(any)
 
-	//if !val.IsNil() {
 	meth := val.MethodByName(name)
 	if !meth.IsZero() && !meth.IsNil() {
 		meth.Call(inputs)
 	} else {
-		rs.Log.LogDebugf("Invoke","Method: %s could not be found ", name)
+		rs.Log.LogDebugf("Invoke", "Method: %s could not be found ", name)
 	}
-	//} else {
-	//	fmt.Println(fmt.Sprintf("Invoke - Value: %s could not be found ", any))
-	//}
 
 }
 
@@ -99,28 +98,32 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	r := mux.NewRouter()
 
-	for _, handl := range rs.Handlers {
+	for _, handl := range rs.Config.Handlers {
 
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
 		if ok {
+			rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding %s", handl.MethodName)
 			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
-		}else{
-			rs.Log.LogError("MapFunctionsToHandlers","Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)
+		} else {
+			rs.Log.LogError("MapFunctionsToHandlers", "Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)
 		}
 	}
 
-	for _, handl := range rs.DefaultHandlers {
-		r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, handl.MappedClass)).Methods(handl.HTTPMethod)
+	for _, handl := range rs.Config.DefaultHandlers {
+
+		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
+
+		if ok {
+			rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding %s", handl.MethodName)
+			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
+		} else {
+			rs.Log.LogError("MapFunctionsToHandlers", "Default Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)
+		}
+
 	}
 
 	return r
-}
-
-func (rs *RServer) Restart() {
- rs.ShutDown()
- rs.ListenAndServe()
-
 }
 
 func (rs *RServer) ShutDown() {
@@ -131,14 +134,14 @@ func (rs *RServer) ShutDown() {
 
 			if err := Server.Shutdown(backg); err != nil {
 				// Error from closing listeners, or context timeout:
-				rs.Log.LogDebugf("Shutdown","HTTP server Shutdown: %v", err)
+				rs.Log.LogDebugf("Shutdown", "HTTP server Shutdown: %v", err)
 			}
-		}else{
-			rs.Log.LogError("Shutdown","Called but context.Background() was nil")
+		} else {
+			rs.Log.LogError("Shutdown", "Called but context.Background() was nil")
 		}
 
-	}else{
-		rs.Log.LogError("Shutdown","Called but server was nil")
+	} else {
+		rs.Log.LogError("Shutdown", "Called but server was nil")
 	}
 
 }
@@ -146,95 +149,64 @@ func (rs *RServer) ShutDown() {
 func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
 
-	Server =  &http.Server{Addr: ":"+rs.Port, Handler: r}
-	//http.ListenAndServe(":"+rs.Port, r)
-/*
-	idleConnsClosed := make(chan struct{})
-	go func() {
-		sigint := make(chan os.Signal, 1)
-		signal.Notify(sigint, os.Interrupt)
-		<-sigint
+	Server = &http.Server{Addr: ":" + rs.Config.Port, Handler: r}
 
-		// We received an interrupt signal, shut down.
-		if err := rs.Server.Shutdown(context.Background()); err != nil {
-			// Error from closing listeners, or context timeout:
-			rs.Log.LogDebugf("Shutdown","HTTP server Shutdown: %v", err)
-		}
-		close(idleConnsClosed)
-	}()
-*/
+	rs.FunctionalMap["RServerCommand"] = RServerCommand{Server: rs}
 
-	for _, handl := range rs.DefaultHandlers {
-		handl.MappedClass.Server = rs
-	}
+	rs.Log.LogDebugf("ListenAndServe", "Listening on: %s", rs.Config.Port)
 
 	if err := Server.ListenAndServe(); err != http.ErrServerClosed {
-		// Error starting or closing listener:
 		rs.Log.LogErrorf("HTTP server ListenAndServe", "%v", err)
 	}
 }
 
-func (rs *RServer) SaveJSONFile(path string) bool {
-	filepath := path + ".json"
-	//ok, err := rs.CheckFileExists(filepath)
-	//if  ok {
-		bytes, err1 := json.MarshalIndent(rs, "", "\t") //json.Marshal(p)
-		if err1 != nil {
-			rs.Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", path, err1.Error())
-			return false
-		}
-
-		err2 := ioutil.WriteFile(filepath, bytes, 0644)
-		if err2 != nil {
-			rs.Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", path, err2.Error())
-			return false
-		}
-
-		return true
-/*
-	} else {
-
-		if(err != nil){
-			rs.Log.LogErrorf("SaveToFile()", "'%s' was not found to save with error: %s", filepath, err.Error())
-		}else{
-			rs.Log.LogErrorf("SaveToFile()", "'%s' was not found to save", filepath)
-		}
-
+func (rs *RServer) SaveJSONFile() bool {
+	filepath := rs.ConfigFilePath + ".json"
+	bytes, err1 := json.MarshalIndent(rs.Config, "", "\t") //json.Marshal(p)
+	if err1 != nil {
+		rs.Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", filepath, err1.Error())
 		return false
 	}
-	*/
+
+	err2 := ioutil.WriteFile(filepath, bytes, 0644)
+	if err2 != nil {
+		rs.Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", filepath, err2.Error())
+		return false
+	}
+
+	return true
+
 }
 
-func (rs *RServer) LoadJSONFile(path string) bool {
-	filepath := path + ".json"
+func (rs *RServer) LoadJSONFile() bool {
+	filepath := rs.ConfigFilePath + ".json"
 	ok, err := rs.CheckFileExists(filepath)
-	if  ok {
+	if ok {
 		bytes, err1 := ioutil.ReadFile(filepath) //ReadAll(jsonFile)
 		if err1 != nil {
 			rs.Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", filepath, err1.Error())
 			return false
 		}
 
-		rserver := RServer{}
+		rserverconfig := RServerConfig{}
 
-		err2 := json.Unmarshal(bytes, &rserver)
+		err2 := json.Unmarshal(bytes, &rserverconfig)
 
 		if err2 != nil {
 			rs.Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", filepath, err2.Error())
 			return false
 		}
 
-		rs.Port = rserver.Port
-		rs.Log.LogDebugf("LoadFile()", "Read Port %s ", rserver.Port)
-
-		rs.Handlers = rserver.Handlers
+		rs.Config = rserverconfig
+		rs.Log.LogDebugf("LoadFile()", "Read Port %s ", rserverconfig.Port)
+		rs.Log.LogDebugf("LoadFile()", "Port in config %s ", rs.Config.Port)
 
 		return true
 	} else {
 
-		if(err != nil){
+		if err != nil {
 			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", filepath, err.Error())
-		}else{
+		} else {
 			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load", filepath)
 		}
 
@@ -242,10 +214,10 @@ func (rs *RServer) LoadJSONFile(path string) bool {
 	}
 }
 
-func (rs *RServer)  CheckFileExists(filename string) (bool, error) {
-    info, err := os.Stat(filename)
-    if os.IsNotExist(err) {
-        return false, err
-    }
-    return !info.IsDir(), nil
+func (rs *RServer) CheckFileExists(filename string) (bool, error) {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false, err
+	}
+	return !info.IsDir(), nil
 }
