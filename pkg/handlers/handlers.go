@@ -1,4 +1,4 @@
-package RESTServer
+package RESTHandlers
 
 type RESTHandler struct {
 	URL             string `json:"url"`

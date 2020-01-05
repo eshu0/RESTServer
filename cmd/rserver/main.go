@@ -1,8 +1,7 @@
 package main
 
 import (
-	"github.com/eshu0/RESTServer/pkg/config"
-	"github.com/eshu0/RESTServer/pkg/handlers"
+	"github.com/eshu0/RESTServer/pkg/commands"
 	"github.com/eshu0/RESTServer/pkg/server"
 )
 
@@ -24,7 +23,7 @@ func main() {
 		return
 	}
 
-	server.AddDefaults()
+	RESTCommands.AddDefaults(server)
 
 	// save the updated config
 	server.ConfigFilePath = "./updated.config"

@@ -4,11 +4,12 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/eshu0/RESTServer/pkg/server"
+	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
+	Server "github.com/eshu0/RESTServer/pkg/server"
 )
 
 type RServerCommand struct {
-	Server *RESTServer.RServer
+	Server *Server.RServer
 }
 
 func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
@@ -51,8 +52,8 @@ func (rsc RServerCommand) SaveConfig(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (rsc RServerCommand) CreateShutDownHandler() RESTHandler {
-	drhs := RESTHandler{}
+func (rsc RServerCommand) CreateShutDownHandler() Handlers.RESTHandler {
+	drhs := Handlers.RESTHandler{}
 
 	drhs.URL = "/admin/shutdown"
 	drhs.MethodName = "ShutDown"
@@ -61,8 +62,8 @@ func (rsc RServerCommand) CreateShutDownHandler() RESTHandler {
 	return drhs
 }
 
-func (rsc RServerCommand) CreateListHandler() RESTHandler {
-	drhr := RESTHandler{}
+func (rsc RServerCommand) CreateListHandler() Handlers.RESTHandler {
+	drhr := Handlers.RESTHandler{}
 
 	drhr.URL = "/admin/listcommands"
 	drhr.MethodName = "ListCommands"
@@ -71,8 +72,8 @@ func (rsc RServerCommand) CreateListHandler() RESTHandler {
 	return drhr
 }
 
-func (rsc RServerCommand) CreateLoadConfigHandler() RESTHandler {
-	drhr := RESTHandler{}
+func (rsc RServerCommand) CreateLoadConfigHandler() Handlers.RESTHandler {
+	drhr := Handlers.RESTHandler{}
 
 	drhr.URL = "/admin/loadconfig"
 	drhr.MethodName = "LoadConfig"
@@ -81,8 +82,8 @@ func (rsc RServerCommand) CreateLoadConfigHandler() RESTHandler {
 	return drhr
 }
 
-func (rsc RServerCommand) CreateSaveConfigHandler() RESTHandler {
-	drhr := RESTHandler{}
+func (rsc RServerCommand) CreateSaveConfigHandler() Handlers.RESTHandler {
+	drhr := Handlers.RESTHandler{}
 
 	drhr.URL = "/admin/saveconfig"
 	drhr.MethodName = "SaveConfig"
@@ -91,7 +92,7 @@ func (rsc RServerCommand) CreateSaveConfigHandler() RESTHandler {
 	return drhr
 }
 
-func AddDefaults(server *RServer) {
+func AddDefaults(server *Server.RServer) {
 
 	// Default commands for server
 	// These should be removed if not required
@@ -109,6 +110,6 @@ func AddDefaults(server *RServer) {
 	}
 }
 
-func SetDefaultFunctionalMap(server *RServer) {
+func SetDefaultFunctionalMap(server *Server.RServer) {
 	server.FunctionalMap["RServerCommand"] = RServerCommand{Server: server}
 }
