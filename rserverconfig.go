@@ -24,8 +24,13 @@ type RServerConfig struct {
 	DefaultHandlers []RESTHandler `json:"defaulthandlers"`
 }
 
-//server.Config = RServerConfig{}
-//server.Config.DefaultHandlers = []RESTHandler{}
+func NewRServerConfig() IRServerConfig {
+	Config := RServerConfig{}
+	Config.DefaultHandlers = []RESTHandler{}
+	Config.Handlers = []RESTHandler{}
+	Config.Port = "7777"
+	return &Config
+}
 
 func (rsc *RServerConfig) GetHandlers() []RESTHandler {
 	return rsc.Handlers
