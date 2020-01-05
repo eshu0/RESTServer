@@ -1,4 +1,4 @@
-package RESTServer
+package RESTCommands
 
 import (
 	"html/template"
@@ -89,4 +89,26 @@ func (rsc RServerCommand) CreateSaveConfigHandler() RESTHandler {
 	drhr.HTTPMethod = "GET"
 	drhr.FunctionalClass = "RServerCommand"
 	return drhr
+}
+
+func AddDefaults(server *RServer) {
+
+	// Default commands for server
+	// These should be removed if not required
+	rsc := RServerCommand{Server: server}
+
+	server.FunctionalMap["RServerCommand"] = rsc
+
+	server.Config.AddDefaultHandler(rsc.CreateShutDownHandler())
+	server.Config.AddDefaultHandler(rsc.CreateListHandler())
+	server.Config.AddDefaultHandler(rsc.CreateLoadConfigHandler())
+	server.Config.AddDefaultHandler(rsc.CreateSaveConfigHandler())
+
+	for _, handl := range server.Config.GetDefaultHandlers() {
+		server.Log.LogDebugf("NewRServerWithDefaults", "Default Handler: Added %s", handl.MethodName)
+	}
+}
+
+func SetDefaultFunctionalMap(server *RServer) {
+	server.FunctionalMap["RServerCommand"] = RServerCommand{Server: server}
 }

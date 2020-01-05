@@ -39,24 +39,6 @@ func NewRServer(config RESTServer.IRServerConfig) (*RServer, *os.File) {
 	return &server, f1
 }
 
-func (server *RServer) AddDefaults() {
-
-	// Default commands for server
-	// These should be removed if not required
-	rsc := RESTServer.RServerCommand{Server: server}
-
-	server.FunctionalMap["RServerCommand"] = rsc
-
-	server.Config.AddDefaultHandler(rsc.CreateShutDownHandler())
-	server.Config.AddDefaultHandler(rsc.CreateListHandler())
-	server.Config.AddDefaultHandler(rsc.CreateLoadConfigHandler())
-	server.Config.AddDefaultHandler(rsc.CreateSaveConfigHandler())
-
-	for _, handl := range server.Config.GetDefaultHandlers() {
-		server.Log.LogDebugf("NewRServerWithDefaults", "Default Handler: Added %s", handl.MethodName)
-	}
-}
-
 func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
 
 	rs.Log.LogDebugf("Invoke", "Method: Looking up %s ", name)
@@ -138,8 +120,6 @@ func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
 
 	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: r}
-
-	rs.FunctionalMap["RServerCommand"] = RServerCommand{Server: rs}
 
 	rs.Log.LogDebugf("ListenAndServe", "Listening on: %s", rs.Config.GetAddress())
 
