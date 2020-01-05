@@ -2,8 +2,6 @@ package RESTServer
 
 import (
 	"context"
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"reflect"
@@ -13,31 +11,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// The new router function creates the router and
-// returns it to us. We can now use this function
-// to instantiate and test the router outside of the main function
-
+// This is the http Server that will host the HTTP requests
 var Server *http.Server
 
-type RServerConfig struct {
-	Port            string        `json:"port"`
-	Handlers        []RESTHandler `json:"handlers"`
-	DefaultHandlers []RESTHandler `json:"defaulthandlers"`
-}
-
 type RServer struct {
-	Config         RServerConfig              `json:"-"`
+	Config         IRServerConfig             `json:"-"`
 	Log            slinterfaces.ISimpleLogger `json:"-"`
 	FunctionalMap  map[string]interface{}     `json:"-"`
 	ConfigFilePath string                     `json:"-"`
-	//Server *http.Server	`json:"-"`
 }
 
-func NewRServer() (*RServer, *os.File) {
+func NewRServer(config *RServerConfig) (*RServer, *os.File) {
 
 	server := RServer{}
-	server.Config = RServerConfig{}
-	server.Config.DefaultHandlers = []RESTHandler{}
 	server.FunctionalMap = make(map[string]interface{})
 
 	// this is the dummy logger object
@@ -59,12 +45,12 @@ func (server *RServer) AddDefaults() {
 
 	server.FunctionalMap["RServerCommand"] = rsc
 
-	server.Config.DefaultHandlers = append(server.Config.DefaultHandlers, rsc.CreateShutDownHandler())
-	server.Config.DefaultHandlers = append(server.Config.DefaultHandlers, rsc.CreateListHandler())
-	server.Config.DefaultHandlers = append(server.Config.DefaultHandlers, rsc.CreateLoadConfigHandler())
-	server.Config.DefaultHandlers = append(server.Config.DefaultHandlers, rsc.CreateSaveConfigHandler())
+	server.Config.AddDefaultHandler(rsc.CreateShutDownHandler())
+	server.Config.AddDefaultHandler(rsc.CreateListHandler())
+	server.Config.AddDefaultHandler(rsc.CreateLoadConfigHandler())
+	server.Config.AddDefaultHandler(rsc.CreateSaveConfigHandler())
 
-	for _, handl := range server.Config.DefaultHandlers {
+	for _, handl := range server.Config.GetDefaultHandlers() {
 		server.Log.LogDebugf("NewRServerWithDefaults", "Default Handler: Added %s", handl.MethodName)
 	}
 }
@@ -98,7 +84,7 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	r := mux.NewRouter()
 
-	for _, handl := range rs.Config.Handlers {
+	for _, handl := range rs.Config.GetHandlers() {
 
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
@@ -110,7 +96,7 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 		}
 	}
 
-	for _, handl := range rs.Config.DefaultHandlers {
+	for _, handl := range rs.Config.GetDefaultHandlers() {
 
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
@@ -149,73 +135,27 @@ func (rs *RServer) ShutDown() {
 func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
 
-	Server = &http.Server{Addr: ":" + rs.Config.Port, Handler: r}
+	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: r}
 
 	rs.FunctionalMap["RServerCommand"] = RServerCommand{Server: rs}
 
-	rs.Log.LogDebugf("ListenAndServe", "Listening on: %s", rs.Config.Port)
+	rs.Log.LogDebugf("ListenAndServe", "Listening on: %s", rs.Config.GetAddress())
 
 	if err := Server.ListenAndServe(); err != http.ErrServerClosed {
 		rs.Log.LogErrorf("HTTP server ListenAndServe", "%v", err)
 	}
 }
 
-func (rs *RServer) SaveJSONFile() bool {
-	bytes, err1 := json.MarshalIndent(rs.Config, "", "\t") //json.Marshal(p)
-	if err1 != nil {
-		rs.Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", rs.ConfigFilePath, err1.Error())
-		return false
-	}
-
-	err2 := ioutil.WriteFile(rs.ConfigFilePath, bytes, 0644)
-	if err2 != nil {
-		rs.Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", rs.ConfigFilePath, err2.Error())
-		return false
-	}
-
-	return true
-
+func (rs *RServer) SaveConfig() bool {
+	ok := rs.Config.Save(rs.ConfigFilePath, rs.Log)
+	return ok
 }
 
-func (rs *RServer) LoadJSONFile() bool {
-	ok, err := rs.CheckFileExists(rs.ConfigFilePath)
+func (rs *RServer) LoadConfig() bool {
+	newconfig, ok := rs.Config.Load(rs.ConfigFilePath, rs.Log)
 	if ok {
-		bytes, err1 := ioutil.ReadFile(rs.ConfigFilePath) //ReadAll(jsonFile)
-		if err1 != nil {
-			rs.Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", rs.ConfigFilePath, err1.Error())
-			return false
-		}
-
-		rserverconfig := RServerConfig{}
-
-		err2 := json.Unmarshal(bytes, &rserverconfig)
-
-		if err2 != nil {
-			rs.Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", rs.ConfigFilePath, err2.Error())
-			return false
-		}
-
-		rs.Config = rserverconfig
-		rs.Log.LogDebugf("LoadFile()", "Read Port %s ", rserverconfig.Port)
-		rs.Log.LogDebugf("LoadFile()", "Port in config %s ", rs.Config.Port)
-
-		return true
-	} else {
-
-		if err != nil {
-			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", rs.ConfigFilePath, err.Error())
-		} else {
-			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load", rs.ConfigFilePath)
-		}
-
-		return false
+		rs.Config = newconfig
 	}
-}
 
-func (rs *RServer) CheckFileExists(filename string) (bool, error) {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false, err
-	}
-	return !info.IsDir(), nil
+	return ok
 }

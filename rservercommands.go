@@ -38,14 +38,14 @@ func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request) {
 func (rsc RServerCommand) LoadConfig(w http.ResponseWriter, r *http.Request) {
 	if rsc.Server != nil {
 		rsc.Server.Log.LogDebug("RServerCommand", "Load Config called")
-		rsc.Server.LoadJSONFile()
+		rsc.Server.LoadConfig()
 	}
 }
 
 func (rsc RServerCommand) SaveConfig(w http.ResponseWriter, r *http.Request) {
 	if rsc.Server != nil {
 		rsc.Server.Log.LogDebug("RServerCommand", "Save Config called")
-		rsc.Server.SaveJSONFile()
+		rsc.Server.SaveConfig()
 	}
 }
 
