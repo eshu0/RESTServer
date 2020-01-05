@@ -21,9 +21,10 @@ type RServer struct {
 	ConfigFilePath string                     `json:"-"`
 }
 
-func NewRServer(config *RServerConfig) (*RServer, *os.File) {
+func NewRServer(config IRServerConfig) (*RServer, *os.File) {
 
 	server := RServer{}
+	server.Config = config
 	server.FunctionalMap = make(map[string]interface{})
 
 	// this is the dummy logger object
