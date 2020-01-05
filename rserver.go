@@ -161,16 +161,15 @@ func (rs *RServer) ListenAndServe() {
 }
 
 func (rs *RServer) SaveJSONFile() bool {
-	filepath := rs.ConfigFilePath + ".json"
 	bytes, err1 := json.MarshalIndent(rs.Config, "", "\t") //json.Marshal(p)
 	if err1 != nil {
-		rs.Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", filepath, err1.Error())
+		rs.Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", rs.ConfigFilePath, err1.Error())
 		return false
 	}
 
-	err2 := ioutil.WriteFile(filepath, bytes, 0644)
+	err2 := ioutil.WriteFile(rs.ConfigFilePath, bytes, 0644)
 	if err2 != nil {
-		rs.Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", filepath, err2.Error())
+		rs.Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", rs.ConfigFilePath, err2.Error())
 		return false
 	}
 
@@ -179,12 +178,11 @@ func (rs *RServer) SaveJSONFile() bool {
 }
 
 func (rs *RServer) LoadJSONFile() bool {
-	filepath := rs.ConfigFilePath + ".json"
-	ok, err := rs.CheckFileExists(filepath)
+	ok, err := rs.CheckFileExists(rs.ConfigFilePath)
 	if ok {
-		bytes, err1 := ioutil.ReadFile(filepath) //ReadAll(jsonFile)
+		bytes, err1 := ioutil.ReadFile(rs.ConfigFilePath) //ReadAll(jsonFile)
 		if err1 != nil {
-			rs.Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", filepath, err1.Error())
+			rs.Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", rs.ConfigFilePath, err1.Error())
 			return false
 		}
 
@@ -193,7 +191,7 @@ func (rs *RServer) LoadJSONFile() bool {
 		err2 := json.Unmarshal(bytes, &rserverconfig)
 
 		if err2 != nil {
-			rs.Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", filepath, err2.Error())
+			rs.Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", rs.ConfigFilePath, err2.Error())
 			return false
 		}
 
@@ -205,9 +203,9 @@ func (rs *RServer) LoadJSONFile() bool {
 	} else {
 
 		if err != nil {
-			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", filepath, err.Error())
+			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", rs.ConfigFilePath, err.Error())
 		} else {
-			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load", filepath)
+			rs.Log.LogErrorf("LoadFile()", "'%s' was not found to load", rs.ConfigFilePath)
 		}
 
 		return false
