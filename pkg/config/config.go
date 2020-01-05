@@ -1,11 +1,11 @@
-package RESTServer
+package RESTConfig
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
 
-	"github.com/eshu0/RESTServer/pkg/handlers"
+	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	"github.com/eshu0/simplelogger/interfaces"
 )
 
@@ -13,31 +13,31 @@ type IRServerConfig interface {
 	GetAddress() string
 	Save(ConfigFilePath string, Log slinterfaces.ISimpleLogger) bool
 	Load(ConfigFilePath string, Log slinterfaces.ISimpleLogger) (IRServerConfig, bool)
-	AddHandler(Handler RESTServer.RESTHandler)
-	AddDefaultHandler(Handler RESTServer.RESTHandler)
-	GetHandlers() []RESTServer.RESTHandler
-	GetDefaultHandlers() []RESTServer.RESTHandler
+	AddHandler(Handler Handlers.RESTHandler)
+	AddDefaultHandler(Handler Handlers.RESTHandler)
+	GetHandlers() []Handlers.RESTHandler
+	GetDefaultHandlers() []Handlers.RESTHandler
 }
 
 type RServerConfig struct {
-	Port            string                   `json:"port"`
-	Handlers        []RESTServer.RESTHandler `json:"handlers"`
-	DefaultHandlers []RESTServer.RESTHandler `json:"defaulthandlers"`
+	Port            string                 `json:"port"`
+	Handlers        []Handlers.RESTHandler `json:"handlers"`
+	DefaultHandlers []Handlers.RESTHandler `json:"defaulthandlers"`
 }
 
 func NewRServerConfig() IRServerConfig {
 	Config := RServerConfig{}
-	Config.DefaultHandlers = []RESTServer.RESTHandler{}
-	Config.Handlers = []RESTServer.RESTHandler{}
+	Config.DefaultHandlers = []Handlers.RESTHandler{}
+	Config.Handlers = []Handlers.RESTHandler{}
 	Config.Port = "7777"
 	return &Config
 }
 
-func (rsc *RServerConfig) GetHandlers() []RESTServer.RESTHandler {
+func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
 	return rsc.Handlers
 }
 
-func (rsc *RServerConfig) GetDefaultHandlers() []RESTServer.RESTHandler {
+func (rsc *RServerConfig) GetDefaultHandlers() []Handlers.RESTHandler {
 	return rsc.DefaultHandlers
 }
 
@@ -45,11 +45,11 @@ func (rsc *RServerConfig) GetAddress() string {
 	return ":" + rsc.Port
 }
 
-func (rsc *RServerConfig) AddDefaultHandler(Handler RESTServer.RESTHandler) {
+func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
 	rsc.DefaultHandlers = append(rsc.DefaultHandlers, Handler)
 }
 
-func (rsc *RServerConfig) AddHandler(Handler RESTServer.RESTHandler) {
+func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
 	rsc.Handlers = append(rsc.Handlers, Handler)
 }
 

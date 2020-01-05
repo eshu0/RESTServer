@@ -2,12 +2,13 @@ package main
 
 import (
 	"github.com/eshu0/RESTServer/pkg/commands"
+	"github.com/eshu0/RESTServer/pkg/config"
 	"github.com/eshu0/RESTServer/pkg/server"
 )
 
 func main() {
 
-	conf := RESTServer.NewRServerConfig()
+	conf := RESTConfig.NewRServerConfig()
 
 	// Create a new REST Server
 	server, f1 := RESTServer.NewRServer(conf)
@@ -24,6 +25,7 @@ func main() {
 	}
 
 	RESTCommands.AddDefaults(server)
+	RESTCommands.SetDefaultFunctionalMap(server)
 
 	// save the updated config
 	server.ConfigFilePath = "./updated.config"
