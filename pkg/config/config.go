@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/eshu0/RESTServer/pkg/handlers"
 	"github.com/eshu0/simplelogger/interfaces"
 )
 
@@ -12,31 +13,31 @@ type IRServerConfig interface {
 	GetAddress() string
 	Save(ConfigFilePath string, Log slinterfaces.ISimpleLogger) bool
 	Load(ConfigFilePath string, Log slinterfaces.ISimpleLogger) (IRServerConfig, bool)
-	AddHandler(Handler RESTHandler)
-	AddDefaultHandler(Handler RESTHandler)
-	GetHandlers() []RESTHandler
-	GetDefaultHandlers() []RESTHandler
+	AddHandler(Handler RESTServer.RESTHandler)
+	AddDefaultHandler(Handler RESTServer.RESTHandler)
+	GetHandlers() []RESTServer.RESTHandler
+	GetDefaultHandlers() []RESTServer.RESTHandler
 }
 
 type RServerConfig struct {
-	Port            string        `json:"port"`
-	Handlers        []RESTHandler `json:"handlers"`
-	DefaultHandlers []RESTHandler `json:"defaulthandlers"`
+	Port            string                   `json:"port"`
+	Handlers        []RESTServer.RESTHandler `json:"handlers"`
+	DefaultHandlers []RESTServer.RESTHandler `json:"defaulthandlers"`
 }
 
 func NewRServerConfig() IRServerConfig {
 	Config := RServerConfig{}
-	Config.DefaultHandlers = []RESTHandler{}
-	Config.Handlers = []RESTHandler{}
+	Config.DefaultHandlers = []RESTServer.RESTHandler{}
+	Config.Handlers = []RESTServer.RESTHandler{}
 	Config.Port = "7777"
 	return &Config
 }
 
-func (rsc *RServerConfig) GetHandlers() []RESTHandler {
+func (rsc *RServerConfig) GetHandlers() []RESTServer.RESTHandler {
 	return rsc.Handlers
 }
 
-func (rsc *RServerConfig) GetDefaultHandlers() []RESTHandler {
+func (rsc *RServerConfig) GetDefaultHandlers() []RESTServer.RESTHandler {
 	return rsc.DefaultHandlers
 }
 
@@ -44,11 +45,11 @@ func (rsc *RServerConfig) GetAddress() string {
 	return ":" + rsc.Port
 }
 
-func (rsc *RServerConfig) AddDefaultHandler(Handler RESTHandler) {
+func (rsc *RServerConfig) AddDefaultHandler(Handler RESTServer.RESTHandler) {
 	rsc.DefaultHandlers = append(rsc.DefaultHandlers, Handler)
 }
 
-func (rsc *RServerConfig) AddHandler(Handler RESTHandler) {
+func (rsc *RServerConfig) AddHandler(Handler RESTServer.RESTHandler) {
 	rsc.Handlers = append(rsc.Handlers, Handler)
 }
 

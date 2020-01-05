@@ -6,6 +6,7 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/eshu0/RESTServer/pkg/config"
 	"github.com/eshu0/simplelogger"
 	"github.com/eshu0/simplelogger/interfaces"
 	"github.com/gorilla/mux"
@@ -15,13 +16,13 @@ import (
 var Server *http.Server
 
 type RServer struct {
-	Config         IRServerConfig             `json:"-"`
+	Config         RESTServer.IRServerConfig  `json:"-"`
 	Log            slinterfaces.ISimpleLogger `json:"-"`
 	FunctionalMap  map[string]interface{}     `json:"-"`
 	ConfigFilePath string                     `json:"-"`
 }
 
-func NewRServer(config IRServerConfig) (*RServer, *os.File) {
+func NewRServer(config RESTServer.IRServerConfig) (*RServer, *os.File) {
 
 	server := RServer{}
 	server.Config = config
@@ -42,7 +43,7 @@ func (server *RServer) AddDefaults() {
 
 	// Default commands for server
 	// These should be removed if not required
-	rsc := RServerCommand{Server: server}
+	rsc := RESTServer.RServerCommand{Server: server}
 
 	server.FunctionalMap["RServerCommand"] = rsc
 

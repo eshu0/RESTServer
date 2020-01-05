@@ -3,10 +3,12 @@ package RESTServer
 import (
 	"html/template"
 	"net/http"
+
+	"github.com/eshu0/RESTServer/pkg/server"
 )
 
 type RServerCommand struct {
-	Server *RServer
+	Server *RESTServer.RServer
 }
 
 func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
