@@ -36,7 +36,7 @@ func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request) {
 		err := errors.New("should not see this error")
 
 		if rsc.Server.Config.HasTemplate() {
-			//t, err = template.ParseFiles(rsc.Server.Config.GetTemplatePath())
+			t, err = template.ParseFiles(rsc.Server.Config.GetTemplatePath())
 		} else {
 			doc := "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Available REST API Calls</title></head><body><h1>Available REST API Calls</h1><h2>Custom</h2>{{range .Handlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div>{{else}}<div><strong>None</strong></div>{{end}}<h2>Default</h2>{{range .DefaultHandlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div></div>{{else}}<div><strong>No Handlers</strong></div>{{end}}</body></html>"
 			t, err = template.New("list").Parse(doc)
