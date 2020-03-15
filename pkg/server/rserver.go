@@ -3,7 +3,6 @@ package RESTServer
 import (
 	"context"
 	"net/http"
-	"os"
 	"reflect"
 
 	Config "github.com/eshu0/RESTServer/pkg/config"
@@ -22,7 +21,7 @@ type RServer struct {
 	ConfigFilePath string                 `json:"-"`
 }
 
-func NewRServer(config Config.IRServerConfig) (*RServer, *os.File) {
+func NewRServer(config Config.IRServerConfig) (*RServer) {
 
 	server := RServer{}
 	server.Config = config
@@ -32,11 +31,11 @@ func NewRServer(config Config.IRServerConfig) (*RServer, *os.File) {
 	logger := &sl.SimpleLogger{}
 
 	// lets open a flie log using the session
-	f1 := logger.OpenSessionFileLog("restserver.log", "123")
-	
+	logger.OpenSessionFileLog("restserver.log", "123")
+
 	server.Log = logger
 
-	return &server, f1
+	return &server
 }
 
 func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {

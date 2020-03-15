@@ -16,10 +16,11 @@ func main() {
 	conf := RESTConfig.NewRServerConfig()
 
 	// Create a new REST Server
-	server, f1 := RESTServer.NewRServer(conf)
+	server := RESTServer.NewRServer(conf)
 
+	log := server.Log
 	//defer the close till the shell has closed
-	defer f1.Close()
+	defer log.CloseAllChannels()
 
 	if ConfigFilePath != nil && *ConfigFilePath != "" {
 		// load this first
