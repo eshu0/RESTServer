@@ -1,0 +1,29 @@
+{
+	"port": "666",
+	"handlers": [
+		{
+			"url": "/test",
+			"methodname": "GetSomething",
+			"httpmethod": "GET",
+			"functionalclass": "TestStruct"
+		},
+		{
+			"url": "/test/call",
+			"methodname": "CallSomething",
+			"httpmethod": "GET",
+			"functionalclass": "TestStruct"
+		},
+		{
+			"url": "/anothertest/",
+			"methodname": "GetSomething",
+			"httpmethod": "GET",
+			"functionalclass": "TestAnother"
+		},
+		{
+			"url": "/anothertest/call",
+			"methodname": "CallSomething",
+			"httpmethod": "GET",
+			"functionalclass": "TestAnother"
+		}
+	]
+}
