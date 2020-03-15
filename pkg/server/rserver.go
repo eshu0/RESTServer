@@ -33,8 +33,7 @@ func NewRServer(config Config.IRServerConfig) (*RServer, *os.File) {
 
 	// lets open a flie log using the session
 	f1 := logger.OpenSessionFileLog("restserver.log", "123")
-	logger.OpenSessionFileLog("restserver.log", "456")
-
+	
 	server.Log = logger
 
 	return &server, f1
