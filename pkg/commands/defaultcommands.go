@@ -1,6 +1,7 @@
 package RESTCommands
 
 import (
+	"errors"
 	"html/template"
 	"net/http"
 
@@ -31,12 +32,21 @@ func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request) {
 	if rsc.Server != nil {
 		rsc.Server.Log.LogDebug("RServerCommand", "List Commands called")
 
-		doc := "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Available REST API Calls</title></head><body><h1>Available REST API Calls</h1><h2>Custom</h2>{{range .Handlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div>{{else}}<div><strong>None</strong></div>{{end}}<h2>Default</h2>{{range .DefaultHandlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div></div>{{else}}<div><strong>No Handlers</strong></div>{{end}}</body></html>"
-		t, err := template.New("list").Parse(doc)
+		t := template.New("old") // *Template{}
+		err := errors.New("should not see this error")
+
+		if rsc.Server.Config.HasTemplate() {
+			//t, err = template.ParseFiles(rsc.Server.Config.GetTemplatePath())
+		} else {
+			doc := "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Available REST API Calls</title></head><body><h1>Available REST API Calls</h1><h2>Custom</h2>{{range .Handlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div>{{else}}<div><strong>None</strong></div>{{end}}<h2>Default</h2>{{range .DefaultHandlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div></div>{{else}}<div><strong>No Handlers</strong></div>{{end}}</body></html>"
+			t, err = template.New("list").Parse(doc)
+		}
+
 		if err != nil {
 			rsc.Server.Log.LogErrorf("RServerCommand", "Error : %s", err.Error())
 			return
 		}
+
 		err = t.Execute(w, rsc.Server.Config) // Template(w, "T", "<script>alert('you have been pwned')</script>")
 		if err != nil {
 			rsc.Server.Log.LogErrorf("RServerCommand", "Error : %s", err.Error())
