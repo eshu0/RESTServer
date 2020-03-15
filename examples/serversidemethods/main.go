@@ -1,8 +1,6 @@
 package main
 
 import (
-	"flag"
-
 	"github.com/eshu0/RESTServer/pkg/commands"
 	"github.com/eshu0/RESTServer/pkg/config"
 	"github.com/eshu0/RESTServer/pkg/server"
@@ -10,30 +8,37 @@ import (
 
 func main() {
 
-	ConfigFilePath := flag.String("config", "", "Filepath to config file")
-	flag.Parse()
-
+	// create a new server
 	conf := RESTConfig.NewRServerConfig()
 
 	// Create a new REST Server
 	server := RESTServer.NewRServer(conf)
 
-	log := server.Log
-	//defer the close till the shell has closed
-	defer log.CloseAllChannels()
+	//defer the close till the server has closed
+	defer server.Log.CloseAllChannels()
 
-	if ConfigFilePath != nil && *ConfigFilePath != "" {
-		// load this first
-		server.ConfigFilePath = *ConfigFilePath
-		ok := server.LoadConfig()
+	// load this first
+	server.ConfigFilePath = "./config.json"
 
-		if !ok {
-			return
-		}
+	ok := server.LoadConfig()
+
+	if !ok {
+		return
 	}
 
+	// add the defaults here
 	RESTCommands.AddDefaults(server)
 	RESTCommands.SetDefaultFunctionalMap(server)
+
+	// this registers the custom structures
+	// in the JSON config the FunctionalClass is the name used for the map "TestAnother"
+	// if these are not public and spelt correctly the lookups will fail
+	server.Register("TestAnother",TestAnother{})
+	server.Register("TestStruct",TestStruct{})
+
+	// as a test save the updated config
+	server.ConfigFilePath = "./updated.json"
+	server.SaveConfig()
 
 	// start Listen Server, this build the mapping and creates Handler/
 	// also fires the "http listen and server method"

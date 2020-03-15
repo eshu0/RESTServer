@@ -29,7 +29,10 @@ func main() {
 	// add the defaults here
 	RESTCommands.AddDefaults(server)
 	RESTCommands.SetDefaultFunctionalMap(server)
-
+	// as a test save the updated config
+	server.ConfigFilePath = "./updated.json"
+	server.SaveConfig()
+	
 	// start Listen Server, this build the mapping and creates Handler/
 	// also fires the "http listen and server method"
 	server.ListenAndServe()
