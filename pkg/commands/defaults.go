@@ -37,7 +37,7 @@ func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request) {
 
 		if rsc.Server.Config.HasTemplate() {
 			rsc.Server.Log.LogDebug("RServerCommand", "We have a template path")
-			rsc.Server.Log.LogDebug("RServerCommand", rsc.Server.Config.GetTemplatePath())			
+			rsc.Server.Log.LogDebug("RServerCommand", rsc.Server.Config.GetTemplatePath())
 			t, err = template.ParseFiles(rsc.Server.Config.GetTemplatePath())
 		} else {
 			doc := "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Available REST API Calls</title></head><body><h1>Available REST API Calls</h1><h2>Custom</h2>{{range .Handlers}}<div><a href=\"{{ .URL }}\">{{ .URL }} will point to {{ .HTTPMethod }} {{ .FunctionalClass }}.{{ .MethodName }} </a></div>{{else}}<div><strong>None</strong></div>{{end}}<h2>Default</h2>{{range .DefaultHandlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div></div>{{else}}<div><strong>No Handlers</strong></div>{{end}}</body></html>"
@@ -130,5 +130,5 @@ func AddDefaults(server *Server.RServer) {
 }
 
 func SetDefaultFunctionalMap(server *Server.RServer) {
-	server.FunctionalMap["RServerCommand"] = RServerCommand{Server: server}
+	server.Register("RServerCommand", RServerCommand{Server: server})
 }

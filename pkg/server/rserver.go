@@ -94,6 +94,10 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 	return r
 }
 
+func (rs *RServer) Register(FunctionClass string, data interface{}) {
+	rs.FunctionalMap[FunctionClass] = data
+}
+
 func (rs *RServer) ShutDown() {
 	if Server != nil {
 		backg := context.Background()

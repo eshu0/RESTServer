@@ -15,3 +15,7 @@
 # vendor/
 
 rserver
+restserver.log
+serversidemethods
+customlisttemplate
+updated.json
