@@ -1,6 +1,8 @@
 github.com/eshu0/RESTServer v0.0.0-20200105131623-e1123b77fd65/go.mod h1:60I5spcX471TmfDA8cMKVBgyQk07MpeRi2tBkKSUTNo=
 github.com/eshu0/simplelogger v0.0.0-20200103131146-05fb117b650a h1:yoeI6qxaquHflzXfALcUiVoArqfvE/WHwTEkAnpsb/s=
 github.com/eshu0/simplelogger v0.0.0-20200103131146-05fb117b650a/go.mod h1:d+JmzUtR/74DYEsNdzpsOWZYUbhACcMrrXb4lCBdQGE=
+github.com/eshu0/simplelogger v0.0.0-20200315110533-88bdac28816a h1:6jTTk+IVOVpcemvcC+0+mUGIMLknJ3rRdC3r/a9z2R8=
+github.com/eshu0/simplelogger v0.0.0-20200315110533-88bdac28816a/go.mod h1:d+JmzUtR/74DYEsNdzpsOWZYUbhACcMrrXb4lCBdQGE=
 github.com/go-kit/kit v0.9.0 h1:wDJmvq38kDhkVxi50ni9ykkdUr1PKgqKOoi01fa0Mdk=
 github.com/go-kit/kit v0.9.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
 github.com/go-logfmt/logfmt v0.5.0 h1:TrB8swr/68K7m9CcGut2g3UOihhbcbiMAYiuTXdEih4=

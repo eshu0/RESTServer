@@ -12,12 +12,19 @@ type RServerCommand struct {
 	Server *Server.RServer
 }
 
+func checkRCommand(rsc RServerCommand) bool {
+	if rsc.Server != nil {
+		return false
+	}
+
+	return true
+}
+
 func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
 	if rsc.Server != nil {
 		rsc.Server.Log.LogDebug("RServerCommand", "HTTP server shutdown called")
 		rsc.Server.ShutDown()
 	}
-
 }
 
 func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request) {

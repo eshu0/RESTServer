@@ -7,9 +7,8 @@ import (
 	"reflect"
 
 	Config "github.com/eshu0/RESTServer/pkg/config"
-	//Handlers "github.com/eshu0/RESTServer/pkg/handlers"
-	"github.com/eshu0/simplelogger"
-	"github.com/eshu0/simplelogger/interfaces"
+	sl "github.com/eshu0/simplelogger"
+	sli "github.com/eshu0/simplelogger/interfaces"
 	"github.com/gorilla/mux"
 )
 
@@ -17,10 +16,10 @@ import (
 var Server *http.Server
 
 type RServer struct {
-	Config         Config.IRServerConfig      `json:"-"`
-	Log            slinterfaces.ISimpleLogger `json:"-"`
-	FunctionalMap  map[string]interface{}     `json:"-"`
-	ConfigFilePath string                     `json:"-"`
+	Config         Config.IRServerConfig  `json:"-"`
+	Log            sli.ISimpleLogger      `json:"-"`
+	FunctionalMap  map[string]interface{} `json:"-"`
+	ConfigFilePath string                 `json:"-"`
 }
 
 func NewRServer(config Config.IRServerConfig) (*RServer, *os.File) {
@@ -30,10 +29,11 @@ func NewRServer(config Config.IRServerConfig) (*RServer, *os.File) {
 	server.FunctionalMap = make(map[string]interface{})
 
 	// this is the dummy logger object
-	logger := &simplelogger.SimpleLogger{}
+	logger := &sl.SimpleLogger{}
 
 	// lets open a flie log using the session
 	f1 := logger.OpenSessionFileLog("restserver.log", "123")
+	logger.OpenSessionFileLog("restserver.log", "456")
 
 	server.Log = logger
 
