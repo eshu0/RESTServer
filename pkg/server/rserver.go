@@ -27,13 +27,12 @@ func NewRServer(config Config.IRServerConfig) (*RServer) {
 	server.Config = config
 	server.FunctionalMap = make(map[string]interface{})
 
-	// this is the dummy logger object
-	logger := &sl.SimpleLogger{}
+	logger := sl.NewSimpleLogger("restserver.log", "123")
 
 	// lets open a flie log using the session
-	logger.OpenSessionFileLog("restserver.log", "123")
+	logger.OpenAllChannels()
 
-	server.Log = logger
+	server.Log = &logger
 
 	return &server
 }
