@@ -74,8 +74,13 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 			rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding %s", handl.MethodName)
 			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
 		} else {
-			rs.Log.LogError("MapFunctionsToHandlers", "Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)
+			if handl.StaticDir != "" {
+				r.PathPrefix(handl.StaticDir).Handler(http.StripPrefix(handl.StaticDir, http.FileServer(http.Dir("."+handl.StaticDir))))
+			} else {
+				rs.Log.LogError("MapFunctionsToHandlers", "Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)		
+			}
 		}
+
 	}
 
 	for _, handl := range rs.Config.GetDefaultHandlers() {
@@ -86,7 +91,11 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 			rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding %s", handl.MethodName)
 			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
 		} else {
-			rs.Log.LogError("MapFunctionsToHandlers", "Default Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)
+			if handl.StaticDir != "" {
+				r.PathPrefix(handl.StaticDir).Handler(http.StripPrefix(handl.StaticDir, http.FileServer(http.Dir("."+handl.StaticDir))))
+			} else {
+				rs.Log.LogError("MapFunctionsToHandlers", "Default Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)
+			}
 		}
 
 	}

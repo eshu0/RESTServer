@@ -19,3 +19,6 @@ restserver.log
 serversidemethods
 customlisttemplate
 updated.json
+.DS_Store
+cmd/restserver/restserver
+cmd/restserver/config.json

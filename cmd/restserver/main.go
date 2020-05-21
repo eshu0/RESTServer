@@ -30,10 +30,14 @@ func main() {
 		if !ok {
 			return
 		}
+	} else {
+		// load this first
+		server.ConfigFilePath = "./config.json"
 	}
 
 	RESTCommands.AddDefaults(server)
 	RESTCommands.SetDefaultFunctionalMap(server)
+	server.SaveConfig()
 
 	// start Listen Server, this build the mapping and creates Handler/
 	// also fires the "http listen and server method"
