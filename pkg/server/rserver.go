@@ -32,7 +32,7 @@ func NewRServer(config Config.IRServerConfig) (*RServer) {
 	// lets open a flie log using the session
 	logger.OpenAllChannels()
 
-	server.Log = &logger
+	server.Log = logger
 
 	return &server
 }
