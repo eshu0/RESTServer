@@ -9,6 +9,10 @@ import (
 	"github.com/eshu0/simplelogger/interfaces"
 )
 
+//
+// Server configuration interface 
+// Gets, Setters etc 
+//
 type IRServerConfig interface {
 	GetAddress() string
 	HasTemplate() bool

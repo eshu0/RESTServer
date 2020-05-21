@@ -27,8 +27,8 @@ func NewRServer(config Config.IRServerConfig) (*RServer) {
 	server.Config = config
 	server.FunctionalMap = make(map[string]interface{})
 
-	logger := sl.NewSimpleLogger("restserver.log", "123")
-
+	logger := sl.NewApplicationLogger()
+	
 	// lets open a flie log using the session
 	logger.OpenAllChannels()
 
@@ -143,3 +143,5 @@ func (rs *RServer) LoadConfig() bool {
 
 	return ok
 }
+
+
