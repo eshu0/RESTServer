@@ -71,7 +71,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 	return func(w http.ResponseWriter, r *http.Request) {
 		rs.Log.LogDebug("MakeTemplateHandlerFunction", "List Commands called")
 
-		t := template.New(handler.TemplateName) // *Template{}
+		t := template.New(handler.TemplateName) 
 		err := errors.New("should not see this error")
 		
 		if handler.TemplatePath != "" {
@@ -111,6 +111,13 @@ func (rs *RServer) CreateTemplateHandler(URL string, MethodName string,HTTPMetho
 	return drhr
 }
 
+func (rs *RServer) CreateBlobTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, Name string, Blob string, Path string) Handlers.RESTHandler {
+	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
+	drhr.TemplateBlob = Blob
+	drhr.TemplatePath = Path
+	drhr.TemplateName = Name		
+	return drhr
+}
 
 func (rs *RServer) CreateSpecificTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, Name string, Blob string, Path string) Handlers.RESTHandler {
 	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)

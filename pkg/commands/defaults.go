@@ -28,9 +28,9 @@ func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
 
 func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request,t *template.Template) {
 	if rsc.Server != nil {
-		err := t.Execute(w, rsc.Server.Config) // Template(w, "T", "<script>alert('you have been pwned')</script>")
+		err := t.Execute(w, rsc.Server.Config)
 		if err != nil {
-			rsc.Server.Log.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
+			rsc.Server.Log.LogErrorf("ListCommands", "Error : %s", err.Error())
 			return
 		}	
 	}
