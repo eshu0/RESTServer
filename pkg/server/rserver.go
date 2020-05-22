@@ -88,7 +88,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 				if handler.TemplateBlob != "" {
 					t, err = template.New(handler.TemplateName).Parse(handler.TemplateBlob)
 				} else {
-					err := errors.New("No template set")
+					err = errors.New("No template set")
 				}
 			}
 		}
