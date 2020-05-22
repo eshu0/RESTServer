@@ -56,10 +56,60 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
 
 }
 
-func (rs *RServer) MakeHandler(MethodName string, any interface{}) http.HandlerFunc {
+func (rs *RServer) MakeHandlerFunction(MethodName string, any interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rs.Invoke(any, MethodName, w, r)
 	}
+}
+
+func (rs *RServer) MakeTemplateHandlerFunction(handler RESTHandler) http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		rs.Log.LogDebug("MakeTemplateHandlerFunction", "List Commands called")
+
+		t := template.New(handler.TemplateName) // *Template{}
+		err := errors.New("should not see this error")
+	
+		if handler.TemplatePath != "" {
+			rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template path")
+			rs.Log.LogDebug("MakeTemplateHandlerFunction", handler.TemplatePath)
+			t, err = template.ParseFiles(handler.TemplatePath)
+		} else {
+			t, err = template.New(handler.TemplateName).Parse(handler.TemplateBlob)
+		}
+	
+		if err != nil {
+			rs.Log.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
+			return
+		}
+	
+		rs.Invoke(any, MethodName, w, r, t)
+	}
+
+}
+
+func (rs *RServer) CreateTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, Name string, Blob string, Path string) Handlers.RESTHandler {
+	drhr := CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
+	drhr.TemplateBlob = Blob
+	drhr.TemplatePath = Path
+	drhr.TemplateName = Name		
+	return drhr
+}
+
+func (rs *RServer) CreateStaticHandler(URL string, StaticDir string) Handlers.RESTHandler {
+	drhr := Handlers.RESTHandler{}
+	drhr.URL = URL
+	drhr.StaticDir = StaticDir
+	return drhr
+}
+
+func (rs *RServer) CreateFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string) Handlers.RESTHandler {
+	drhr := Handlers.RESTHandler{}
+	drhr.URL = URL
+	drhr.MethodName = MethodName
+	drhr.HTTPMethod = HTTPMethod
+	drhr.FunctionalClass = FunctionalClass
+	return drhr
 }
 
 func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
@@ -71,13 +121,16 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
 		if ok {
-			rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding %s", handl.MethodName)
-			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
+			if handl.TemplatePath != "" {
+				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding Template path %s", handl.MethodName)
+				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl)).Methods(handl.HTTPMethod)
+			} else {
+				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding %s", handl.MethodName)
+				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
+			}
 		} else {
 			if handl.StaticDir != "" {
 				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding route %s for  static directory %s", handl.URL, handl.StaticDir)		
-				//r.PathPrefix(handl.StaticDir).Handler(http.StripPrefix(handl.StaticDir, http.FileServer(http.Dir("."+handl.StaticDir))))
-				//r.Handle(handl.URL, http.FileServer(http.Dir(handl.StaticDir)))
 				r.PathPrefix(handl.URL).Handler(http.StripPrefix(handl.URL, http.FileServer(http.Dir(handl.StaticDir))))
 
 			} else {
@@ -92,13 +145,16 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
 		if ok {
-			rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding %s", handl.MethodName)
-			r.HandleFunc(handl.URL, rs.MakeHandler(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
+			if handl.TemplatePath != "" {
+				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding Template path %s", handl.MethodName)
+				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl)).Methods(handl.HTTPMethod)
+			} else {
+				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding %s", handl.MethodName)
+				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
+			}
 		} else {
 			if handl.StaticDir != "" {
 				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding route %s for static directory %s", handl.URL, handl.StaticDir)
-				//r.PathPrefix(handl.StaticDir).Handler(http.StripPrefix(handl.StaticDir, http.FileServer(http.Dir("."+handl.StaticDir))))
-				//r.Handle(handl.URL, http.FileServer(http.Dir(handl.StaticDir)))
 				r.PathPrefix(handl.URL).Handler(http.StripPrefix(handl.URL, http.FileServer(http.Dir(handl.StaticDir))))
 
 			} else {
@@ -114,6 +170,8 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 func (rs *RServer) Register(FunctionClass string, data interface{}) {
 	rs.FunctionalMap[FunctionClass] = data
 }
+
+/// GENERAL OPERATIONS
 
 func (rs *RServer) ShutDown() {
 	if Server != nil {

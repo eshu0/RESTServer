@@ -28,6 +28,14 @@ func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (rsc RServerCommand) ListCommands2(w http.ResponseWriter, r *http.Request,t *Template) {
+	err = t.Execute(w, rsc.Server.Config) // Template(w, "T", "<script>alert('you have been pwned')</script>")
+	if err != nil {
+		rs.Log.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
+		return
+	}	
+}
+
 func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request) {
 	if rsc.Server != nil {
 		rsc.Server.Log.LogDebug("RServerCommand", "List Commands called")
@@ -36,7 +44,7 @@ func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request) {
 		err := errors.New("should not see this error")
 
 		if rsc.Server.Config.HasTemplate() {
-			rsc.Server.Log.LogDebug("RServerCommand", "We have a template path")
+			rsc.Server.Log.LogDebug("RServerCommand", "We have a global template path")
 			rsc.Server.Log.LogDebug("RServerCommand", rsc.Server.Config.GetTemplatePath())
 			t, err = template.ParseFiles(rsc.Server.Config.GetTemplatePath())
 		} else {
@@ -71,46 +79,6 @@ func (rsc RServerCommand) SaveConfig(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (rsc RServerCommand) CreateShutDownHandler() Handlers.RESTHandler {
-	drhs := Handlers.RESTHandler{}
-
-	drhs.URL = "/admin/shutdown"
-	drhs.MethodName = "ShutDown"
-	drhs.HTTPMethod = "GET"
-	drhs.FunctionalClass = "RServerCommand"
-	return drhs
-}
-
-func (rsc RServerCommand) CreateListHandler() Handlers.RESTHandler {
-	drhr := Handlers.RESTHandler{}
-
-	drhr.URL = "/admin/listcommands"
-	drhr.MethodName = "ListCommands"
-	drhr.HTTPMethod = "GET"
-	drhr.FunctionalClass = "RServerCommand"
-	return drhr
-}
-
-func (rsc RServerCommand) CreateLoadConfigHandler() Handlers.RESTHandler {
-	drhr := Handlers.RESTHandler{}
-
-	drhr.URL = "/admin/loadconfig"
-	drhr.MethodName = "LoadConfig"
-	drhr.HTTPMethod = "GET"
-	drhr.FunctionalClass = "RServerCommand"
-	return drhr
-}
-
-func (rsc RServerCommand) CreateSaveConfigHandler() Handlers.RESTHandler {
-	drhr := Handlers.RESTHandler{}
-
-	drhr.URL = "/admin/saveconfig"
-	drhr.MethodName = "SaveConfig"
-	drhr.HTTPMethod = "GET"
-	drhr.FunctionalClass = "RServerCommand"
-	return drhr
-}
-
 func AddDefaults(server *Server.RServer) {
 
 	// Default commands for server
@@ -119,13 +87,15 @@ func AddDefaults(server *Server.RServer) {
 
 	server.FunctionalMap["RServerCommand"] = rsc
 
-	server.Config.AddDefaultHandler(rsc.CreateShutDownHandler())
-	server.Config.AddDefaultHandler(rsc.CreateListHandler())
-	server.Config.AddDefaultHandler(rsc.CreateLoadConfigHandler())
-	server.Config.AddDefaultHandler(rsc.CreateSaveConfigHandler())
+	server.Config.AddDefaultHandler(rs.CreateFunctionHandler("/admin/shutdown","ShutDown","GET","RServerCommand"))
+	server.Config.AddDefaultHandler(rs.CreateFunctionHandler("/admin/listcommands","ListCommands","GET","RServerCommand"))
+	server.Config.AddDefaultHandler(rs.CreateFunctionHandler("/admin/loadconfig","LoadConfig","GET","RServerCommand"))
+	server.Config.AddDefaultHandler(rs.CreateFunctionHandler("/admin/saveconfig","SaveConfig","GET","RServerCommand"))
+	server.Config.AddDefaultHandler(rs.CreateTemplateHandler("/admin/listcommands2","ListCommands2","GET","RServerCommand","list","<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Available REST API Calls</title></head><body><h1>Available REST API Calls</h1><h2>Custom</h2>{{range .Handlers}}<div><a href=\"{{ .URL }}\">{{ .URL }} will point to {{ .HTTPMethod }} {{ .FunctionalClass }}.{{ .MethodName }} </a></div>{{else}}<div><strong>None</strong></div>{{end}}<h2>Default</h2>{{range .DefaultHandlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div></div>{{else}}<div><strong>No Handlers</strong></div>{{end}}</body></html>",rsc.Server.Config.GetTemplatePath())
 
+	
 	for _, handl := range server.Config.GetDefaultHandlers() {
-		server.Log.LogDebugf("NewRServerWithDefaults", "Default Handler: Added %s", handl.MethodName)
+		server.Log.LogDebugf("AddDefaults", "Default Handler: Added %s", handl.MethodName)
 	}
 }
 

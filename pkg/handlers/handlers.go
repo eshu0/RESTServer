@@ -7,4 +7,6 @@ type RESTHandler struct {
 	FunctionalClass string `json:"functionalclass"`
 	StaticDir 		string `json:"staticdir"`
 	TemplatePath  	string `json:"templatepath"`
+	TemplateBlob  	string `json:"templateblob"`	
+	TemplateName  	string `json:"templatename"`		
 }
