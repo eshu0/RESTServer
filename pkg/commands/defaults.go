@@ -52,6 +52,11 @@ func (rsc RServerCommand) SaveConfig(w http.ResponseWriter, r *http.Request) {
 
 func AddDefaults(server *Server.RServer) {
 
+	if len(server.Config.DefaultHandlers) > 0{
+		server.Log.LogDebugf("AddDefaults", "Not adding defaults as there is %d handlers already", len(server.Config.DefaultHandlers) )
+		return
+	}
+
 	// Default commands for server
 	// These should be removed if not required
 	rsc := RServerCommand{Server: server}
