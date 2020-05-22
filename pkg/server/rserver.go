@@ -4,8 +4,12 @@ import (
 	"context"
 	"net/http"
 	"reflect"
+	"html/template"
+	"errors"
 
+	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	Config "github.com/eshu0/RESTServer/pkg/config"
+	
 	sl "github.com/eshu0/simplelogger"
 	sli "github.com/eshu0/simplelogger/interfaces"
 	"github.com/gorilla/mux"
@@ -62,7 +66,7 @@ func (rs *RServer) MakeHandlerFunction(MethodName string, any interface{}) http.
 	}
 }
 
-func (rs *RServer) MakeTemplateHandlerFunction(handler RESTHandler) http.HandlerFunc {
+func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		rs.Log.LogDebug("MakeTemplateHandlerFunction", "List Commands called")
@@ -83,7 +87,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler RESTHandler) http.Handler
 			return
 		}
 	
-		rs.Invoke(any, MethodName, w, r, t)
+		rs.Invoke(any, handler.MethodName, w, r, t)
 	}
 
 }
@@ -123,7 +127,7 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 		if ok {
 			if handl.TemplatePath != "" {
 				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding Template path %s", handl.MethodName)
-				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl)).Methods(handl.HTTPMethod)
+				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 			} else {
 				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding %s", handl.MethodName)
 				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
@@ -147,7 +151,7 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 		if ok {
 			if handl.TemplatePath != "" {
 				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding Template path %s", handl.MethodName)
-				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl)).Methods(handl.HTTPMethod)
+				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 			} else {
 				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding %s", handl.MethodName)
 				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
