@@ -28,7 +28,7 @@ func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (rsc RServerCommand) ListCommands2(w http.ResponseWriter, r *http.Request,t *Template) {
+func (rsc RServerCommand) ListCommands2(w http.ResponseWriter, r *http.Request,t *template.Template) {
 	if rsc.Server != nil {
 		err := t.Execute(w, rsc.Server.Config) // Template(w, "T", "<script>alert('you have been pwned')</script>")
 		if err != nil {
