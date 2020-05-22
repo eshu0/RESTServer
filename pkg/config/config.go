@@ -69,10 +69,6 @@ func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
 	return rsc.Handlers
 }
 
-func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
-	return rsc.Handlers
-}
-
 func (rsc *RServerConfig) GetDefaultHandlers() []Handlers.RESTHandler {
 	return rsc.DefaultHandlers
 }
