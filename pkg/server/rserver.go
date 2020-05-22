@@ -73,13 +73,24 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 
 		t := template.New(handler.TemplateName) // *Template{}
 		err := errors.New("should not see this error")
-	
+		
 		if handler.TemplatePath != "" {
 			rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template path")
 			rs.Log.LogDebug("MakeTemplateHandlerFunction", handler.TemplatePath)
 			t, err = template.ParseFiles(handler.TemplatePath)
 		} else {
-			t, err = template.New(handler.TemplateName).Parse(handler.TemplateBlob)
+			if handler.TemplateFilename != "" {
+				tfilepath := rs.Config.GetTemplatePath() + handler.TemplateFilename 
+				rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template filename")
+				rs.Log.LogDebug("MakeTemplateHandlerFunction", tfilepath)
+				t, err = template.ParseFiles(tfilepath)
+			} else {
+				if handler.TemplateBlob != "" {
+					t, err = template.New(handler.TemplateName).Parse(handler.TemplateBlob)
+				} else {
+					err := errors.New("No template set")
+				}
+			}
 		}
 	
 		if err != nil {
@@ -92,7 +103,16 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 
 }
 
-func (rs *RServer) CreateTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, Name string, Blob string, Path string) Handlers.RESTHandler {
+func (rs *RServer) CreateTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, Name string, Blob string, Filename string) Handlers.RESTHandler {
+	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
+	drhr.TemplateBlob = Blob
+	drhr.TemplateFilename = Filename
+	drhr.TemplateName = Name		
+	return drhr
+}
+
+
+func (rs *RServer) CreateSpecificTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, Name string, Blob string, Path string) Handlers.RESTHandler {
 	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
 	drhr.TemplateBlob = Blob
 	drhr.TemplatePath = Path
