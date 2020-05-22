@@ -21,8 +21,12 @@ type IRServerConfig interface {
 	Load(ConfigFilePath string, Log slinterfaces.ISimpleLogger) (IRServerConfig, bool)
 	AddHandler(Handler Handlers.RESTHandler)
 	AddDefaultHandler(Handler Handlers.RESTHandler)
+
 	GetHandlers() []Handlers.RESTHandler
+	GetHandlersLen() int 
+
 	GetDefaultHandlers() []Handlers.RESTHandler
+	GetDefaultHandlersLen() int
 }
 
 type RServerConfig struct {
@@ -57,6 +61,14 @@ func (rsc *RServerConfig) GetTemplatePath() string {
 	return rsc.TemplateFilepath
 }
 
+func (rsc *RServerConfig) GetHandlersLen() int {
+	return len(rsc.Handlers)
+}
+
+func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
+	return rsc.Handlers
+}
+
 func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
 	return rsc.Handlers
 }
@@ -64,6 +76,11 @@ func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
 func (rsc *RServerConfig) GetDefaultHandlers() []Handlers.RESTHandler {
 	return rsc.DefaultHandlers
 }
+
+func (rsc *RServerConfig) GetDefaultHandlersLen() int {
+	return len(rsc.DefaultHandlers)
+}
+
 
 func (rsc *RServerConfig) GetAddress() string {
 	return ":" + rsc.Port
