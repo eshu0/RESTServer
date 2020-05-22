@@ -9,7 +9,7 @@ import (
 
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	Config "github.com/eshu0/RESTServer/pkg/config"
-	
+
 	sl "github.com/eshu0/simplelogger"
 	sli "github.com/eshu0/simplelogger/interfaces"
 	"github.com/gorilla/mux"
@@ -93,7 +93,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 }
 
 func (rs *RServer) CreateTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, Name string, Blob string, Path string) Handlers.RESTHandler {
-	drhr := CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
+	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
 	drhr.TemplateBlob = Blob
 	drhr.TemplatePath = Path
 	drhr.TemplateName = Name		
