@@ -1,4 +1,4 @@
 {
 	"port": "666",
-	"templatefilepath": "./views/list.html"
+	"templatefilepath": "./views/"
 }

@@ -1,0 +1,17 @@
+{
+	"port": "666",
+	"handlers": [
+		{
+			"url": "/uis/",
+			"methodname": "",
+			"httpmethod": "",
+			"functionalclass": "",
+			"staticdir": "./static/",
+			"templatepath": "",
+			"templatefilename": "",
+			"templateblob": "",
+			"templatename": ""
+		}
+	],
+	"templatefilepath": "./views/"
+}
