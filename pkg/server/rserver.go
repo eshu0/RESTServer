@@ -145,8 +145,8 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
 		if ok {
-			if handl.TemplatePath != "" {
-				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding Template path %s", handl.MethodName)
+			if handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != ""  {
+				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding Template function %s", handl.MethodName)
 				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 			} else {
 				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding %s", handl.MethodName)
@@ -169,8 +169,8 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
 		if ok {
-			if handl.TemplatePath != "" {
-				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding Template path %s", handl.MethodName)
+			if  handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != ""  {
+				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding Template function %s", handl.MethodName)
 				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 			} else {
 				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding %s", handl.MethodName)
