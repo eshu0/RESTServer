@@ -28,42 +28,13 @@ func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (rsc RServerCommand) ListCommands2(w http.ResponseWriter, r *http.Request,t *template.Template) {
+func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request,t *template.Template) {
 	if rsc.Server != nil {
 		err := t.Execute(w, rsc.Server.Config) // Template(w, "T", "<script>alert('you have been pwned')</script>")
 		if err != nil {
 			rsc.Server.Log.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
 			return
 		}	
-	}
-}
-
-func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request) {
-	if rsc.Server != nil {
-		rsc.Server.Log.LogDebug("RServerCommand", "List Commands called")
-
-		t := template.New("old") // *Template{}
-		err := errors.New("should not see this error")
-
-		if rsc.Server.Config.HasTemplate() {
-			rsc.Server.Log.LogDebug("RServerCommand", "We have a global template path")
-			rsc.Server.Log.LogDebug("RServerCommand", rsc.Server.Config.GetTemplatePath())
-			t, err = template.ParseFiles(rsc.Server.Config.GetTemplatePath())
-		} else {
-			doc := "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Available REST API Calls</title></head><body><h1>Available REST API Calls</h1><h2>Custom</h2>{{range .Handlers}}<div><a href=\"{{ .URL }}\">{{ .URL }} will point to {{ .HTTPMethod }} {{ .FunctionalClass }}.{{ .MethodName }} </a></div>{{else}}<div><strong>None</strong></div>{{end}}<h2>Default</h2>{{range .DefaultHandlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div></div>{{else}}<div><strong>No Handlers</strong></div>{{end}}</body></html>"
-			t, err = template.New("list").Parse(doc)
-		}
-
-		if err != nil {
-			rsc.Server.Log.LogErrorf("RServerCommand", "Error : %s", err.Error())
-			return
-		}
-
-		err = t.Execute(w, rsc.Server.Config) // Template(w, "T", "<script>alert('you have been pwned')</script>")
-		if err != nil {
-			rsc.Server.Log.LogErrorf("RServerCommand", "Error : %s", err.Error())
-			return
-		}
 	}
 }
 
@@ -90,10 +61,9 @@ func AddDefaults(server *Server.RServer) {
 	server.FunctionalMap["RServerCommand"] = rsc
 
 	server.Config.AddDefaultHandler(server.CreateFunctionHandler("/admin/shutdown","ShutDown","GET","RServerCommand"))
-	server.Config.AddDefaultHandler(server.CreateFunctionHandler("/admin/listcommands","ListCommands","GET","RServerCommand"))
 	server.Config.AddDefaultHandler(server.CreateFunctionHandler("/admin/loadconfig","LoadConfig","GET","RServerCommand"))
 	server.Config.AddDefaultHandler(server.CreateFunctionHandler("/admin/saveconfig","SaveConfig","GET","RServerCommand"))
-	server.Config.AddDefaultHandler(server.CreateTemplateHandler("/admin/listcommands2","ListCommands2","GET","RServerCommand","list","<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Available REST API Calls</title></head><body><h1>Available REST API Calls</h1><h2>Custom</h2>{{range .Handlers}}<div><a href=\"{{ .URL }}\">{{ .URL }} will point to {{ .HTTPMethod }} {{ .FunctionalClass }}.{{ .MethodName }} </a></div>{{else}}<div><strong>None</strong></div>{{end}}<h2>Default</h2>{{range .DefaultHandlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div></div>{{else}}<div><strong>No Handlers</strong></div>{{end}}</body></html>",rsc.Server.Config.GetTemplatePath()))
+	server.Config.AddDefaultHandler(server.CreateTemplateHandler("/admin/listcommands","ListCommands","GET","RServerCommand","list","<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Available REST API Calls</title></head><body><h1>Available REST API Calls</h1><h2>Custom</h2>{{range .Handlers}}<div><a href=\"{{ .URL }}\">{{ .URL }} will point to {{ .HTTPMethod }} {{ .FunctionalClass }}.{{ .MethodName }} </a></div>{{else}}<div><strong>None</strong></div>{{end}}<h2>Default</h2>{{range .DefaultHandlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div></div>{{else}}<div><strong>No Handlers</strong></div>{{end}}</body></html>",rsc.Server.Config.GetTemplatePath()))
 
 	
 	for _, handl := range server.Config.GetDefaultHandlers() {
