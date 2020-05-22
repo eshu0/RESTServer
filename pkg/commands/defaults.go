@@ -1,11 +1,9 @@
 package RESTCommands
 
 import (
-	"errors"
 	"html/template"
 	"net/http"
 
-	//Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	Server "github.com/eshu0/RESTServer/pkg/server"
 )
 
@@ -65,7 +63,6 @@ func AddDefaults(server *Server.RServer) {
 	server.Config.AddDefaultHandler(server.CreateFunctionHandler("/admin/saveconfig","SaveConfig","GET","RServerCommand"))
 	server.Config.AddDefaultHandler(server.CreateTemplateHandler("/admin/listcommands","ListCommands","GET","RServerCommand","list","<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Available REST API Calls</title></head><body><h1>Available REST API Calls</h1><h2>Custom</h2>{{range .Handlers}}<div><a href=\"{{ .URL }}\">{{ .URL }} will point to {{ .HTTPMethod }} {{ .FunctionalClass }}.{{ .MethodName }} </a></div>{{else}}<div><strong>None</strong></div>{{end}}<h2>Default</h2>{{range .DefaultHandlers}}<div><a href=\"{{ .URL }}\">{{ .MethodName }}</a></div></div>{{else}}<div><strong>No Handlers</strong></div>{{end}}</body></html>",rsc.Server.Config.GetTemplatePath()))
 
-	
 	for _, handl := range server.Config.GetDefaultHandlers() {
 		server.Log.LogDebugf("AddDefaults", "Default Handler: Added %s", handl.MethodName)
 	}
