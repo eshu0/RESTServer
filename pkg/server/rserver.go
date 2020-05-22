@@ -79,8 +79,8 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 			rs.Log.LogDebug("MakeTemplateHandlerFunction", handler.TemplatePath)
 			t, err = template.ParseFiles(handler.TemplatePath)
 		} else {
-			if handler.TemplateFilename != "" {
-				tfilepath := rs.Config.GetTemplatePath() + handler.TemplateFilename 
+			if handler.TemplateFileName != "" {
+				tfilepath := rs.Config.GetTemplatePath() + handler.TemplateFileName 
 				rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template filename")
 				rs.Log.LogDebug("MakeTemplateHandlerFunction", tfilepath)
 				t, err = template.ParseFiles(tfilepath)
@@ -106,7 +106,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 func (rs *RServer) CreateTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, Name string, Blob string, Filename string) Handlers.RESTHandler {
 	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
 	drhr.TemplateBlob = Blob
-	drhr.TemplateFilename = Filename
+	drhr.TemplateFileName = Filename
 	drhr.TemplateName = Name		
 	return drhr
 }
