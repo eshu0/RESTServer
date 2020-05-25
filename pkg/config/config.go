@@ -16,7 +16,10 @@ import (
 type IRServerConfig interface {
 	GetAddress() string
 	HasTemplate() bool
+	CacheTemplates() bool
 	GetTemplatePath() string
+	GetTemplateFileTypes() []string
+
 	Save(ConfigFilePath string, Log slinterfaces.ISimpleLogger) bool
 	Load(ConfigFilePath string, Log slinterfaces.ISimpleLogger) (IRServerConfig, bool)
 	AddHandler(Handler Handlers.RESTHandler)
@@ -30,10 +33,12 @@ type IRServerConfig interface {
 }
 
 type RServerConfig struct {
-	Port             string                 `json:"port"`
-	Handlers         []Handlers.RESTHandler `json:"handlers"`
-	DefaultHandlers  []Handlers.RESTHandler `json:"defaulthandlers"`
-	TemplateFilepath string                 `json:"templatefilepath"`
+	Port                string                 	`json:"port"`
+	Handlers            []Handlers.RESTHandler 	`json:"handlers"`
+	DefaultHandlers     []Handlers.RESTHandler 	`json:"defaulthandlers"`
+	TemplateFilepath    string                 	`json:"templatefilepath"`
+	TemplateFileTypes   []string                `json:"templatefiletypes"`
+	CacheTemplates 		bool					`json:"cachetemplates"`
 }
 
 func NewRServerConfig() IRServerConfig {
@@ -41,6 +46,8 @@ func NewRServerConfig() IRServerConfig {
 	Config.DefaultHandlers = []Handlers.RESTHandler{}
 	Config.Handlers = []Handlers.RESTHandler{}
 	Config.Port = "7777"
+	Config.TemplateFileTypes = []string{ ".tmpl", ".html"}
+	Config.CacheTemplates = false
 	return &Config
 }
 
@@ -59,6 +66,14 @@ func (rsc *RServerConfig) HasTemplate() bool {
 
 func (rsc *RServerConfig) GetTemplatePath() string {
 	return rsc.TemplateFilepath
+}
+
+func (rsc *RServerConfig) CacheTemplates() bool {
+	return rsc.CacheTemplates
+}
+
+func (rsc *RServerConfig) GetTemplateFileTypes() []string {
+	return rsc.TemplateFileTypes
 }
 
 func (rsc *RServerConfig) GetHandlersLen() int {

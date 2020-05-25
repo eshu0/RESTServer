@@ -23,6 +23,7 @@ type RServer struct {
 	Log            sli.ISimpleLogger      `json:"-"`
 	FunctionalMap  map[string]interface{} `json:"-"`
 	ConfigFilePath string                 `json:"-"`
+	Templates *template.Template
 }
 
 func NewRServer(config Config.IRServerConfig) (*RServer) {
@@ -69,36 +70,42 @@ func (rs *RServer) MakeHandlerFunction(MethodName string, any interface{}) http.
 func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		rs.Log.LogDebug("MakeTemplateHandlerFunction", "List Commands called")
-
-		t := template.New(handler.TemplateName) 
-		err := errors.New("should not see this error")
+		rs.Log.LogDebug("MakeTemplateHandlerFunction", "MakeTemplateHandlerFunction called")
 		
-		if handler.TemplatePath != "" {
-			rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template path")
-			rs.Log.LogDebug("MakeTemplateHandlerFunction", handler.TemplatePath)
-			t, err = template.ParseFiles(handler.TemplatePath)
+		if rs.Config.CacheTemplates(){
+			rs.Log.LogDebugf("MakeTemplateHandlerFunction", "Looking up template %s",handler.TemplateName)
+			t := rs.Templates.Lookup(handler.TemplateName) 
+			rs.Invoke(any, handler.MethodName, w, r, t)
 		} else {
-			if handler.TemplateFileName != "" {
-				tfilepath := rs.Config.GetTemplatePath() + handler.TemplateFileName 
-				rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template filename")
-				rs.Log.LogDebug("MakeTemplateHandlerFunction", tfilepath)
-				t, err = template.ParseFiles(tfilepath)
+			t := template.New(handler.TemplateName) 
+			err := errors.New("should not see this error")
+			
+			if handler.TemplatePath != "" {
+				rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template path")
+				rs.Log.LogDebug("MakeTemplateHandlerFunction", handler.TemplatePath)
+				t, err = template.ParseFiles(handler.TemplatePath)
 			} else {
-				if handler.TemplateBlob != "" {
-					t, err = template.New(handler.TemplateName).Parse(handler.TemplateBlob)
+				if handler.TemplateFileName != "" {
+					tfilepath := rs.Config.GetTemplatePath() + handler.TemplateFileName 
+					rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template filename")
+					rs.Log.LogDebug("MakeTemplateHandlerFunction", tfilepath)
+					t, err = template.ParseFiles(tfilepath)
 				} else {
-					err = errors.New("No template set")
+					if handler.TemplateBlob != "" {
+						t, err = template.New(handler.TemplateName).Parse(handler.TemplateBlob)
+					} else {
+						err = errors.New("No template set")
+					}
 				}
 			}
+		
+			if err != nil {
+				rs.Log.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
+				return
+			}
+			rs.Invoke(any, handler.MethodName, w, r, t)
 		}
 	
-		if err != nil {
-			rs.Log.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
-			return
-		}
-	
-		rs.Invoke(any, handler.MethodName, w, r, t)
 	}
 
 }
@@ -212,7 +219,7 @@ func (rs *RServer) ShutDown() {
 
 			if err := Server.Shutdown(backg); err != nil {
 				// Error from closing listeners, or context timeout:
-				rs.Log.LogDebugf("Shutdown", "HTTP server Shutdown: %v", err)
+				rs.Log.LogErrorf("Shutdown", "HTTP server Shutdown: %v", err)
 			}
 		} else {
 			rs.Log.LogError("Shutdown", "Called but context.Background() was nil")
@@ -224,12 +231,57 @@ func (rs *RServer) ShutDown() {
 
 }
 
+func (rs *RServer) LoadTemplates(){
+
+	if rs.Config.HasTemplate() && rs.Config.CacheTemplates() {
+
+		var allFiles []string
+		TemplatePath := rs.Config.GetTemplatePath() 
+		files, err := ioutil.ReadDir(TemplatePath)
+		if err != nil {
+			rs.Templates = nil
+			rs.Log.LogErrorf("LoadTemplates", "ReadDir - Error : %s", err.Error())
+			return 
+		}
+	
+		filtypes := GetTemplateFileTypes()
+		for _, file := range files {
+			filename := file.Name()
+			for _, filetype := range filtypes {
+				if strings.HasSuffix(filename, filetype) {
+					allFiles = append(allFiles, TemplatePath+filename)
+				}
+			}
+		}
+	
+		templates, err = template.ParseFiles(allFiles...) 
+		if err != nil {
+			rs.Templates = nil
+			rs.Log.LogErrorf("LoadTemplates", "ParseFiles - Error : %s", err.Error())
+			return 
+		}
+		rs.Log.LogDebug("LoadTemplates", "Loaded Templates")
+		rs.Templates = templates
+	}else{
+		if !rs.Config.HasTemplate() {
+			rs.Log.LogDebug("LoadTemplates", "No Template")
+		}
+
+		if !rs.Config.CacheTemplates() {
+			rs.Log.LogDebug("LoadTemplates", "Not Caching Templates")
+		}
+
+		rs.Templates = nil
+	}
+
+}
+
 func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
-
+	rs.LoadTemplates()
 	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: r}
 
-	rs.Log.LogDebugf("ListenAndServe", "Listening on: %s", rs.Config.GetAddress())
+	rs.Log.LogInfof("ListenAndServe", "Listening on: %s", rs.Config.GetAddress())
 
 	if err := Server.ListenAndServe(); err != http.ErrServerClosed {
 		rs.Log.LogErrorf("HTTP server ListenAndServe", "%v", err)
