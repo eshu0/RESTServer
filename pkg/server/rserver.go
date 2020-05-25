@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"html/template"
 	"errors"
+    "io/ioutil"
+	"strings"
 
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	Config "github.com/eshu0/RESTServer/pkg/config"
@@ -72,7 +74,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 	return func(w http.ResponseWriter, r *http.Request) {
 		rs.Log.LogDebug("MakeTemplateHandlerFunction", "MakeTemplateHandlerFunction called")
 		
-		if rs.Config.CacheTemplates(){
+		if rs.Config.GetCacheTemplates(){
 			rs.Log.LogDebugf("MakeTemplateHandlerFunction", "Looking up template %s",handler.TemplateName)
 			t := rs.Templates.Lookup(handler.TemplateName) 
 			rs.Invoke(any, handler.MethodName, w, r, t)
@@ -233,7 +235,7 @@ func (rs *RServer) ShutDown() {
 
 func (rs *RServer) LoadTemplates(){
 
-	if rs.Config.HasTemplate() && rs.Config.CacheTemplates() {
+	if rs.Config.HasTemplate() && rs.Config.GetCacheTemplates() {
 
 		var allFiles []string
 		TemplatePath := rs.Config.GetTemplatePath() 
@@ -244,10 +246,10 @@ func (rs *RServer) LoadTemplates(){
 			return 
 		}
 	
-		filtypes := GetTemplateFileTypes()
+		filetypes := rs.Config.GetTemplateFileTypes()
 		for _, file := range files {
 			filename := file.Name()
-			for _, filetype := range filtypes {
+			for _, filetype := range filetypes {
 				if strings.HasSuffix(filename, filetype) {
 					allFiles = append(allFiles, TemplatePath+filename)
 				}
@@ -267,7 +269,7 @@ func (rs *RServer) LoadTemplates(){
 			rs.Log.LogDebug("LoadTemplates", "No Template")
 		}
 
-		if !rs.Config.CacheTemplates() {
+		if !rs.Config.GetCacheTemplates() {
 			rs.Log.LogDebug("LoadTemplates", "Not Caching Templates")
 		}
 
