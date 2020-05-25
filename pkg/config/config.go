@@ -16,7 +16,7 @@ import (
 type IRServerConfig interface {
 	GetAddress() string
 	HasTemplate() bool
-	CacheTemplates() bool
+	GetCacheTemplates() bool
 	GetTemplatePath() string
 	GetTemplateFileTypes() []string
 
@@ -68,7 +68,7 @@ func (rsc *RServerConfig) GetTemplatePath() string {
 	return rsc.TemplateFilepath
 }
 
-func (rsc *RServerConfig) CacheTemplates() bool {
+func (rsc *RServerConfig) GetCacheTemplates() bool {
 	return rsc.CacheTemplates
 }
 
