@@ -5,9 +5,6 @@ import (
 	"net/http"
 	"reflect"
 	"html/template"
-	"errors"
-    "io/ioutil"
-	"strings"
 
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"

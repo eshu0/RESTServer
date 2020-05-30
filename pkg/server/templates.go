@@ -1,17 +1,15 @@
 package RESTServer
 
 import (
-	"context"
 	"net/http"
-	"reflect"
 	"html/template"
 	"errors"
     "io/ioutil"
 	"strings"
 
-	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
+	//Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
-	Config "github.com/eshu0/RESTServer/pkg/config"
+	//Config "github.com/eshu0/RESTServer/pkg/config"
 
 	sl "github.com/eshu0/simplelogger"
 	sli "github.com/eshu0/simplelogger/interfaces"

@@ -9,7 +9,7 @@ import (
 	//Config "github.com/eshu0/RESTServer/pkg/config"
 
 	//sl "github.com/eshu0/simplelogger"
-	sli "github.com/eshu0/simplelogger/interfaces"
+	//sli "github.com/eshu0/simplelogger/interfaces"
 	mux "github.com/gorilla/mux"
 )
 
