@@ -279,9 +279,13 @@ func (rs *RServer) LoadTemplates(){
 	}
 
 }
+func notFound(w http.ResponseWriter, r *http.Request){
+	fmt.Fprint(w, "custom 404")
+}
 
 func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
+	r.NotFoundHandler = http.HandlerFunc(notFound)
 	rs.LoadTemplates()
 	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: r}
 
