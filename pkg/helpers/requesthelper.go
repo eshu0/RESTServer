@@ -3,6 +3,8 @@ package RESTHelpers
 import (
 	"net/http"
 	"strconv"
+	"encoding/json"
+	"io/ioutil"
 
 	sli "github.com/eshu0/simplelogger/interfaces"
 	mux "github.com/gorilla/mux"
@@ -54,7 +56,7 @@ func (rh *RequestHelper) ParseForm(r *http.Request, names []string) map[string]s
 
 	if err := r.ParseForm(); err != nil {
 		rh.Log.LogErrorf("ParseForm","Got the following error parsing form %s",err.Error())
-		return
+		return results
 	}
 	for _, name := range names {
 		v := r.FormValue(name)
@@ -64,26 +66,26 @@ func (rh *RequestHelper) ParseForm(r *http.Request, names []string) map[string]s
 	return results
 }
 
-func (rh *RequestHelper) ReadBody(r *http.Request,Data interface{}) ([]byte, error) {
+func (rh *RequestHelper) ReadBody(r *http.Request) ([]byte, error) {
 	body, err1 := ioutil.ReadAll(r.Body)
 	if err1 != nil {
-		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while reading body %s",err.Error())
-		return "",err1
+		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while reading body %s",err1.Error())
+		return []byte{},err1
 	}
 	rh.Log.LogDebugf("ReadJSONRequest","Got the following request body %s",string(body))
 	return body,err1
 }
 
 func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (interface{}, error) {
-	body, err1 := rh.ReadBody(r)
-	if err1 != nil {
+	body, err := rh.ReadBody(r)
+	if err != nil {
 		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while reading body %s",err.Error())
-		return nil, err1
+		return nil, err
 	}
 	rh.Log.LogDebugf("ReadJSONRequest","Got the following request body %s",string(body))
 
 	//err := json.NewDecoder(string(body)).Decode(&Data)
-	err := json.Unmarshal(body, &Data)
+	err = json.Unmarshal(body, &Data)
 	if err != nil {
 		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while unmarchsalling JSON %s",err.Error())
 		return nil, err
