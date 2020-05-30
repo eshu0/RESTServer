@@ -285,8 +285,8 @@ func (rs *RServer) LoadTemplates(){
 func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
 
-	if ns.NotFoundHandler != nil {
-		r.NotFoundHandler = http.HandlerFunc(ns.NotFoundHandler)
+	if rs.NotFoundHandler != nil {
+		r.NotFoundHandler = http.HandlerFunc(rs.NotFoundHandler)
 	}
 
 	rs.LoadTemplates()
