@@ -51,7 +51,6 @@ func (rh *RequestHelper) GetRequestIds(r *http.Request, names []string) map[stri
 }
 
 func (rh *RequestHelper) ParseForm(r *http.Request, names []string) map[string]string{
-	vars := mux.Vars(r)
 	results := make(map[string]string)
 
 	if err := r.ParseForm(); err != nil {
