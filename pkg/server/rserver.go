@@ -9,7 +9,7 @@ import (
     "io/ioutil"
 	"strings"
 	"strconv"
-	
+
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	Config "github.com/eshu0/RESTServer/pkg/config"
 
@@ -220,7 +220,7 @@ func (rs *RServer) GetRequestId(r *http.Request, name string) *int {
 		rs.Log.LogErrorf("GetRequestId","Got the following error parsing %s for %s",name, err.Error())
 		return nil
 	}else{
-		return Id
+		return &Id
 	}
 }
 
