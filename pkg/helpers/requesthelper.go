@@ -1,17 +1,11 @@
 package RESTHelpers
 
 import (
-	"context"
 	"net/http"
-	"reflect"
-	"html/template"
-	"errors"
-    "io/ioutil"
-	"strings"
 	"strconv"
 
 	sli "github.com/eshu0/simplelogger/interfaces"
-	"github.com/gorilla/mux"
+	mux "github.com/gorilla/mux"
 )
 
 type RequestHelper struct {
