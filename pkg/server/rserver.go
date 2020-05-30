@@ -80,7 +80,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 		rs.Log.LogDebug("MakeTemplateHandlerFunction", "MakeTemplateHandlerFunction called")
 		
 		if rs.Config.GetCacheTemplates(){
-			rs.Log.LogDebugf("MakeTemplateHandlerFunction", "Looking up template %s",handler.TemplateName)
+			rs.Log.LogDebugf("MakeTemplateHandlerFunction", "Looking up template %s for %s ",handler.TemplateName,handler.URL)
 			t := rs.Templates.Lookup(handler.TemplateName) 
 			rs.Invoke(any, handler.MethodName, w, r, t)
 		} else {
@@ -88,17 +88,16 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 			err := errors.New("should not see this error")
 			
 			if handler.TemplatePath != "" {
-				rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template path")
-				rs.Log.LogDebug("MakeTemplateHandlerFunction", handler.TemplatePath)
+				rs.Log.LogDebugf("MakeTemplateHandlerFunction", "We have a template path %s for %s", handler.TemplatePath,handler.URL)
 				t, err = template.ParseFiles(handler.TemplatePath)
 			} else {
 				if handler.TemplateFileName != "" {
 					tfilepath := rs.Config.GetTemplatePath() + handler.TemplateFileName 
-					rs.Log.LogDebug("MakeTemplateHandlerFunction", "We have a template filename")
-					rs.Log.LogDebug("MakeTemplateHandlerFunction", tfilepath)
+					rs.Log.LogDebugf("MakeTemplateHandlerFunction", "We have a template filename %s for %s", tfilepath,handler.URL)
 					t, err = template.ParseFiles(tfilepath)
 				} else {
 					if handler.TemplateBlob != "" {
+						rs.Log.LogDebugf("MakeTemplateHandlerFunction", "We have a template blob %s for %s", handler.TemplateBlob,handler.URL)
 						t, err = template.New(handler.TemplateName).Parse(handler.TemplateBlob)
 					} else {
 						err = errors.New("No template set")
