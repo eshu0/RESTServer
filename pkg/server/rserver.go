@@ -15,7 +15,7 @@ import (
 
 	sl "github.com/eshu0/simplelogger"
 	sli "github.com/eshu0/simplelogger/interfaces"
-	"github.com/gorilla/mux"
+	mux "github.com/gorilla/mux"
 )
 
 // This is the http Server that will host the HTTP requests
