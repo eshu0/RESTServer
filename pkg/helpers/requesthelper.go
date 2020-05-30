@@ -12,7 +12,7 @@ type RequestHelper struct {
 	Log sli.ISimpleLogger      `json:"-"`
 }
 
-func NewRequestHelper(logger Log) *RequestHelper {
+func NewRequestHelper(logger sli.ISimpleLogger) *RequestHelper {
 
 	helper := RequestHelper{}
 	helper.Log = logger
