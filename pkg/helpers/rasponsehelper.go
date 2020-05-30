@@ -26,7 +26,7 @@ func (rh *ResponseHelper) WriteIndentJSON(w http.ResponseWriter, Data interface{
 		rh.Log.LogErrorf("WriteIndentJSON()", "MarshalIndent json failed with %s ", err.Error())
 		return false, err
 	}
-	fmt.Fprint(w, bytes)
+	fmt.Fprint(w, string(bytes))
 	return true, nil
 }
 
@@ -36,7 +36,7 @@ func (rh *ResponseHelper) WriteJSON(w http.ResponseWriter, Data interface{}) (bo
 		rh.Log.LogErrorf("WriteJSON()", "Marshal json failed with %s", err.Error())
 		return false, err
 	}
-	fmt.Fprint(w, bytes)
+	fmt.Fprint(w, string(bytes))
 	return true, nil
 
 }
