@@ -190,7 +190,7 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	for _, handl := range rs.Config.GetHandlers() {
 
-		addHandlerToRouter(r,handl)
+		rs.addHandlerToRouter(r,handl)
 		/*
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
@@ -217,7 +217,7 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	for _, handl := range rs.Config.GetDefaultHandlers() {
 
-		addHandlerToRouter(r,handl)
+		rs.addHandlerToRouter(r,handl)
 
 		/*
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
