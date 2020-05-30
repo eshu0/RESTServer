@@ -10,6 +10,7 @@ import (
 	"strings"
 	"strconv"
 
+	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	Config "github.com/eshu0/RESTServer/pkg/config"
 
@@ -22,11 +23,12 @@ import (
 var Server *http.Server
 
 type RServer struct {
-	Config         Config.IRServerConfig  `json:"-"`
-	Log            sli.ISimpleLogger      `json:"-"`
-	FunctionalMap  map[string]interface{} `json:"-"`
-	ConfigFilePath string                 `json:"-"`
-	Templates *template.Template
+	Config         	Config.IRServerConfig  `json:"-"`
+	Log            	sli.ISimpleLogger      `json:"-"`
+	FunctionalMap  	map[string]interface{} `json:"-"`
+	ConfigFilePath 	string                 `json:"-"`
+	Templates 		*template.Template     `json:"-"`
+	RequestHelper 	*RequestHelper         `json:"-"`
 }
 
 func NewRServer(config Config.IRServerConfig) (*RServer) {
@@ -41,7 +43,7 @@ func NewRServer(config Config.IRServerConfig) (*RServer) {
 	logger.OpenAllChannels()
 
 	server.Log = logger
-
+	server.RequestHelper = Helpers.NewRequestHelper(logger)
 	return &server
 }
 
@@ -210,34 +212,6 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 func (rs *RServer) Register(FunctionClass string, data interface{}) {
 	rs.FunctionalMap[FunctionClass] = data
-}
-
-func (rs *RServer) GetRequestId(r *http.Request, name string) *int {
-	vars := mux.Vars(r)
-	rs.Log.LogInfof("GetRequestId","Got the following %s for %v ",name, vars[name])
-	Id, err := strconv.Atoi(vars[name])
-	if err != nil {
-		rs.Log.LogErrorf("GetRequestId","Got the following error parsing %s for %s",name, err.Error())
-		return nil
-	}else{
-		return &Id
-	}
-}
-
-func (rs *RServer) GetRequestIds(r *http.Request, names []string) map[string]*int{
-	vars := mux.Vars(r)
-	results := make(map[string]*int)
-	for _, name := range names {
-		rs.Log.LogInfof("GetRequestIds","Got the following %s for %v",name, vars[name])
-		id, err := strconv.Atoi(vars[name])
-		if err != nil {
-			rs.Log.LogErrorf("GetRequestIds","Got the following error parsing %s for %s",name, err.Error())
-			results[name] = nil
-		}else{
-			results[name] = &id
-		}
-	}
-	return results
 }
 
 /// GENERAL OPERATIONS
