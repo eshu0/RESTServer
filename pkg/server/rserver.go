@@ -190,6 +190,8 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	for _, handl := range rs.Config.GetHandlers() {
 
+		addHandlerToRouter(r,handl)
+		/*
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
 		if ok {
@@ -209,11 +211,15 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 				rs.Log.LogError("MapFunctionsToHandlers", "Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)		
 			}
 		}
+		*/
 
 	}
 
 	for _, handl := range rs.Config.GetDefaultHandlers() {
 
+		addHandlerToRouter(r,handl)
+
+		/*
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
 		if ok {
@@ -233,6 +239,7 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 				rs.Log.LogError("MapFunctionsToHandlers", "Default Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)
 			}
 		}
+		*/
 
 	}
 
