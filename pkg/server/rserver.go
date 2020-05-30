@@ -164,13 +164,13 @@ func (rs *RSServer) addHandlerToRouter(r mux.Router, handl Handlers.RESTHandler)
 			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding Template function %s", handl.MethodName)
 			r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass))
 			if handl.HTTPMethod != ""{
-				r.Methods(strings.Split(handl.HTTPMethod,","))
+				r.Methods(strings.Split(handl.HTTPMethod,",")...)
 			}
 		} else {
 			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding %s", handl.MethodName)
 			r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass))
 			if handl.HTTPMethod != ""{
-				r.Methods(strings.Split(handl.HTTPMethod,","))
+				r.Methods(strings.Split(handl.HTTPMethod,",")...)
 			}
 		}
 	} else {
