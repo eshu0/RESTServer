@@ -8,7 +8,6 @@ import (
 	"errors"
     "io/ioutil"
 	"strings"
-	"strconv"
 
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
@@ -28,7 +27,7 @@ type RServer struct {
 	FunctionalMap  	map[string]interface{} `json:"-"`
 	ConfigFilePath 	string                 `json:"-"`
 	Templates 		*template.Template     `json:"-"`
-	RequestHelper 	*RequestHelper         `json:"-"`
+	RequestHelper 	*Helpers.RequestHelper `json:"-"`
 }
 
 func NewRServer(config Config.IRServerConfig) (*RServer) {
