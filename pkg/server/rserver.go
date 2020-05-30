@@ -155,7 +155,7 @@ func (rs *RServer) CreateFunctionHandler(URL string, MethodName string,HTTPMetho
 	return drhr
 }
 
-func (rs *RServer) addHandlerToRouter(r mux.Router, handl Handlers.RESTHandler){
+func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler){
 
 	funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
@@ -190,7 +190,7 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	for _, handl := range rs.Config.GetHandlers() {
 
-		rs.addHandlerToRouter(&r,handl)
+		rs.addHandlerToRouter(r,handl)
 		/*
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
@@ -217,7 +217,7 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	for _, handl := range rs.Config.GetDefaultHandlers() {
 
-		rs.addHandlerToRouter(&r,handl)
+		rs.addHandlerToRouter(r,handl)
 
 		/*
 		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
