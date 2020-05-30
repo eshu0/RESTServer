@@ -8,7 +8,8 @@ import (
 	"errors"
     "io/ioutil"
 	"strings"
-
+	"strconv"
+	
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	Config "github.com/eshu0/RESTServer/pkg/config"
 
@@ -225,7 +226,7 @@ func (rs *RServer) GetRequestId(r *http.Request, name string) *int {
 
 func (rs *RServer) GetRequestIds(r *http.Request, names []string) map[string]*int{
 	vars := mux.Vars(r)
-	results = make(map[string]*int)
+	results := make(map[string]*int)
 	for _, name := range names {
 		rs.Log.LogInfof("GetRequestIds","Got the following %s for %v",name, vars[name])
 		id, err := strconv.Atoi(vars[name])
