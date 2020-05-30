@@ -11,9 +11,9 @@ import (
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	//Config "github.com/eshu0/RESTServer/pkg/config"
 
-	sl "github.com/eshu0/simplelogger"
-	sli "github.com/eshu0/simplelogger/interfaces"
-	mux "github.com/gorilla/mux"
+	//sl "github.com/eshu0/simplelogger"
+	//sli "github.com/eshu0/simplelogger/interfaces"
+	//mux "github.com/gorilla/mux"
 )
 
 
