@@ -155,6 +155,35 @@ func (rs *RServer) CreateFunctionHandler(URL string, MethodName string,HTTPMetho
 	return drhr
 }
 
+func (rs *RSServer) addHandlerToRouter(r mux.Router, handl Handlers.RESTHandler){
+
+	funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
+
+	if ok {
+		if handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != ""  {
+			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding Template function %s", handl.MethodName)
+			r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass))
+			if handl.HTTPMethod != ""{
+				r.Methods(strings.Split(handl.HTTPMethod,","))
+			}
+		} else {
+			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding %s", handl.MethodName)
+			r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass))
+			if handl.HTTPMethod != ""{
+				r.Methods(strings.Split(handl.HTTPMethod,","))
+			}
+		}
+	} else {
+		if handl.StaticDir != "" {
+			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding route %s for  static directory %s", handl.URL, handl.StaticDir)		
+			r.PathPrefix(handl.URL).Handler(http.StripPrefix(handl.URL, http.FileServer(http.Dir(handl.StaticDir))))
+
+		} else {
+			rs.Log.LogError("addHandlertoRouter", "Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)		
+		}
+	}
+}
+
 func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	r := mux.NewRouter()
@@ -267,7 +296,7 @@ func (rs *RServer) LoadTemplates(){
 		}
 		rs.Log.LogDebug("LoadTemplates", "Loaded Templates")
 		rs.Templates = templates
-	}else{
+	} else {
 		if !rs.Config.HasTemplate() {
 			rs.Log.LogDebug("LoadTemplates", "No Template")
 		}
@@ -278,8 +307,8 @@ func (rs *RServer) LoadTemplates(){
 
 		rs.Templates = nil
 	}
-
 }
+
 func notFound(w http.ResponseWriter, r *http.Request){
 	fmt.Fprint(w, "custom 404")
 }
@@ -287,6 +316,7 @@ func notFound(w http.ResponseWriter, r *http.Request){
 func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
 	r.NotFoundHandler = http.HandlerFunc(notFound)
+
 	rs.LoadTemplates()
 	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: r}
 
