@@ -155,7 +155,7 @@ func (rs *RServer) CreateFunctionHandler(URL string, MethodName string,HTTPMetho
 	return drhr
 }
 
-func (rs *RSServer) addHandlerToRouter(r mux.Router, handl Handlers.RESTHandler){
+func (rs *RServer) addHandlerToRouter(r mux.Router, handl Handlers.RESTHandler){
 
 	funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
