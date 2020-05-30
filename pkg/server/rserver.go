@@ -164,13 +164,23 @@ func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler)
 			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding Template function %s", handl.MethodName)
 			r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass))
 			if handl.HTTPMethod != ""{
-				r.Methods(strings.Split(handl.HTTPMethod,",")...)
+				if strings.Contains(handl.HTTPMethod,",") {
+					r.Methods(strings.Split(handl.HTTPMethod,",")...)
+
+				}else{
+					r.Methods(handl.HTTPMethod)
+				}
 			}
 		} else {
 			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding %s", handl.MethodName)
 			r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass))
 			if handl.HTTPMethod != ""{
-				r.Methods(strings.Split(handl.HTTPMethod,",")...)
+				if strings.Contains(handl.HTTPMethod,",") {
+					r.Methods(strings.Split(handl.HTTPMethod,",")...)
+
+				}else{
+					r.Methods(handl.HTTPMethod)
+				}
 			}
 		}
 	} else {
