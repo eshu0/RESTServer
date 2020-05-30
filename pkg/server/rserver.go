@@ -286,6 +286,7 @@ func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
 
 	if rs.NotFoundHandler != nil {
+		rs.Log.LogInfo("ListenAndServe", "NotFoundHandler is set")
 		r.NotFoundHandler = http.HandlerFunc(rs.NotFoundHandler)
 	}
 
