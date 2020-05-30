@@ -2,12 +2,9 @@ package RESTHelpers
 
 import (
 	"net/http"
-	"strconv"
 	"encoding/json"
-	"io/ioutil"
-
+	"fmt"
 	sli "github.com/eshu0/simplelogger/interfaces"
-	mux "github.com/gorilla/mux"
 )
 
 type ResponseHelper struct {
@@ -30,6 +27,7 @@ func (rh *ResponseHelper) WriteIndentJSON(w http.ResponseWriter, Data interface{
 		return false, err
 	}
 	fmt.Fprint(w, bytes)
+	return true, nil
 }
 
 func (rh *ResponseHelper) WriteJSON(w http.ResponseWriter, Data interface{}) (bool,error) {
@@ -39,5 +37,7 @@ func (rh *ResponseHelper) WriteJSON(w http.ResponseWriter, Data interface{}) (bo
 		return false, err
 	}
 	fmt.Fprint(w, bytes)
+	return true, nil
+
 }
 
