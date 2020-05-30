@@ -1,7 +1,6 @@
 package RESTServer
 
 import (
-	"fmt"
 	"context"
 	"net/http"
 	"reflect"
@@ -23,12 +22,13 @@ import (
 var Server *http.Server
 
 type RServer struct {
-	Config         	Config.IRServerConfig  `json:"-"`
-	Log            	sli.ISimpleLogger      `json:"-"`
-	FunctionalMap  	map[string]interface{} `json:"-"`
-	ConfigFilePath 	string                 `json:"-"`
-	Templates 		*template.Template     `json:"-"`
-	RequestHelper 	*Helpers.RequestHelper `json:"-"`
+	Config         		Config.IRServerConfig  `json:"-"`
+	Log            		sli.ISimpleLogger      `json:"-"`
+	FunctionalMap  		map[string]interface{} `json:"-"`
+	ConfigFilePath 		string                 `json:"-"`
+	Templates 			*template.Template     `json:"-"`
+	RequestHelper 		*Helpers.RequestHelper `json:"-"`
+	NotFoundHandler   	func(w http.ResponseWriter, r *http.Request)
 }
 
 func NewRServer(config Config.IRServerConfig) (*RServer) {
@@ -202,58 +202,11 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 	r := mux.NewRouter()
 
 	for _, handl := range rs.Config.GetHandlers() {
-
 		rs.addHandlerToRouter(r,handl)
-		/*
-		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
-
-		if ok {
-			if handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != ""  {
-				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding Template function %s", handl.MethodName)
-				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
-			} else {
-				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding %s", handl.MethodName)
-				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
-			}
-		} else {
-			if handl.StaticDir != "" {
-				rs.Log.LogDebugf("MapFunctionsToHandlers", "Handlers: Adding route %s for  static directory %s", handl.URL, handl.StaticDir)		
-				r.PathPrefix(handl.URL).Handler(http.StripPrefix(handl.URL, http.FileServer(http.Dir(handl.StaticDir))))
-
-			} else {
-				rs.Log.LogError("MapFunctionsToHandlers", "Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)		
-			}
-		}
-		*/
-
 	}
 
 	for _, handl := range rs.Config.GetDefaultHandlers() {
-
 		rs.addHandlerToRouter(r,handl)
-
-		/*
-		funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
-
-		if ok {
-			if  handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != ""  {
-				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding Template function %s", handl.MethodName)
-				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
-			} else {
-				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding %s", handl.MethodName)
-				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
-			}
-		} else {
-			if handl.StaticDir != "" {
-				rs.Log.LogDebugf("MapFunctionsToHandlers", "Default Handlers: Adding route %s for static directory %s", handl.URL, handl.StaticDir)
-				r.PathPrefix(handl.URL).Handler(http.StripPrefix(handl.URL, http.FileServer(http.Dir(handl.StaticDir))))
-
-			} else {
-				rs.Log.LogError("MapFunctionsToHandlers", "Default Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)
-			}
-		}
-		*/
-
 	}
 
 	return r
@@ -329,13 +282,12 @@ func (rs *RServer) LoadTemplates(){
 	}
 }
 
-func notFound(w http.ResponseWriter, r *http.Request){
-	fmt.Fprint(w, "custom 404")
-}
-
 func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
-	r.NotFoundHandler = http.HandlerFunc(notFound)
+
+	if ns.NotFoundHandler != nil {
+		r.NotFoundHandler = http.HandlerFunc(ns.NotFoundHandler)
+	}
 
 	rs.LoadTemplates()
 	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: r}
