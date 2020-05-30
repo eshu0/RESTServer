@@ -28,6 +28,7 @@ type RServer struct {
 	ConfigFilePath 		string                 `json:"-"`
 	Templates 			*template.Template     `json:"-"`
 	RequestHelper 		*Helpers.RequestHelper `json:"-"`
+	ResponseHelper 		*Helpers.ResponseHelper `json:"-"`
 	NotFoundHandler   	func(w http.ResponseWriter, r *http.Request)
 }
 
@@ -44,6 +45,7 @@ func NewRServer(config Config.IRServerConfig) (*RServer) {
 
 	server.Log = logger
 	server.RequestHelper = Helpers.NewRequestHelper(logger)
+	server.ResponseHelper= Helpers.NewResponseHelper(logger)
 	return &server
 }
 
