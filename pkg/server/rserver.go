@@ -162,25 +162,28 @@ func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler)
 	if ok {
 		if handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != ""  {
 			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding Template function %s", handl.MethodName)
-			r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass))
+			
 			if handl.HTTPMethod != ""{
 				if strings.Contains(handl.HTTPMethod,",") {
-					r.Methods(strings.Split(handl.HTTPMethod,",")...)
+					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
 
 				}else{
-					r.Methods(handl.HTTPMethod)
+					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 				}
+			}else{
+				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass))
 			}
 		} else {
 			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding %s", handl.MethodName)
-			r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass))
 			if handl.HTTPMethod != ""{
 				if strings.Contains(handl.HTTPMethod,",") {
-					r.Methods(strings.Split(handl.HTTPMethod,",")...)
+					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
 
 				}else{
-					r.Methods(handl.HTTPMethod)
+					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
 				}
+			}else{
+				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass))
 			}
 		}
 	} else {
