@@ -49,35 +49,29 @@ func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler)
 
 	if ok {
 		if handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != ""  {
-			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding Template function %s", handl.MethodName)
+			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding Template function %s - %s",handl.HTTPMethod, handl.MethodName)
 			
 			if handl.HTTPMethod != ""{
 				if strings.Contains(handl.HTTPMethod,",") {
+					rs.Log.LogDebugf("addHandlertoRouter", "Method is multiple")	
 					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
-					r.Use(mux.CORSMethodMiddleware(r))
-
 				}else{
-					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod,http.MethodOptions)
-					r.Use(mux.CORSMethodMiddleware(r))
+					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 				}
 			}else{
 				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass))
-				r.Use(mux.CORSMethodMiddleware(r))
-
 			}
 		} else {
-			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding %s", handl.MethodName)
+			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding %s - %s",handl.HTTPMethod, handl.MethodName)
 			if handl.HTTPMethod != ""{
 				if strings.Contains(handl.HTTPMethod,",") {
+					rs.Log.LogDebugf("addHandlertoRouter", "Method is multiple")
 					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
-					r.Use(mux.CORSMethodMiddleware(r))
 				}else{
-					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod, http.MethodOptions)
-					r.Use(mux.CORSMethodMiddleware(r))
+					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
 				}
 			}else{
 				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass))
-				r.Use(mux.CORSMethodMiddleware(r))
 			}
 		}
 	} else {
@@ -89,6 +83,10 @@ func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler)
 			rs.Log.LogError("addHandlertoRouter", "Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)		
 		}
 	}
+	r.HandleFunc(handl.URL, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Max-Age", "86400")
+	}).Methods(http.MethodOptions)
 }
 
 func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
@@ -102,6 +100,8 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 	for _, handl := range rs.Config.GetDefaultHandlers() {
 		rs.addHandlerToRouter(r,handl)
 	}
+	
+	r.Use(mux.CORSMethodMiddleware(r))
 
 	return r
 }
