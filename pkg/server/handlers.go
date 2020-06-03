@@ -53,25 +53,31 @@ func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler)
 			
 			if handl.HTTPMethod != ""{
 				if strings.Contains(handl.HTTPMethod,",") {
-					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
+					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(http.MethodOptions,strings.Split(handl.HTTPMethod,",")...)
+					r.Use(mux.CORSMethodMiddleware(r))
 
 				}else{
-					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
+					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod,http.MethodOptions)
+					r.Use(mux.CORSMethodMiddleware(r))
 				}
 			}else{
 				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass))
+				r.Use(mux.CORSMethodMiddleware(r))
+
 			}
 		} else {
 			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding %s", handl.MethodName)
 			if handl.HTTPMethod != ""{
 				if strings.Contains(handl.HTTPMethod,",") {
-					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
-
+					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(http.MethodOptions,strings.Split(handl.HTTPMethod,",")...)
+					r.Use(mux.CORSMethodMiddleware(r))
 				}else{
-					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
+					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod, http.MethodOptions)
+					r.Use(mux.CORSMethodMiddleware(r))
 				}
 			}else{
 				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass))
+				r.Use(mux.CORSMethodMiddleware(r))
 			}
 		}
 	} else {
