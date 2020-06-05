@@ -7,14 +7,33 @@ import (
     "io/ioutil"
 	"strings"
 
-	//Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
-	//Config "github.com/eshu0/RESTServer/pkg/config"
-
-	//sl "github.com/eshu0/simplelogger"
-	//sli "github.com/eshu0/simplelogger/interfaces"
-	//mux "github.com/gorilla/mux"
 )
+
+// Create Handlers helper functions
+func (rs *RServer) CreateTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string) Handlers.RESTHandler {
+	return rs.CreateJSONTemplateHandler(URL, MethodName, HTTPMethod, FunctionalClass,false,false)
+}
+
+func (rs *RServer) CreateSpecificTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string) Handlers.RESTHandler {		
+	return rs.CreateJSONSpecificTemplateHandler(URL, MethodName, HTTPMethod, FunctionalClass,TemplateName,Blob,Path,false,false)
+}
+func (rs *RServer) CreateJSONTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string, HandleJSONRequest bool, HandleJSONResponse bool) Handlers.RESTHandler {
+	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass,HandleJSONRequest,HandleJSONResponse)
+	drhr.TemplateBlob = Blob
+	drhr.TemplateFileName = Filename
+	drhr.TemplateName = TemplateName		
+	return drhr
+}
+
+func (rs *RServer) CreateJSONSpecificTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string, HandleJSONRequest bool, HandleJSONResponse bool) Handlers.RESTHandler {
+	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass,HandleJSONRequest,HandleJSONResponse)
+	drhr.TemplateBlob = Blob
+	drhr.TemplatePath = Path
+	drhr.TemplateName = TemplateName		
+	return drhr
+}
+// end create handlers
 
 
 func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
@@ -52,7 +71,17 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 				rs.Log.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
 				return
 			}
-			rs.Invoke(any, handler.MethodName, w, r, t)
+			if handler.HandleJSONRequest {
+				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r)
+				if err != nil {
+					rs.Invoke(any, handler.MethodName, w, r, t, data)
+				}else{
+					rs.Log.LogErrorf("MakeTemplateHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
+					return			
+				}
+			} else {
+				rs.Invoke(any, handler.MethodName, w, r, t)
+			}
 		}
 	
 	}
@@ -68,36 +97,11 @@ func (rs *RServer) AddTemplateHandlerWithBlob(URL string, MethodName string,HTTP
 }
 
 func (rs *RServer) AddBlobTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string)  {
-	rs.Config.AddHandler(rs.CreateBlobTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Path))
+	rs.Config.AddHandler(rs.CreateSpecificTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Path))
 }
 
 func (rs *RServer) AddSpecificTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string)  {
 	rs.Config.AddHandler(rs.CreateSpecificTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Filename))
-}
-
-
-func (rs *RServer) CreateTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string) Handlers.RESTHandler {
-	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
-	drhr.TemplateBlob = Blob
-	drhr.TemplateFileName = Filename
-	drhr.TemplateName = TemplateName		
-	return drhr
-}
-
-func (rs *RServer) CreateBlobTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string) Handlers.RESTHandler {
-	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
-	drhr.TemplateBlob = Blob
-	drhr.TemplatePath = Path
-	drhr.TemplateName = TemplateName		
-	return drhr
-}
-
-func (rs *RServer) CreateSpecificTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string) Handlers.RESTHandler {
-	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass)
-	drhr.TemplateBlob = Blob
-	drhr.TemplatePath = Path
-	drhr.TemplateName = TemplateName		
-	return drhr
 }
 
 func (rs *RServer) LoadTemplates(){

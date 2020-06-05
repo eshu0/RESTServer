@@ -68,10 +68,10 @@ func (rh *RequestHelper) ParseForm(r *http.Request, names []string) map[string]s
 func (rh *RequestHelper) ReadBody(r *http.Request) ([]byte, error) {
 	body, err1 := ioutil.ReadAll(r.Body)
 	if err1 != nil {
-		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while reading body %s",err1.Error())
+		rh.Log.LogErrorf("ReadBody","Got the following error while reading body %s",err1.Error())
 		return []byte{},err1
 	}
-	rh.Log.LogDebugf("ReadJSONRequest","Got the following request body %s",string(body))
+	rh.Log.LogDebugf("ReadBody","Got the following request body %s",string(body))
 	return body,err1
 }
 

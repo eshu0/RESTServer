@@ -4,18 +4,64 @@ import (
 	"net/http"
 	"strings"
 
-	//Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
-	//Config "github.com/eshu0/RESTServer/pkg/config"
 
-	//sl "github.com/eshu0/simplelogger"
-	//sli "github.com/eshu0/simplelogger/interfaces"
 	mux "github.com/gorilla/mux"
 )
 
+// Create Handlers helper functions
+func (rs *RServer) CreateStaticHandler(URL string, StaticDir string) Handlers.RESTHandler {
+	drhr := Handlers.RESTHandler{}
+	drhr.URL = URL
+	drhr.StaticDir = StaticDir
+	drhr.JSONRequest = false
+	drhr.JSONResponse = false
+	return drhr
+}
+
+func (rs *RServer) CreateFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, HandleJSONRequest bool, HandleJSONResponse bool) Handlers.RESTHandler {
+	drhr := Handlers.RESTHandler{}
+	drhr.URL = URL
+	drhr.MethodName = MethodName
+	drhr.HTTPMethod = HTTPMethod
+	drhr.FunctionalClass = FunctionalClass
+	drhr.JSONRequest = HandleJSONRequest
+	drhr.JSONResponse = HandleJSONResponse
+	return drhr
+}
+// end 
+
 func (rs *RServer) MakeHandlerFunction(MethodName string, any interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rs.Invoke(any, MethodName, w, r)
+		if handler.HandleJSONResponse {
+			if handler.HandleJSONRequest {
+				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r)
+				if err != nil {
+					resp := rs.Invoke(any, handler.MethodName,data)
+				}else{
+					rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
+					return			
+				}
+			} else{ 
+				resp := rs.Invoke(any, handler.MethodName, r)
+			}
+
+			rs.RequestHelper.WriteJSON(w,resp)
+			
+		} else {
+			if handler.HandleJSONRequest {
+				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r)
+				if err != nil {
+					rs.Invoke(any, handler.MethodName, w, r, data)
+				}else{
+					rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
+					return			
+				}
+			} else{ 
+				rs.Invoke(any, MethodName, w, r)
+			}
+		}
+
 	}
 }
 
@@ -25,22 +71,6 @@ func (rs *RServer) AddStaticHandler(URL string, StaticDir string)  {
 
 func (rs *RServer) AddFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string)  {
 	rs.Config.AddHandler(rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass))
-}
-
-func (rs *RServer) CreateStaticHandler(URL string, StaticDir string) Handlers.RESTHandler {
-	drhr := Handlers.RESTHandler{}
-	drhr.URL = URL
-	drhr.StaticDir = StaticDir
-	return drhr
-}
-
-func (rs *RServer) CreateFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string) Handlers.RESTHandler {
-	drhr := Handlers.RESTHandler{}
-	drhr.URL = URL
-	drhr.MethodName = MethodName
-	drhr.HTTPMethod = HTTPMethod
-	drhr.FunctionalClass = FunctionalClass
-	return drhr
 }
 
 func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler){
