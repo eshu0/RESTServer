@@ -39,15 +39,17 @@ func (rs *RServer) AddFunctionHandler(URL string, MethodName string,HTTPMethod s
 	rs.Config.AddHandler(rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, false, false))
 }
 
-func (rs *RServer) AddJSONFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string)  {
-	rs.Config.AddHandler(rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, true, true))
+func (rs *RServer) AddJSONFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, DataType interface{})  {
+	fc := rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, true, true)
+	fc.JSONRequestType = DataType
+	rs.Config.AddHandler(fc)
 }
 
 func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if handler.JSONRequest {
-			if handler.HandleJSONRequest {
-				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r)
+			if handler.JSONRequest {
+				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,JSONRequestType)
 				if err != nil {
 					resp := rs.Invoke(any, handler.MethodName,data)
 				}else{
