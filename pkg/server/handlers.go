@@ -39,6 +39,18 @@ func (rs *RServer) AddFunctionHandler(URL string, MethodName string,HTTPMethod s
 	rs.Config.AddHandler(rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, false, false))
 }
 
+func (rs *RServer) AddJSONRequestFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, DataType interface{})  {
+	fc := rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, true, false)
+	fc.JSONRequestType = DataType
+	rs.Config.AddHandler(fc)
+}
+
+func (rs *RServer) AddJSONResponseFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, DataType interface{})  {
+	fc := rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, false, true)
+	fc.JSONRequestType = DataType
+	rs.Config.AddHandler(fc)
+}
+
 func (rs *RServer) AddJSONFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, DataType interface{})  {
 	fc := rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, true, true)
 	fc.JSONRequestType = DataType
