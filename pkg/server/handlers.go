@@ -51,14 +51,14 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 			if handler.JSONRequest {
 				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
 				if jsonerr != nil {
-					resp := rs.Invoke(any, handler.MethodName,data)
+					resp := rs.Invoke(any,handler.MethodName, w, r,data)
 					rs.ResponseHelper.WriteJSON(w,resp)
 				}else{
 					rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
 					return			
 				}
 			} else{ 
-				resp := rs.Invoke(any, handler.MethodName, r)
+				resp := rs.Invoke(any,handler.MethodName, w, r)
 				rs.ResponseHelper.WriteJSON(w,resp)
 			}
 
