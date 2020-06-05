@@ -37,7 +37,7 @@ func (rs *RServer) CreateJSONSpecificTemplateHandler(URL string, MethodName stri
 
 
 func (rs *RServer) AddJSONTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Filename string)  {
-	rs.Config.AddHandler(rs.CreateJSONTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Filename, true, false))
+	rs.Config.AddHandler(rs.CreateJSONTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,"",Filename, true, false))
 }
 
 func (rs *RServer) AddTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Filename string)  {

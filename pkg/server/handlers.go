@@ -65,7 +65,7 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 	
 		} else {
 			if handler.JSONRequest {
-				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r)
+				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
 				if jsonerr != nil {
 					rs.Invoke(any, handler.MethodName, w, r, data)
 				}else{
