@@ -60,7 +60,7 @@ func (rs *RServer) AddJSONFunctionHandler(URL string, MethodName string,HTTPMeth
 func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if handler.JSONRequest {
-			if handler.JSONRequest {
+			if handler.JSONResponse {
 				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
 				if jsonerr != nil {
 					resp := rs.Invoke(any,handler.MethodName,data)
@@ -80,7 +80,7 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 
 	
 		} else {
-			if handler.JSONRequest {
+			if handler.JSONResponse {
 				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
 				if jsonerr != nil {
 					rs.Invoke(any, handler.MethodName, w, r, data)
