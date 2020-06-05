@@ -52,20 +52,21 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,JSONRequestType)
 				if err != nil {
 					resp := rs.Invoke(any, handler.MethodName,data)
+					rs.RequestHelper.WriteJSON(w,resp)
 				}else{
 					rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
 					return			
 				}
 			} else{ 
 				resp := rs.Invoke(any, handler.MethodName, r)
+				rs.RequestHelper.WriteJSON(w,resp)
 			}
 
-			rs.RequestHelper.WriteJSON(w,resp)
 	
 		} else {
 			if handler.JSONRequest {
 				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r)
-				if err != nil {
+				if jsonerr != nil {
 					rs.Invoke(any, handler.MethodName, w, r, data)
 				}else{
 					rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())

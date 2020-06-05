@@ -12,7 +12,7 @@ import (
 
 // Create Handlers helper functions
 func (rs *RServer) CreateTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string) Handlers.RESTHandler {
-	return rs.CreateJSONTemplateHandler(URL, MethodName, HTTPMethod, FunctionalClass,false,false)
+	return rs.CreateJSONTemplateHandler(URL, MethodName, HTTPMethod, FunctionalClass,TemplateName,Blob,Filename,false,false)
 }
 
 func (rs *RServer) CreateSpecificTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string) Handlers.RESTHandler {		
@@ -93,7 +93,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 			}
 			if handler.JSONRequest {
 				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r)
-				if err != nil {
+				if jsonerr != nil {
 					rs.Invoke(any, handler.MethodName, w, r, t, data)
 				}else{
 					rs.Log.LogErrorf("MakeTemplateHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
