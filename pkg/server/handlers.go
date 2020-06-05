@@ -59,36 +59,39 @@ func (rs *RServer) AddJSONFunctionHandler(URL string, MethodName string,HTTPMeth
 
 func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		
+		// JSON request expected
 		if handler.JSONRequest {
-			if handler.JSONResponse {
-				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
-				if jsonerr != nil {
+			// parse the JSON
+			data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
+			
+			// no error
+			if jsonerr == nil {
+				// are we returning JSON?
+				if handler.JSONResponse {
+					// we are invoking a JSON method this should do the writing
 					resp := rs.Invoke(any,handler.MethodName,data)
 					if len(resp) > 0{ 
 						rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 					}
-				}else{
-					rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
-					return			
+				} else{ 
+					// we are invoking the method that will do the writing out etc
+					rs.Invoke(any, handler.MethodName, w, r, data)
 				}
-			} else{ 
-				resp := rs.Invoke(any,handler.MethodName)
-				if len(resp) > 0{ 
-					rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
-				}
+			}else{
+				rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
+				return			
 			}
-
 	
 		} else {
 			if handler.JSONResponse {
-				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
-				if jsonerr != nil {
-					rs.Invoke(any, handler.MethodName, w, r, data)
-				}else{
-					rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
-					return			
+				// we are just letting the request do the work and then the data will be returned
+				resp := rs.Invoke(any,handler.MethodName,r)
+				if len(resp) > 0{ 
+					rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 				}
 			} else{ 
+				// not json request or response -> raw read/write
 				rs.Invoke(any,handler.MethodName, w, r)
 			}
 		}
