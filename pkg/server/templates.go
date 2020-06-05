@@ -36,6 +36,26 @@ func (rs *RServer) CreateJSONSpecificTemplateHandler(URL string, MethodName stri
 // end create handlers
 
 
+func (rs *RServer) AddJSONTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Filename string)  {
+	rs.Config.AddHandler(rs.CreateJSONTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Filename, true, false))
+}
+
+func (rs *RServer) AddTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Filename string)  {
+	rs.AddTemplateHandlerWithBlob(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,"",Filename)
+}
+
+func (rs *RServer) AddTemplateHandlerWithBlob(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string)  {
+	rs.Config.AddHandler(rs.CreateTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Filename))
+}
+
+func (rs *RServer) AddBlobTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string)  {
+	rs.Config.AddHandler(rs.CreateSpecificTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Path))
+}
+
+func (rs *RServer) AddSpecificTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string)  {
+	rs.Config.AddHandler(rs.CreateSpecificTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Filename))
+}
+
 func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -86,22 +106,6 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 	
 	}
 
-}
-
-func (rs *RServer) AddTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Filename string)  {
-	rs.AddTemplateHandlerWithBlob(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,"",Filename)
-}
-
-func (rs *RServer) AddTemplateHandlerWithBlob(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string)  {
-	rs.Config.AddHandler(rs.CreateTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Filename))
-}
-
-func (rs *RServer) AddBlobTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string)  {
-	rs.Config.AddHandler(rs.CreateSpecificTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Path))
-}
-
-func (rs *RServer) AddSpecificTemplateHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string)  {
-	rs.Config.AddHandler(rs.CreateSpecificTemplateHandler(URL,MethodName,HTTPMethod,FunctionalClass,TemplateName,Blob,Filename))
 }
 
 func (rs *RServer) LoadTemplates(){

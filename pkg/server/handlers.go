@@ -31,6 +31,18 @@ func (rs *RServer) CreateFunctionHandler(URL string, MethodName string,HTTPMetho
 }
 // end 
 
+func (rs *RServer) AddStaticHandler(URL string, StaticDir string)  {
+	rs.Config.AddHandler(rs.CreateStaticHandler(URL,StaticDir))
+}
+
+func (rs *RServer) AddFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string)  {
+	rs.Config.AddHandler(rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, false, false))
+}
+
+func (rs *RServer) AddJSONFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string)  {
+	rs.Config.AddHandler(rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, true, true))
+}
+
 func (rs *RServer) MakeHandlerFunction(MethodName string, any interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if handler.HandleJSONResponse {
@@ -47,7 +59,7 @@ func (rs *RServer) MakeHandlerFunction(MethodName string, any interface{}) http.
 			}
 
 			rs.RequestHelper.WriteJSON(w,resp)
-			
+	
 		} else {
 			if handler.HandleJSONRequest {
 				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r)
@@ -65,13 +77,6 @@ func (rs *RServer) MakeHandlerFunction(MethodName string, any interface{}) http.
 	}
 }
 
-func (rs *RServer) AddStaticHandler(URL string, StaticDir string)  {
-	rs.Config.AddHandler(rs.CreateStaticHandler(URL,StaticDir))
-}
-
-func (rs *RServer) AddFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string)  {
-	rs.Config.AddHandler(rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass))
-}
 
 func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler){
 
