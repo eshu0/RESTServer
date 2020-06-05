@@ -92,7 +92,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 				return
 			}
 			if handler.JSONRequest {
-				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r)
+				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
 				if jsonerr != nil {
 					rs.Invoke(any, handler.MethodName, w, r, t, data)
 				}else{
