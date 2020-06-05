@@ -44,7 +44,7 @@ func NewRServer(config Config.IRServerConfig) (*RServer) {
 	return &server
 }
 
-func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
+func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []Value {
 
 	rs.Log.LogDebugf("Invoke", "Method: Looking up %s ", name)
 
@@ -56,11 +56,12 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) {
 
 	meth := val.MethodByName(name)
 	if !meth.IsZero() && !meth.IsNil() {
-		meth.Call(inputs)
+		return meth.Call(inputs)
 	} else {
 		rs.Log.LogDebugf("Invoke", "Method: %s could not be found ", name)
 	}
 
+	return nil
 }
 
 func (rs *RServer) Register(FunctionClass string, data interface{}) {
