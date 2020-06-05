@@ -53,7 +53,7 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 				if jsonerr != nil {
 					resp := rs.Invoke(any,handler.MethodName,data)
 					if len(resp) > 0{ 
-						rs.ResponseHelper.WriteJSON(w,result[0].Interface())
+						rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 					}
 				}else{
 					rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
@@ -62,7 +62,7 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 			} else{ 
 				resp := rs.Invoke(any,handler.MethodName)
 				if len(resp) > 0{ 
-					rs.ResponseHelper.WriteJSON(w,result[0].Interface())
+					rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 				}
 			}
 

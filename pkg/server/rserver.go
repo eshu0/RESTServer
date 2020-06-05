@@ -44,7 +44,7 @@ func NewRServer(config Config.IRServerConfig) (*RServer) {
 	return &server
 }
 
-func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []Value {
+func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []reflect.Value {
 
 	rs.Log.LogDebugf("Invoke", "Method: Looking up %s ", name)
 
