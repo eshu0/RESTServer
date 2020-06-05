@@ -43,7 +43,7 @@ func (rs *RServer) AddJSONFunctionHandler(URL string, MethodName string,HTTPMeth
 	rs.Config.AddHandler(rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, true, true))
 }
 
-func (rs *RServer) MakeHandlerFunction(MethodName string, any interface{}) http.HandlerFunc {
+func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if handler.HandleJSONResponse {
 			if handler.HandleJSONRequest {
@@ -101,12 +101,12 @@ func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler)
 			if handl.HTTPMethod != ""{
 				if strings.Contains(handl.HTTPMethod,",") {
 					rs.Log.LogDebugf("addHandlertoRouter", "Method is multiple")
-					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
+					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
 				}else{
-					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass)).Methods(handl.HTTPMethod)
+					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 				}
 			}else{
-				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl.MethodName, funcclass))
+				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass))
 			}
 		}
 	} else {
