@@ -90,5 +90,23 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 		return nil, err
 	}
 
+	s := reflect.ValueOf(Data).Elem()
+	typeOfT := s.Type()
+	for i := 0; i < s.NumField(); i++ {
+		for j, f := range Data {
+			if typeOfT.Field(i).Tag.Get("json") == j {
+				fl := s.FieldByName(typeOfT.Field(i).Name)
+				switch fl.Kind() {
+				case reflect.Bool:
+					fl.SetBool(f.(bool))
+				case reflect.Int, reflect.Int64:
+					c, _ := f.(float64)
+					fl.SetInt(int64(c))
+				case reflect.String:
+					fl.SetString(f.(string))
+				}
+			}
+		}
+	}
 	return Data, nil
 }
