@@ -85,7 +85,7 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 	rh.Log.LogDebugf("ReadJSONRequest","Got the following request body %s",string(body))
 
 	// Get first arg of the function
-	firstArg := reflect.TypeOf(Data).Elem()//.In(0)
+	firstArg := reflect.TypeOf(Data).Type().Elem()//.In(0)
 
 	// Get the PtrTo to the first function parameter
 	structPtr := reflect.New(firstArg)
