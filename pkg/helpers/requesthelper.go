@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"reflect"
 	"strings"
-	
+
 	sli "github.com/eshu0/simplelogger/interfaces"
 	mux "github.com/gorilla/mux"
 )
@@ -139,5 +139,5 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 	}
 	rh.Log.LogDebugf("ReadJSONRequest","%+v\n", structPtr) 
 
-	return structPtr.Interface()
+	return structPtr.Interface(),nil
 }
