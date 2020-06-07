@@ -73,7 +73,7 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 				if handler.JSONResponse {
 					// we are invoking a JSON method this should do the writing
 					rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(data)",handler.HTTPMethod, handler.MethodName)
-					resp := rs.Invoke(any,handler.MethodName,Request.CreateServerPayloadRequest(w, r,"empty"))
+					resp := rs.Invoke(any,handler.MethodName,Request.CreateServerPayloadRequest(w, r,data))
 					if len(resp) > 0 { 
 						rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 					}
