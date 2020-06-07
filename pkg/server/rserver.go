@@ -55,7 +55,7 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []r
 	val := reflect.ValueOf(any)
 
 	meth := val.MethodByName(name)
-	if !meth.IsZero() && !meth.IsNil() {
+	if  !meth.IsNil() && !meth.IsZero() {
 		return meth.Call(inputs)
 	} else {
 		rs.Log.LogDebugf("Invoke", "Method: %s could not be found ", name)
