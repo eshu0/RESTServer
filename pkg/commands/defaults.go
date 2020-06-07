@@ -1,12 +1,8 @@
 package RESTCommands
 
 import (
-	"html/template"
-	"net/http"
-
 	Server "github.com/eshu0/RESTServer/pkg/server"
 	Request "github.com/eshu0/RESTServer/pkg/request"
-
 )
 
 type RServerCommand struct {
