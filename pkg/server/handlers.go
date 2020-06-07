@@ -67,6 +67,8 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 			
 			// no error
 			if jsonerr == nil {
+				rs.Log.LogDebugf("MakeHandlerFunction", "Data: %v ", data)
+	
 				// are we returning JSON?
 				if handler.JSONResponse {
 					// we are invoking a JSON method this should do the writing
