@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	Server "github.com/eshu0/RESTServer/pkg/server"
+	Request "github.com/eshu0/RESTServer/pkg/request"
+
 )
 
 type RServerCommand struct {
@@ -19,16 +21,16 @@ func checkRCommand(rsc RServerCommand) bool {
 	return true
 }
 
-func (rsc RServerCommand) ShutDown(w http.ResponseWriter, r *http.Request) {
+func (rsc RServerCommand) ShutDown(request Request.ServerRequest) {
 	if rsc.Server != nil {
 		rsc.Server.Log.LogDebug("RServerCommand", "HTTP server shutdown called")
 		rsc.Server.ShutDown()
 	}
 }
 
-func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request,t *template.Template) {
+func (rsc RServerCommand) ListCommands(request Request.ServerRequest) {
 	if rsc.Server != nil {
-		err := t.Execute(w, rsc.Server.Config)
+		err := request.Template.Execute(request.Writer, rsc.Server.Config)
 		if err != nil {
 			rsc.Server.Log.LogErrorf("ListCommands", "Error : %s", err.Error())
 			return
@@ -36,14 +38,14 @@ func (rsc RServerCommand) ListCommands(w http.ResponseWriter, r *http.Request,t 
 	}
 }
 
-func (rsc RServerCommand) LoadConfig(w http.ResponseWriter, r *http.Request) {
+func (rsc RServerCommand) LoadConfig(request Request.ServerRequest) {
 	if rsc.Server != nil {
 		rsc.Server.Log.LogDebug("RServerCommand", "Load Config called")
 		rsc.Server.LoadConfig()
 	}
 }
 
-func (rsc RServerCommand) SaveConfig(w http.ResponseWriter, r *http.Request) {
+func (rsc RServerCommand) SaveConfig(request Request.ServerRequest) {
 	if rsc.Server != nil {
 		rsc.Server.Log.LogDebug("RServerCommand", "Save Config called")
 		rsc.Server.SaveConfig()
