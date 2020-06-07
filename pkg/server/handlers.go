@@ -64,8 +64,7 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 		// JSON request expected
 		if handler.JSONRequest {
 			// parse the JSON
-			//data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
-			data := "empty"
+			data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
 			// no error
 			if jsonerr == nil {
 				rs.Log.LogDebugf("MakeHandlerFunction", "Data: %v ", data)
@@ -74,7 +73,7 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 				if handler.JSONResponse {
 					// we are invoking a JSON method this should do the writing
 					rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(data)",handler.HTTPMethod, handler.MethodName)
-					resp := rs.Invoke(any,handler.MethodName,Request.CreateServerPayloadRequest(w, r,data))
+					resp := rs.Invoke(any,handler.MethodName,Request.CreateServerPayloadRequest(w, r,"empty"))
 					if len(resp) > 0 { 
 						rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 					}
