@@ -99,14 +99,16 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 	return vfn.Interface(), nil
 */
 	d := map[string]interface{}{}
-	json.Unmarshal([]byte(jsonstr), &d)
+	json.Unmarshal(body, &d)
 
 	//
 	//obj := data.Project{}
+	firstArg := reflect.TypeOf(Data)
+	structPtr := reflect.New(firstArg)
+	//instance := structPtr.Interface()
 
-	//s := reflect.ValueOf(&obj).Elem()
-	//typeOfT := s.Type()
-	typeOfT := reflect.TypeOf(Data)
+	s := reflect.ValueOf(&Data).Elem()
+	typeOfT := s.Type()
 	//
 	for i := 0; i < s.NumField(); i++ {
 		for j, f := range d {
@@ -133,5 +135,7 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 			}
 		}
 	}
-	fmt.Printf("%+v\n", obj) 
+
+
+	return Data, nil
 }
