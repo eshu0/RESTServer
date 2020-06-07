@@ -89,7 +89,7 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while unmarchsalling JSON %s",err.Error())
 		return nil, err
 	}
-
+/*
 	s := reflect.ValueOf(Data).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
@@ -108,5 +108,6 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 			}
 		}
 	}
+	*/
 	return Data, nil
 }
