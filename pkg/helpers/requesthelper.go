@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"encoding/json"
 	"io/ioutil"
+	"reflect"
 
 	sli "github.com/eshu0/simplelogger/interfaces"
 	mux "github.com/gorilla/mux"
