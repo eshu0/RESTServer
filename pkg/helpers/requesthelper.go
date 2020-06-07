@@ -84,7 +84,7 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 	}
 	rh.Log.LogDebugf("ReadJSONRequest","Got the following request body %s",string(body))
 
-	rv := reflect.ValueOf(v)
+	rv := reflect.ValueOf(Data)
 
 	// Get first arg of the function
 	//firstArg := reflect.TypeOf(Data).Type().Elem()//.In(0)
