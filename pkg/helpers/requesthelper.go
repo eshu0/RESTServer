@@ -103,7 +103,7 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 
 	//
 	//obj := data.Project{}
-	firstArg := reflect.TypeOf(Data)
+	//firstArg := reflect.TypeOf(Data)
 	//structPtr := reflect.New(firstArg)
 	//instance := structPtr.Interface()
 
