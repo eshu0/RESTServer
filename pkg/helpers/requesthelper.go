@@ -7,7 +7,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"reflect"
-
+	"strings"
+	
 	sli "github.com/eshu0/simplelogger/interfaces"
 	mux "github.com/gorilla/mux"
 )
@@ -101,41 +102,42 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 	d := map[string]interface{}{}
 	json.Unmarshal(body, &d)
 
-	//
-	//obj := data.Project{}
-	//firstArg := reflect.TypeOf(Data)
-	//structPtr := reflect.New(firstArg)
-	//instance := structPtr.Interface()
+	firstArg := reflect.TypeOf(Data)
+	s := reflect.New(firstArg).Elem()
 
-	s := reflect.ValueOf(&Data).Elem()
+	structPtr := reflect.New(firstArg).Elem()
 	typeOfT := s.Type()
-	//
+
 	for i := 0; i < s.NumField(); i++ {
 		for j, f := range d {
-			//fmt.Printf("j :%+v\n", j) 
-			//fmt.Printf("%v - %v - %v - %v\n",typeOfT,typeOfT.Field(i),typeOfT.Field(i).Tag,typeOfT.Field(i).Tag.Get("json"))
-			fmt.Printf("%v - %v - %v - %v\n",typeOfT,typeOfT.Field(i),typeOfT.Field(i).Tag,typeOfT.Field(i).Tag.Get("json"))
+			rh.Log.LogDebugf("ReadJSONRequest","j :%+v\n", j) 
+			rh.Log.LogDebugf("ReadJSONRequest","%v - %v - %v - %v\n",typeOfT,typeOfT.Field(i),typeOfT.Field(i).Tag,typeOfT.Field(i).Tag.Get("json"))
+			rh.Log.LogDebugf("ReadJSONRequest","%v - %v - %v - %v\n",typeOfT,typeOfT.Field(i),typeOfT.Field(i).Tag,typeOfT.Field(i).Tag.Get("json"))
 
-			if typeOfT.Field(i).Tag.Get("json") == j {
-				//fmt.Printf("Name :%+v\n", typeOfT.Field(i).Name) 
+			withoutomit:= typeOfT.Field(i).Tag.Get("json")
+			withoutomit = strings.Replace(withoutomit,",omitempty","",-1)
+			if withoutomit == j {
+				rh.Log.LogDebugf("ReadJSONRequest","Name :%+v\n", typeOfT.Field(i).Name) 
 
-				fl := s.FieldByName(typeOfT.Field(i).Name)
+				fl := structPtr.FieldByName(typeOfT.Field(i).Name)
+				rh.Log.LogDebugf("ReadJSONRequest","Kind :%+v\n", fl.Kind()) 
 
 				switch fl.Kind() {
 					case reflect.Bool:
 						fl.SetBool(f.(bool))
 					case reflect.Int, reflect.Int64:
 						c, _ := f.(float64)
-						//fmt.Printf("c :%+v\n",c) 
+						fmt.Printf("c :%+v\n",c) 
 
 						fl.SetInt(int64(c))
 					case reflect.String:
+						fmt.Printf("f :%+v\n",f) 
 						fl.SetString(f.(string))
 				}
 			}
 		}
 	}
+	rh.Log.LogDebugf("ReadJSONRequest","%+v\n", structPtr) 
 
-
-	return Data, nil
+	return structPtr.Interface()
 }
