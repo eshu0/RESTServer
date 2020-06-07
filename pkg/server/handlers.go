@@ -70,11 +70,13 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 				// are we returning JSON?
 				if handler.JSONResponse {
 					// we are invoking a JSON method this should do the writing
+					rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(data)",handl.HTTPMethod, handl.MethodName)
 					resp := rs.Invoke(any,handler.MethodName,data)
-					if len(resp) > 0{ 
+					if len(resp) > 0 { 
 						rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 					}
 				} else{ 
+					rs.Log.LogDebugf("MakeHandlerFunction", "The response is not a JSON response for %s and %s(w,r,data)",handl.HTTPMethod, handl.MethodName)
 					// we are invoking the method that will do the writing out etc
 					rs.Invoke(any, handler.MethodName, w, r, data)
 				}
@@ -85,12 +87,14 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 	
 		} else {
 			if handler.JSONResponse {
+				rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(r)",handl.HTTPMethod, handl.MethodName)
 				// we are just letting the request do the work and then the data will be returned
 				resp := rs.Invoke(any,handler.MethodName,r)
 				if len(resp) > 0{ 
 					rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 				}
 			} else{ 
+				rs.Log.LogDebugf("MakeHandlerFunction", "The response is not a JSON response for %s and %s(w,r)",handl.HTTPMethod, handl.MethodName)
 				// not json request or response -> raw read/write
 				rs.Invoke(any,handler.MethodName, w, r)
 			}
