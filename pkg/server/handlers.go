@@ -143,7 +143,7 @@ func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler)
 			r.PathPrefix(handl.URL).Handler(http.StripPrefix(handl.URL, http.FileServer(http.Dir(handl.StaticDir))))
 
 		} else {
-			rs.Log.LogError("addHandlertoRouter", "Handlers Error FunctionalClass (%s) doesn't have a function mapped", handl.FunctionalClass)		
+			rs.Log.LogErrorf("addHandlertoRouter", "Handlers Error FunctionalClass (%s) doesn't have a function %s mapped", handl.FunctionalClass, handl.MethodName)		
 		}
 	}
 	r.HandleFunc(handl.URL, func(w http.ResponseWriter, r *http.Request) {
