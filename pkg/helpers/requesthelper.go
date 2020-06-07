@@ -83,8 +83,18 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 	}
 	rh.Log.LogDebugf("ReadJSONRequest","Got the following request body %s",string(body))
 
+	// Get first arg of the function
+	firstArg := reflect.TypeOf(Data) // .In(0)
+
+	// Get the PtrTo to the first function parameter
+	structPtr := reflect.New(firstArg)
+
+	// Convert to Interface
+	// Note that I can't assert this to .(myStruct) type
+	instance := structPtr.Interface()
+
 	//err := json.NewDecoder(string(body)).Decode(&Data)
-	err = json.Unmarshal(body, Data)
+	err = json.Unmarshal(body, instance)
 	if err != nil {
 		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while unmarchsalling JSON %s",err.Error())
 		return nil, err
