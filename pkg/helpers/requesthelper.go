@@ -84,26 +84,68 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 	}
 	rh.Log.LogDebugf("ReadJSONRequest","Got the following request body %s",string(body))
 
-	//rv := reflect.ValueOf(Data)
+	firstArg := reflect.TypeOf(Data)
+	structPtr := reflect.New(firstArg)
+	instance := structPtr.Interface()
 
-	// Get first arg of the function
-	//firstArg := reflect.TypeOf(Data).Type().Elem()//.In(0)
-
-	// Get the PtrTo to the first function parameter
-	//structPtr := reflect.New(rv.Elem().Type())
-
-	// Convert to Interface
-	// Note that I can't assert this to .(myStruct) type
-	//instance := structPtr.Interface()
-
-	//err := json.NewDecoder(string(body)).Decode(&Data)
-	err = json.Unmarshal(body, &Data)
+	err = json.Unmarshal(body, &instance)
 	if err != nil {
 		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while unmarchsalling JSON %s",err.Error())
 		return nil, err
 	}
+	vfn := reflect.ValueOf(instance)
+
+	return vfn.Interface(), nil
+}
+
 /*
-	s := reflect.ValueOf(Data).Elem()
+
+var jsonData = []byte(`{"id" : -1,"displayname" : "Hello","description" : "Something","archived" : 0,"completed" : 0}`)
+
+func TestJSON(Data interface{}) interface{}{
+
+	//rv := reflect.ValueOf(&Data)
+	rv := reflect.ValueOf(&Data).Elem()
+	fmt.Printf("TestJSON - Got the following rv %v\n",rv)
+
+	// Get first arg of the function
+	firstArg := reflect.TypeOf(Data)//.In(0)
+
+	fmt.Printf("TestJSON - Got the following firstArg %v\n",firstArg)
+
+	// Get the PtrTo to the first function parameter
+	structPtr := reflect.New(firstArg)//rv.Elem().Type())
+	fmt.Printf("TestJSON - Got the following structPtr %v\n",structPtr)
+
+
+	// Convert to Interface
+	// Note that I can't assert this to .(myStruct) type
+	instance := structPtr.Interface()
+	fmt.Printf("TestJSON - Got the following instance %v\n",instance)
+
+	//b := []byte(str)
+	//fmt.Printf("TestJSON - str %s\n",str)
+
+	//err := json.NewDecoder(string(body)).Decode(&Data)
+	err := json.Unmarshal(jsonData, &instance)
+	if err != nil {
+		fmt.Printf("TestJSON - Unmarshal -> Got the following error while unmarchsalling JSON %s\n",err.Error())
+		return nil
+	}else{
+		fmt.Printf("TestJSON - Unmarshal -> Got the following %v\n",Data)
+	}
+
+	vfn := reflect.ValueOf(instance)
+	fmt.Printf("TestJSON - Got the following instance %v\n",vfn)
+	/*
+		err := json.Unmarshal(jsonData, &Data)
+	if err != nil {
+		fmt.Printf("TestJSON - Unmarshal -> Got the following error while unmarchsalling JSON %s\n",err.Error())
+		return nil
+	}else{
+		fmt.Printf("TestJSON - Unmarshal -> Got the following %v\n",Data)
+	}
+	s := reflect.ValueOf(&Data).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
 		for j, f := range Data {
@@ -122,5 +164,9 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 		}
 	}
 	*/
-	return Data, nil
+
+	return vfn.Interface()
 }
+
+*/
+
