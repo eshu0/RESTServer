@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
+	Request "github.com/eshu0/RESTServer/pkg/request"
 
 	mux "github.com/gorilla/mux"
 )
@@ -73,14 +74,14 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 				if handler.JSONResponse {
 					// we are invoking a JSON method this should do the writing
 					rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(data)",handler.HTTPMethod, handler.MethodName)
-					resp := rs.Invoke(any,handler.MethodName,data)
+					resp := rs.Invoke(any,handler.MethodName,Request.CreateServerPayloadRequest(w, r,data))
 					if len(resp) > 0 { 
 						rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 					}
 				} else{ 
 					rs.Log.LogDebugf("MakeHandlerFunction", "The response is not a JSON response for %s and %s(w,r,data)",handler.HTTPMethod, handler.MethodName)
 					// we are invoking the method that will do the writing out etc
-					rs.Invoke(any, handler.MethodName, w, r, data)
+					rs.Invoke(any, handler.MethodName, Request.CreateServerPayloadRequest(w, r, data))
 				}
 			}else{
 				rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
@@ -91,14 +92,14 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 			if handler.JSONResponse {
 				rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(r)",handler.HTTPMethod, handler.MethodName)
 				// we are just letting the request do the work and then the data will be returned
-				resp := rs.Invoke(any,handler.MethodName,r)
+				resp := rs.Invoke(any,handler.MethodName,Request.CreateServerRawRequest(w, r))
 				if len(resp) > 0{ 
 					rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
 				}
 			} else{ 
 				rs.Log.LogDebugf("MakeHandlerFunction", "The response is not a JSON response for %s and %s(w,r)",handler.HTTPMethod, handler.MethodName)
 				// not json request or response -> raw read/write
-				rs.Invoke(any,handler.MethodName, w, r)
+				rs.Invoke(any,handler.MethodName, Request.CreateServerRawRequest(w, r))
 			}
 		}
 

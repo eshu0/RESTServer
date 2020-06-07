@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
+	Request "github.com/eshu0/RESTServer/pkg/request"
+
 )
 
 // Create Handlers helper functions
@@ -64,7 +66,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 		if rs.Config.GetCacheTemplates(){
 			rs.Log.LogDebugf("MakeTemplateHandlerFunction", "Looking up template %s for %s ",handler.TemplateName,handler.URL)
 			t := rs.Templates.Lookup(handler.TemplateName) 
-			rs.Invoke(any, handler.MethodName, w, r, t)
+			rs.Invoke(any, handler.MethodName, Request.CreateServerTemplateRequest(w, r, t))
 		} else {
 			t := template.New(handler.TemplateName) 
 			err := errors.New("should not see this error")
@@ -94,13 +96,13 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 			if handler.JSONRequest {
 				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
 				if jsonerr != nil {
-					rs.Invoke(any, handler.MethodName, w, r, t, data)
+					rs.Invoke(any, handler.MethodName, Request.CreateServerTemaplatedPayloadRequest(w, r, t, data))
 				}else{
 					rs.Log.LogErrorf("MakeTemplateHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
 					return			
 				}
 			} else {
-				rs.Invoke(any, handler.MethodName, w, r, t)
+				rs.Invoke(any, handler.MethodName, Request.CreateServerTemplateRequest(w, r, t))
 			}
 		}
 	
