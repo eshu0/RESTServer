@@ -84,7 +84,7 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 	rh.Log.LogDebugf("ReadJSONRequest","Got the following request body %s",string(body))
 
 	//err := json.NewDecoder(string(body)).Decode(&Data)
-	err = json.Unmarshal(body, &Data)
+	err = json.Unmarshal(body, Data)
 	if err != nil {
 		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while unmarchsalling JSON %s",err.Error())
 		return nil, err
