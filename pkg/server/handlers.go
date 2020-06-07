@@ -64,8 +64,8 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 		// JSON request expected
 		if handler.JSONRequest {
 			// parse the JSON
-			data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
-			
+			//data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
+			data := "empty"
 			// no error
 			if jsonerr == nil {
 				rs.Log.LogDebugf("MakeHandlerFunction", "Data: %v ", data)
