@@ -90,7 +90,7 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 	//firstArg := reflect.TypeOf(Data).Type().Elem()//.In(0)
 
 	// Get the PtrTo to the first function parameter
-	structPtr := reflect.New(rv.Type().Elem())
+	structPtr := reflect.New(rv.Elem().Type())
 
 	// Convert to Interface
 	// Note that I can't assert this to .(myStruct) type
