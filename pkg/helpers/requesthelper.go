@@ -80,25 +80,14 @@ func (rh *RequestHelper) ReadBody(r *http.Request) ([]byte, error) {
 
 func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (interface{}, error) {
 	body, err := rh.ReadBody(r)
+	
 	if err != nil {
 		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while reading body %s",err.Error())
 		return nil, err
 	}
+
 	rh.Log.LogDebugf("ReadJSONRequest","Got the following request body %s",string(body))
-/*
-	firstArg := reflect.TypeOf(Data)
-	structPtr := reflect.New(firstArg)
-	instance := structPtr.Interface()
 
-	err = json.Unmarshal(body, &instance)
-	if err != nil {
-		rh.Log.LogErrorf("ReadJSONRequest","Got the following error while unmarchsalling JSON %s",err.Error())
-		return nil, err
-	}
-	vfn := reflect.ValueOf(instance)
-
-	return vfn.Interface(), nil
-*/
 	d := map[string]interface{}{}
 	json.Unmarshal(body, &d)
 
@@ -127,11 +116,11 @@ func (rh *RequestHelper) ReadJSONRequest(r *http.Request,Data interface{}) (inte
 						fl.SetBool(f.(bool))
 					case reflect.Int, reflect.Int64:
 						c, _ := f.(float64)
-						fmt.Printf("c :%+v\n",c) 
+						rh.Log.LogDebugf("ReadJSONRequest","c :%+v\n",c) 
 
 						fl.SetInt(int64(c))
 					case reflect.String:
-						fmt.Printf("f :%+v\n",f) 
+						rh.Log.LogDebugf("ReadJSONRequest","f :%+v\n",f) 
 						fl.SetString(f.(string))
 				}
 			}
