@@ -1,7 +1,6 @@
 package RESTHelpers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"encoding/json"
