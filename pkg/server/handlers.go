@@ -20,7 +20,7 @@ func (rs *RServer) CreateStaticHandler(URL string, StaticDir string) Handlers.RE
 	return drhr
 }
 
-func (rs *RServer) CreateFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, HandleJSONRequest bool, HandleJSONResponse bool) Handlers.RESTHandler {
+func (rs *RServer) CreateFunctionHandler(URL string, MethodName string, HTTPMethod string, FunctionalClass string, HandleJSONRequest bool, HandleJSONResponse bool) Handlers.RESTHandler {
 	drhr := Handlers.RESTHandler{}
 	drhr.URL = URL
 	drhr.MethodName = MethodName
@@ -30,120 +30,120 @@ func (rs *RServer) CreateFunctionHandler(URL string, MethodName string,HTTPMetho
 	drhr.JSONResponse = HandleJSONResponse
 	return drhr
 }
-// end 
 
-func (rs *RServer) AddStaticHandler(URL string, StaticDir string)  {
-	rs.Config.AddHandler(rs.CreateStaticHandler(URL,StaticDir))
+// end
+
+func (rs *RServer) AddStaticHandler(URL string, StaticDir string) {
+	rs.Config.AddHandler(rs.CreateStaticHandler(URL, StaticDir))
 }
 
-func (rs *RServer) AddFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string)  {
-	rs.Config.AddHandler(rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, false, false))
+func (rs *RServer) AddFunctionHandler(URL string, MethodName string, HTTPMethod string, FunctionalClass string) {
+	rs.Config.AddHandler(rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass, false, false))
 }
 
-func (rs *RServer) AddJSONRequestFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, DataType interface{})  {
-	fc := rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, true, false)
+func (rs *RServer) AddJSONRequestFunctionHandler(URL string, MethodName string, HTTPMethod string, FunctionalClass string, DataType interface{}) {
+	fc := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass, true, false)
 	fc.JSONRequestType = DataType
 	rs.Config.AddHandler(fc)
 }
 
-func (rs *RServer) AddJSONResponseFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, DataType interface{})  {
-	fc := rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, false, true)
+func (rs *RServer) AddJSONResponseFunctionHandler(URL string, MethodName string, HTTPMethod string, FunctionalClass string, DataType interface{}) {
+	fc := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass, false, true)
 	fc.JSONRequestType = DataType
 	rs.Config.AddHandler(fc)
 }
 
-func (rs *RServer) AddJSONFunctionHandler(URL string, MethodName string,HTTPMethod string, FunctionalClass string, DataType interface{})  {
-	fc := rs.CreateFunctionHandler(URL,MethodName,HTTPMethod,FunctionalClass, true, true)
+func (rs *RServer) AddJSONFunctionHandler(URL string, MethodName string, HTTPMethod string, FunctionalClass string, DataType interface{}) {
+	fc := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass, true, true)
 	fc.JSONRequestType = DataType
 	rs.Config.AddHandler(fc)
 }
 
 func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+
 		// JSON request expected
 		if handler.JSONRequest {
 			// parse the JSON
-			data, jsonerr := rs.RequestHelper.ReadJSONRequest(r,handler.JSONRequestType)
+			data, jsonerr := rs.RequestHelper.ReadJSONRequest(r, handler.JSONRequestType)
 			// no error
 			if jsonerr == nil {
 				rs.Log.LogDebugf("MakeHandlerFunction", "Data: %v ", data)
-	
+
 				// are we returning JSON?
 				if handler.JSONResponse {
 					// we are invoking a JSON method this should do the writing
-					rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(data)",handler.HTTPMethod, handler.MethodName)
-					resp := rs.Invoke(any,handler.MethodName,Request.CreateServerPayloadRequest(w, r,data))
-					if len(resp) > 0 { 
-						rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
+					rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(data)", handler.HTTPMethod, handler.MethodName)
+					resp := rs.Invoke(any, handler.MethodName, Request.CreateServerPayloadRequest(w, r, data))
+					if len(resp) > 0 {
+						rs.ResponseHelper.WriteJSON(w, resp[0].Interface())
 					}
-				} else{ 
-					rs.Log.LogDebugf("MakeHandlerFunction", "The response is not a JSON response for %s and %s(w,r,data)",handler.HTTPMethod, handler.MethodName)
+				} else {
+					rs.Log.LogDebugf("MakeHandlerFunction", "The response is not a JSON response for %s and %s(w,r,data)", handler.HTTPMethod, handler.MethodName)
 					// we are invoking the method that will do the writing out etc
 					rs.Invoke(any, handler.MethodName, Request.CreateServerPayloadRequest(w, r, data))
 				}
-			}else{
+			} else {
 				rs.Log.LogErrorf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
-				return			
+				return
 			}
-	
+
 		} else {
 			if handler.JSONResponse {
-				rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(r)",handler.HTTPMethod, handler.MethodName)
+				rs.Log.LogDebugf("MakeHandlerFunction", "The response is JSON response for %s and %s(r)", handler.HTTPMethod, handler.MethodName)
 				// we are just letting the request do the work and then the data will be returned
-				resp := rs.Invoke(any,handler.MethodName,Request.CreateServerRawRequest(w, r))
-				if len(resp) > 0{ 
-					rs.ResponseHelper.WriteJSON(w,resp[0].Interface())
+				resp := rs.Invoke(any, handler.MethodName, Request.CreateServerRawRequest(w, r))
+				if len(resp) > 0 {
+					rs.ResponseHelper.WriteJSON(w, resp[0].Interface())
 				}
-			} else{ 
-				rs.Log.LogDebugf("MakeHandlerFunction", "The response is not a JSON response for %s and %s(w,r)",handler.HTTPMethod, handler.MethodName)
+			} else {
+				rs.Log.LogDebugf("MakeHandlerFunction", "The response is not a JSON response for %s and %s(w,r)", handler.HTTPMethod, handler.MethodName)
 				// not json request or response -> raw read/write
-				rs.Invoke(any,handler.MethodName, Request.CreateServerRawRequest(w, r))
+				rs.Invoke(any, handler.MethodName, Request.CreateServerRawRequest(w, r))
 			}
 		}
 
 	}
 }
 
-
-func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler){
+func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler) {
 
 	funcclass, ok := rs.FunctionalMap[handl.FunctionalClass]
 
 	if ok {
-		if handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != ""  {
-			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding Template function %s - %s",handl.HTTPMethod, handl.MethodName)
-			
-			if handl.HTTPMethod != ""{
-				if strings.Contains(handl.HTTPMethod,",") {
-					rs.Log.LogDebugf("addHandlertoRouter", "Method is multiple")	
-					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
-				}else{
+		if handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != "" {
+			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding Template function %s - %s", handl.HTTPMethod, handl.MethodName)
+
+			if handl.HTTPMethod != "" {
+				if strings.Contains(handl.HTTPMethod, ",") {
+					rs.Log.LogDebugf("addHandlertoRouter", "Method is multiple")
+					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(strings.Split(handl.HTTPMethod, ",")...)
+				} else {
 					r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 				}
-			}else{
+			} else {
 				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass))
 			}
 		} else {
-			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding %s - %s",handl.HTTPMethod, handl.MethodName)
-			if handl.HTTPMethod != ""{
-				if strings.Contains(handl.HTTPMethod,",") {
+			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding %s - %s", handl.HTTPMethod, handl.MethodName)
+			if handl.HTTPMethod != "" {
+				if strings.Contains(handl.HTTPMethod, ",") {
 					rs.Log.LogDebugf("addHandlertoRouter", "Method is multiple")
-					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass)).Methods(strings.Split(handl.HTTPMethod,",")...)
-				}else{
+					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass)).Methods(strings.Split(handl.HTTPMethod, ",")...)
+				} else {
 					r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 				}
-			}else{
+			} else {
 				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass))
 			}
 		}
 	} else {
 		if handl.StaticDir != "" {
-			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding route %s for  static directory %s", handl.URL, handl.StaticDir)		
+			rs.Log.LogDebugf("addHandlertoRouter", "Handlers: Adding route %s for  static directory %s", handl.URL, handl.StaticDir)
 			r.PathPrefix(handl.URL).Handler(http.StripPrefix(handl.URL, http.FileServer(http.Dir(handl.StaticDir))))
 
 		} else {
-			rs.Log.LogErrorf("addHandlertoRouter", "Handlers Error FunctionalClass (%s) doesn't have a function %s mapped", handl.FunctionalClass, handl.MethodName)		
+			rs.Log.LogErrorf("addHandlertoRouter", "Handlers Error FunctionalClass (%s) doesn't have a function %s mapped", handl.FunctionalClass, handl.MethodName)
 		}
 	}
 	r.HandleFunc(handl.URL, func(w http.ResponseWriter, r *http.Request) {
@@ -157,13 +157,13 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 	r := mux.NewRouter()
 
 	for _, handl := range rs.Config.GetHandlers() {
-		rs.addHandlerToRouter(r,handl)
+		rs.addHandlerToRouter(r, handl)
 	}
 
 	for _, handl := range rs.Config.GetDefaultHandlers() {
-		rs.addHandlerToRouter(r,handl)
+		rs.addHandlerToRouter(r, handl)
 	}
-	
+
 	r.Use(mux.CORSMethodMiddleware(r))
 
 	return r

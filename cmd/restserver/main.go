@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 
-	"github.com/eshu0/RESTServer/pkg/commands"
-	"github.com/eshu0/RESTServer/pkg/config"
-	"github.com/eshu0/RESTServer/pkg/server"
+	RESTCommands "github.com/eshu0/RESTServer/pkg/commands"
+	RESTConfig "github.com/eshu0/RESTServer/pkg/config"
+	RESTServer "github.com/eshu0/RESTServer/pkg/server"
 )
 
 func main() {

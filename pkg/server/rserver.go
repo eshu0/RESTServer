@@ -2,45 +2,45 @@ package RESTServer
 
 import (
 	"context"
+	"html/template"
 	"net/http"
 	"reflect"
-	"html/template"
 
-	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 	Config "github.com/eshu0/RESTServer/pkg/config"
+	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 
-	sl "github.com/eshu0/simplelogger"
-	sli "github.com/eshu0/simplelogger/interfaces"
+	sl "github.com/eshu0/simplelogger/pkg"
+	sli "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
 // This is the http Server that will host the HTTP requests
 var Server *http.Server
 
 type RServer struct {
-	Config         		Config.IRServerConfig  `json:"-"`
-	Log            		sli.ISimpleLogger      `json:"-"`
-	FunctionalMap  		map[string]interface{} `json:"-"`
-	ConfigFilePath 		string                 `json:"-"`
-	Templates 			*template.Template     `json:"-"`
-	RequestHelper 		*Helpers.RequestHelper `json:"-"`
-	ResponseHelper 		*Helpers.ResponseHelper `json:"-"`
-	NotFoundHandler   	func(w http.ResponseWriter, r *http.Request)
+	Config          Config.IRServerConfig   `json:"-"`
+	Log             sli.ISimpleLogger       `json:"-"`
+	FunctionalMap   map[string]interface{}  `json:"-"`
+	ConfigFilePath  string                  `json:"-"`
+	Templates       *template.Template      `json:"-"`
+	RequestHelper   *Helpers.RequestHelper  `json:"-"`
+	ResponseHelper  *Helpers.ResponseHelper `json:"-"`
+	NotFoundHandler func(w http.ResponseWriter, r *http.Request)
 }
 
-func NewRServer(config Config.IRServerConfig) (*RServer) {
+func NewRServer(config Config.IRServerConfig) *RServer {
 
 	server := RServer{}
 	server.Config = config
 	server.FunctionalMap = make(map[string]interface{})
 
 	logger := sl.NewApplicationLogger()
-	
+
 	// lets open a flie log using the session
 	logger.OpenAllChannels()
 
 	server.Log = logger
 	server.RequestHelper = Helpers.NewRequestHelper(logger)
-	server.ResponseHelper= Helpers.NewResponseHelper(logger)
+	server.ResponseHelper = Helpers.NewResponseHelper(logger)
 	return &server
 }
 
@@ -50,8 +50,8 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []r
 
 	inputs := make([]reflect.Value, len(args))
 	for i, _ := range args {
-		val := reflect.ValueOf(args[i])	
-		rs.Log.LogDebugf("Invoke", "ValueOf of arg at [%d] = %v ", i , val)	
+		val := reflect.ValueOf(args[i])
+		rs.Log.LogDebugf("Invoke", "ValueOf of arg at [%d] = %v ", i, val)
 		inputs[i] = val
 	}
 	val := reflect.ValueOf(any)
@@ -126,5 +126,3 @@ func (rs *RServer) LoadConfig() bool {
 
 	return ok
 }
-
-
