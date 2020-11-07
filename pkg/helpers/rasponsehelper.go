@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	sli "github.com/eshu0/simplelogger/interfaces"
+	sli "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
 type ResponseHelper struct {
