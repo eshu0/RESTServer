@@ -6,12 +6,12 @@ import (
 	"os"
 
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
-	"github.com/eshu0/simplelogger/interfaces"
+	slinterfaces "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
 //
-// Server configuration interface 
-// Gets, Setters etc 
+// Server configuration interface
+// Gets, Setters etc
 //
 type IRServerConfig interface {
 	GetAddress() string
@@ -26,19 +26,19 @@ type IRServerConfig interface {
 	AddDefaultHandler(Handler Handlers.RESTHandler)
 
 	GetHandlers() []Handlers.RESTHandler
-	GetHandlersLen() int 
+	GetHandlersLen() int
 
 	GetDefaultHandlers() []Handlers.RESTHandler
 	GetDefaultHandlersLen() int
 }
 
 type RServerConfig struct {
-	Port                string                 	`json:"port"`
-	Handlers            []Handlers.RESTHandler 	`json:"handlers"`
-	DefaultHandlers     []Handlers.RESTHandler 	`json:"defaulthandlers"`
-	TemplateFilepath    string                 	`json:"templatefilepath"`
-	TemplateFileTypes   []string                `json:"templatefiletypes"`
-	CacheTemplates 		bool					`json:"cachetemplates"`
+	Port              string                 `json:"port"`
+	Handlers          []Handlers.RESTHandler `json:"handlers"`
+	DefaultHandlers   []Handlers.RESTHandler `json:"defaulthandlers"`
+	TemplateFilepath  string                 `json:"templatefilepath"`
+	TemplateFileTypes []string               `json:"templatefiletypes"`
+	CacheTemplates    bool                   `json:"cachetemplates"`
 }
 
 func NewRServerConfig() IRServerConfig {
@@ -46,7 +46,7 @@ func NewRServerConfig() IRServerConfig {
 	Config.DefaultHandlers = []Handlers.RESTHandler{}
 	Config.Handlers = []Handlers.RESTHandler{}
 	Config.Port = "7777"
-	Config.TemplateFileTypes = []string{ ".tmpl", ".html"}
+	Config.TemplateFileTypes = []string{".tmpl", ".html"}
 	Config.CacheTemplates = false
 	return &Config
 }
@@ -91,7 +91,6 @@ func (rsc *RServerConfig) GetDefaultHandlers() []Handlers.RESTHandler {
 func (rsc *RServerConfig) GetDefaultHandlersLen() int {
 	return len(rsc.DefaultHandlers)
 }
-
 
 func (rsc *RServerConfig) GetAddress() string {
 	return ":" + rsc.Port

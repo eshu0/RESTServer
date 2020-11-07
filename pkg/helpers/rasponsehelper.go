@@ -1,14 +1,15 @@
 package RESTHelpers
 
 import (
-	"net/http"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	sli "github.com/eshu0/simplelogger/interfaces"
 )
 
 type ResponseHelper struct {
-	Log sli.ISimpleLogger      `json:"-"`
+	Log sli.ISimpleLogger `json:"-"`
 }
 
 func NewResponseHelper(logger sli.ISimpleLogger) *ResponseHelper {
@@ -19,9 +20,8 @@ func NewResponseHelper(logger sli.ISimpleLogger) *ResponseHelper {
 	return &helper
 }
 
-
-func (rh *ResponseHelper) WriteIndentJSON(w http.ResponseWriter, Data interface{}) (bool,error) {
-	bytes, err := json.MarshalIndent(Data, "", "\t") 
+func (rh *ResponseHelper) WriteIndentJSON(w http.ResponseWriter, Data interface{}) (bool, error) {
+	bytes, err := json.MarshalIndent(Data, "", "\t")
 	if err != nil {
 		rh.Log.LogErrorf("WriteIndentJSON()", "MarshalIndent json failed with %s ", err.Error())
 		return false, err
@@ -30,7 +30,7 @@ func (rh *ResponseHelper) WriteIndentJSON(w http.ResponseWriter, Data interface{
 	return true, nil
 }
 
-func (rh *ResponseHelper) WriteJSON(w http.ResponseWriter, Data interface{}) (bool,error) {
+func (rh *ResponseHelper) WriteJSON(w http.ResponseWriter, Data interface{}) (bool, error) {
 	bytes, err := json.Marshal(Data)
 	if err != nil {
 		rh.Log.LogErrorf("WriteJSON()", "Marshal json failed with %s", err.Error())
@@ -40,4 +40,3 @@ func (rh *ResponseHelper) WriteJSON(w http.ResponseWriter, Data interface{}) (bo
 	return true, nil
 
 }
-

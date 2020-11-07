@@ -6,10 +6,10 @@ import (
 )
 
 type ServerRequest struct {
-	Writer 		http.ResponseWriter
-	Request 	*http.Request
-	Template	 *template.Template
-	Payload 	interface{}
+	Writer   http.ResponseWriter
+	Request  *http.Request
+	Template *template.Template
+	Payload  interface{}
 }
 
 func CreateServerRawRequest(w http.ResponseWriter, r *http.Request) ServerRequest {
@@ -17,11 +17,11 @@ func CreateServerRawRequest(w http.ResponseWriter, r *http.Request) ServerReques
 	sr.Writer = w
 	sr.Request = r
 	sr.Template = nil
-	sr.Payload = nil	
+	sr.Payload = nil
 	return sr
 }
 
-func CreateServerTemplateRequest(w http.ResponseWriter, r *http.Request,t *template.Template) ServerRequest {
+func CreateServerTemplateRequest(w http.ResponseWriter, r *http.Request, t *template.Template) ServerRequest {
 	sr := ServerRequest{}
 	sr.Writer = w
 	sr.Request = r
@@ -39,7 +39,7 @@ func CreateServerPayloadRequest(w http.ResponseWriter, r *http.Request, data int
 	return sr
 }
 
-func CreateServerTemaplatedPayloadRequest(w http.ResponseWriter, r *http.Request,t *template.Template, data interface{}) ServerRequest {
+func CreateServerTemaplatedPayloadRequest(w http.ResponseWriter, r *http.Request, t *template.Template, data interface{}) ServerRequest {
 	sr := ServerRequest{}
 	sr.Writer = w
 	sr.Request = r
