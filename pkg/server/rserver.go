@@ -123,10 +123,10 @@ func (rs *RServer) LoadConfig() bool {
 
 func DefaultServer(ConfigFilePath *string, logger sli.ISimpleLogger) (rs *RServer) {
 
-	conf := RESTConfig.NewRServerConfig()
+	conf := Config.NewRServerConfig()
 
 	// Create a new REST Server
-	server := RESTServer.NewRServer(conf, logger)
+	server := NewRServer(conf, logger)
 
 	log := server.Log
 
@@ -153,4 +153,5 @@ func DefaultServer(ConfigFilePath *string, logger sli.ISimpleLogger) (rs *RServe
 		server.ConfigFilePath = "./config.json"
 	}
 
+	return server
 }
