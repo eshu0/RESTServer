@@ -3,44 +3,33 @@ package main
 import (
 	"flag"
 
-	RESTCommands "github.com/eshu0/RESTServer/pkg/commands"
-	RESTConfig "github.com/eshu0/RESTServer/pkg/config"
 	RESTServer "github.com/eshu0/RESTServer/pkg/server"
 )
 
 func main() {
 
 	ConfigFilePath := flag.String("config", "", "Filepath to config file")
+	UpdatedConfigFilePath := flag.String("newconfigpath", "", "Filepath to config file to be saved after ")
 	flag.Parse()
 
-	conf := RESTConfig.NewRServerConfig()
+	logger := sl.NewApplicationLogger()
 
-	// Create a new REST Server
-	server := RESTServer.NewRServer(conf)
+	server := RESTServer.DefaultServer(ConfigFilePath, logger)
 
-	log := server.Log
-	//defer the close till the shell has closed
-	defer log.CloseAllChannels()
-
-	if ConfigFilePath != nil && *ConfigFilePath != "" {
-		// load this first
-		server.ConfigFilePath = *ConfigFilePath
-		ok := server.LoadConfig()
-
-		if !ok {
-			return
-		}
-	} else {
-		// load this first
-		server.ConfigFilePath = "./config.json"
-	}
-
+	// add the defaults here
 	RESTCommands.AddDefaults(server)
 	RESTCommands.SetDefaultFunctionalMap(server)
-	server.SaveConfig()
 
 	// start Listen Server, this build the mapping and creates Handler/
 	// also fires the "http listen and server method"
 	server.ListenAndServe()
+
+	// has a conifg file been provided?
+	if UpdatedConfigFilePath != nil && *UpdatedConfigFilePath != "" {
+
+		// as a test save the updated config
+		server.ConfigFilePath = UpdatedConfigFilePath
+		server.SaveConfig()
+	}
 
 }
