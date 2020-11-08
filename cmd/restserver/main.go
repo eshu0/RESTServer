@@ -3,7 +3,10 @@ package main
 import (
 	"flag"
 
+	RESTCommands "github.com/eshu0/RESTServer/pkg/commands"
 	RESTServer "github.com/eshu0/RESTServer/pkg/server"
+
+	sl "github.com/eshu0/simplelogger/"
 )
 
 func main() {
