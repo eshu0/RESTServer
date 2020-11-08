@@ -9,7 +9,6 @@ import (
 	Config "github.com/eshu0/RESTServer/pkg/config"
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 
-	sl "github.com/eshu0/simplelogger/pkg"
 	sli "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
@@ -27,16 +26,11 @@ type RServer struct {
 	NotFoundHandler func(w http.ResponseWriter, r *http.Request)
 }
 
-func NewRServer(config Config.IRServerConfig) *RServer {
+func NewRServer(config Config.IRServerConfig, logger sli.ISimpleLogger) *RServer {
 
 	server := RServer{}
 	server.Config = config
 	server.FunctionalMap = make(map[string]interface{})
-
-	logger := sl.NewApplicationLogger()
-
-	// lets open a flie log using the session
-	logger.OpenAllChannels()
 
 	server.Log = logger
 	server.RequestHelper = Helpers.NewRequestHelper(logger)
@@ -125,4 +119,38 @@ func (rs *RServer) LoadConfig() bool {
 	}
 
 	return ok
+}
+
+func DefaultServer(ConfigFilePath *string, logger sli.ISimpleLogger) (rs *RServer) {
+
+	conf := RESTConfig.NewRServerConfig()
+
+	// Create a new REST Server
+	server := RESTServer.NewRServer(conf, logger)
+
+	log := server.Log
+
+	// lets open a flie log using the session
+	log.OpenAllChannels()
+
+	//defer the close till the shell has closed
+	defer log.CloseAllChannels()
+
+	// has a conifg file been provided?
+	if ConfigFilePath != nil && *ConfigFilePath != "" {
+
+		// load this first
+		server.ConfigFilePath = *ConfigFilePath
+		ok := server.LoadConfig()
+
+		// we failed to load the configuration file
+		if !ok {
+			return
+		}
+
+	} else {
+		// load this first
+		server.ConfigFilePath = "./config.json"
+	}
+
 }
