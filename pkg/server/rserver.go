@@ -128,14 +128,6 @@ func DefaultServer(ConfigFilePath *string, logger sli.ISimpleLogger) (rs *RServe
 	// Create a new REST Server
 	server := NewRServer(conf, logger)
 
-	log := server.Log
-
-	// lets open a flie log using the session
-	log.OpenAllChannels()
-
-	//defer the close till the shell has closed
-	defer log.CloseAllChannels()
-
 	// has a conifg file been provided?
 	if ConfigFilePath != nil && *ConfigFilePath != "" {
 

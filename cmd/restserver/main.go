@@ -6,7 +6,7 @@ import (
 	RESTCommands "github.com/eshu0/RESTServer/pkg/commands"
 	RESTServer "github.com/eshu0/RESTServer/pkg/server"
 
-	sl "github.com/eshu0/simplelogger/"
+	sl "github.com/eshu0/simplelogger/pkg"
 )
 
 func main() {
@@ -18,6 +18,12 @@ func main() {
 	logger := sl.NewApplicationLogger()
 
 	server := RESTServer.DefaultServer(ConfigFilePath, logger)
+
+	// lets open a flie log using the session
+	server.Log.OpenAllChannels()
+
+	//defer the close till the shell has closed
+	defer server.Log.CloseAllChannels()
 
 	// add the defaults here
 	RESTCommands.AddDefaults(server)
@@ -31,7 +37,7 @@ func main() {
 	if UpdatedConfigFilePath != nil && *UpdatedConfigFilePath != "" {
 
 		// as a test save the updated config
-		server.ConfigFilePath = UpdatedConfigFilePath
+		server.ConfigFilePath = *UpdatedConfigFilePath
 		server.SaveConfig()
 	}
 
