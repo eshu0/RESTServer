@@ -10,6 +10,7 @@ import (
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 
 	sl "github.com/eshu0/simplelogger/pkg"
+	sli "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
 // This is the http Server that will host the HTTP requests
