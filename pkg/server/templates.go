@@ -60,10 +60,10 @@ func (rs *RServer) AddSpecificTemplateHandler(URL string, MethodName string, HTT
 func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any interface{}) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		rs.Log.LogDebug("MakeTemplateHandlerFunction", "MakeTemplateHandlerFunction called")
+		rs.LogDebug("MakeTemplateHandlerFunction", "MakeTemplateHandlerFunction called")
 
 		if rs.Config.GetCacheTemplates() {
-			rs.Log.LogDebugf("MakeTemplateHandlerFunction", "Looking up template %s for %s ", handler.TemplateName, handler.URL)
+			rs.LogDebugf("MakeTemplateHandlerFunction", "Looking up template %s for %s ", handler.TemplateName, handler.URL)
 			t := rs.Templates.Lookup(handler.TemplateName)
 			rs.Invoke(any, handler.MethodName, Request.CreateServerTemplateRequest(w, r, t))
 		} else {
@@ -71,16 +71,16 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 			err := errors.New("should not see this error")
 
 			if handler.TemplatePath != "" {
-				rs.Log.LogDebugf("MakeTemplateHandlerFunction", "We have a template path %s for %s", handler.TemplatePath, handler.URL)
+				rs.LogDebugf("MakeTemplateHandlerFunction", "We have a template path %s for %s", handler.TemplatePath, handler.URL)
 				t, err = template.ParseFiles(handler.TemplatePath)
 			} else {
 				if handler.TemplateFileName != "" {
 					tfilepath := rs.Config.GetTemplatePath() + handler.TemplateFileName
-					rs.Log.LogDebugf("MakeTemplateHandlerFunction", "We have a template filename %s for %s", tfilepath, handler.URL)
+					rs.LogDebugf("MakeTemplateHandlerFunction", "We have a template filename %s for %s", tfilepath, handler.URL)
 					t, err = template.ParseFiles(tfilepath)
 				} else {
 					if handler.TemplateBlob != "" {
-						rs.Log.LogDebugf("MakeTemplateHandlerFunction", "We have a template blob %s for %s", handler.TemplateBlob, handler.URL)
+						rs.LogDebugf("MakeTemplateHandlerFunction", "We have a template blob %s for %s", handler.TemplateBlob, handler.URL)
 						t, err = template.New(handler.TemplateName).Parse(handler.TemplateBlob)
 					} else {
 						err = errors.New("No template set")
@@ -89,7 +89,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 			}
 
 			if err != nil {
-				rs.Log.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
+				rs.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
 				return
 			}
 			if handler.JSONRequest {
@@ -97,7 +97,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 				if jsonerr != nil {
 					rs.Invoke(any, handler.MethodName, Request.CreateServerTemaplatedPayloadRequest(w, r, t, data))
 				} else {
-					rs.Log.LogErrorf("MakeTemplateHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
+					rs.LogErrorf("MakeTemplateHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
 					return
 				}
 			} else {
@@ -118,7 +118,7 @@ func (rs *RServer) LoadTemplates() {
 		files, err := ioutil.ReadDir(TemplatePath)
 		if err != nil {
 			rs.Templates = nil
-			rs.Log.LogErrorf("LoadTemplates", "ReadDir - Error : %s", err.Error())
+			rs.LogErrorf("LoadTemplates", "ReadDir - Error : %s", err.Error())
 			return
 		}
 
@@ -135,18 +135,18 @@ func (rs *RServer) LoadTemplates() {
 		templates, terr := template.ParseFiles(allFiles...)
 		if terr != nil {
 			rs.Templates = nil
-			rs.Log.LogErrorf("LoadTemplates", "ParseFiles - Error : %s", terr.Error())
+			rs.LogErrorf("LoadTemplates", "ParseFiles - Error : %s", terr.Error())
 			return
 		}
-		rs.Log.LogDebug("LoadTemplates", "Loaded Templates")
+		rs.LogDebug("LoadTemplates", "Loaded Templates")
 		rs.Templates = templates
 	} else {
 		if !rs.Config.HasTemplate() {
-			rs.Log.LogDebug("LoadTemplates", "No Template")
+			rs.LogDebug("LoadTemplates", "No Template")
 		}
 
 		if !rs.Config.GetCacheTemplates() {
-			rs.Log.LogDebug("LoadTemplates", "Not Caching Templates")
+			rs.LogDebug("LoadTemplates", "Not Caching Templates")
 		}
 
 		rs.Templates = nil
