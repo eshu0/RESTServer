@@ -9,15 +9,15 @@ import (
 	Config "github.com/eshu0/RESTServer/pkg/config"
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 
-	sli "github.com/eshu0/simplelogger/pkg/interfaces"
+	sl "github.com/eshu0/simplelogger/pkg"
 )
 
 // This is the http Server that will host the HTTP requests
 var Server *http.Server
 
 type RServer struct {
+	sl.AppLogger
 	Config          Config.IRServerConfig   `json:"-"`
-	Log             sli.ISimpleLogger       `json:"-"`
 	FunctionalMap   map[string]interface{}  `json:"-"`
 	ConfigFilePath  string                  `json:"-"`
 	Templates       *template.Template      `json:"-"`
@@ -26,38 +26,40 @@ type RServer struct {
 	NotFoundHandler func(w http.ResponseWriter, r *http.Request)
 }
 
-func NewRServer(config Config.IRServerConfig, logger sli.ISimpleLogger) *RServer {
+func NewRServer(config Config.IRServerConfig) *RServer {
+	return NewRServerCustomLog(config, sl.NewApplicationNowLogger())
+}
 
+func NewRServerCustomLog(config Config.IRServerConfig, logger sli.ISimpleLogger) *RServer {
 	server := RServer{}
 	server.Config = config
-	server.FunctionalMap = make(map[string]interface{})
-
 	server.Log = logger
-	server.RequestHelper = Helpers.NewRequestHelper(logger)
-	server.ResponseHelper = Helpers.NewResponseHelper(logger)
+	server.FunctionalMap = make(map[string]interface{})
+	server.RequestHelper = Helpers.NewRequestHelper(server.Log)
+	server.ResponseHelper = Helpers.NewResponseHelper(server.Log)
 	return &server
 }
 
 func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []reflect.Value {
 
-	rs.Log.LogDebugf("Invoke", "Method: Looking up %s ", name)
+	rs.LogDebugf("Invoke", "Method: Looking up %s ", name)
 
 	inputs := make([]reflect.Value, len(args))
 	for i, _ := range args {
 		val := reflect.ValueOf(args[i])
-		rs.Log.LogDebugf("Invoke", "ValueOf of arg at [%d] = %v ", i, val)
+		rs.LogDebugf("Invoke", "ValueOf of arg at [%d] = %v ", i, val)
 		inputs[i] = val
 	}
 	val := reflect.ValueOf(any)
-	rs.Log.LogDebugf("Invoke", "ValueOf %v ", val)
-	rs.Log.LogDebugf("Invoke", "Looking up method by %s", name)
+	rs.LogDebugf("Invoke", "ValueOf %v ", val)
+	rs.LogDebugf("Invoke", "Looking up method by %s", name)
 	meth := val.MethodByName(name)
-	rs.Log.LogDebugf("Invoke", "MethodByName %v ", meth)
+	rs.LogDebugf("Invoke", "MethodByName %v ", meth)
 
 	if meth.IsValid() && !meth.IsNil() {
 		return meth.Call(inputs)
 	} else {
-		rs.Log.LogErrorf("Invoke", "Method: %s could not be found", name)
+		rs.LogErrorf("Invoke", "Method: %s could not be found", name)
 	}
 
 	return nil
@@ -77,14 +79,14 @@ func (rs *RServer) ShutDown() {
 
 			if err := Server.Shutdown(backg); err != nil {
 				// Error from closing listeners, or context timeout:
-				rs.Log.LogErrorf("Shutdown", "HTTP server Shutdown: %v", err)
+				rs.LogErrorf("Shutdown", "HTTP server Shutdown: %v", err)
 			}
 		} else {
-			rs.Log.LogError("Shutdown", "Called but context.Background() was nil")
+			rs.LogError("Shutdown", "Called but context.Background() was nil")
 		}
 
 	} else {
-		rs.Log.LogError("Shutdown", "Called but server was nil")
+		rs.LogError("Shutdown", "Called but server was nil")
 	}
 
 }
@@ -93,17 +95,17 @@ func (rs *RServer) ListenAndServe() {
 	r := rs.MapFunctionsToHandlers()
 
 	if rs.NotFoundHandler != nil {
-		rs.Log.LogInfo("ListenAndServe", "NotFoundHandler is set")
+		rs.LogInfo("ListenAndServe", "NotFoundHandler is set")
 		r.NotFoundHandler = http.HandlerFunc(rs.NotFoundHandler)
 	}
 
 	rs.LoadTemplates()
 	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: r}
 
-	rs.Log.LogInfof("ListenAndServe", "Listening on: %s", rs.Config.GetAddress())
+	rs.LogInfof("ListenAndServe", "Listening on: %s", rs.Config.GetAddress())
 
 	if err := Server.ListenAndServe(); err != http.ErrServerClosed {
-		rs.Log.LogErrorf("HTTP server ListenAndServe", "%v", err)
+		rs.LogErrorf("HTTP server ListenAndServe", "%v", err)
 	}
 }
 
