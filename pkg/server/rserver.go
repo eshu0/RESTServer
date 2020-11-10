@@ -123,12 +123,12 @@ func (rs *RServer) LoadConfig() bool {
 	return ok
 }
 
-func DefaultServer(ConfigFilePath *string, logger sli.ISimpleLogger) (rs *RServer) {
+func DefaultServer(ConfigFilePath *string) (rs *RServer) {
 
 	conf := Config.NewRServerConfig()
 
 	// Create a new REST Server
-	server := NewRServer(conf, logger)
+	server := NewRServer(conf)
 
 	// has a conifg file been provided?
 	if ConfigFilePath != nil && *ConfigFilePath != "" {
