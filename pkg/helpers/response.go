@@ -9,10 +9,10 @@ import (
 )
 
 type ResponseHelper struct {
-	Log sli.IAppLogger `json:"-"`
+	Log sli.ISimpleLogger `json:"-"`
 }
 
-func NewResponseHelper(logger sli.IAppLogger) *ResponseHelper {
+func NewResponseHelper(logger sli.ISimpleLogger) *ResponseHelper {
 
 	helper := ResponseHelper{}
 	helper.Log = logger

@@ -13,10 +13,10 @@ import (
 )
 
 type RequestHelper struct {
-	Log sli.IAppLogger `json:"-"`
+	Log sli.ISimpleLogger `json:"-"`
 }
 
-func NewRequestHelper(logger sli.IAppLogger) *RequestHelper {
+func NewRequestHelper(logger sli.ISimpleLogger) *RequestHelper {
 
 	helper := RequestHelper{}
 	helper.Log = logger

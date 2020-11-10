@@ -36,8 +36,8 @@ func NewRServerCustomLog(config Config.IRServerConfig, logger sli.ISimpleLogger)
 	server.Config = config
 	server.Log = logger
 	server.FunctionalMap = make(map[string]interface{})
-	server.RequestHelper = Helpers.NewRequestHelper(server)
-	server.ResponseHelper = Helpers.NewResponseHelper(server)
+	server.RequestHelper = Helpers.NewRequestHelper(server.Log)
+	server.ResponseHelper = Helpers.NewResponseHelper(server.Log)
 	return &server
 }
 
