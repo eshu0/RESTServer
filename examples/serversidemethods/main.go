@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/eshu0/RESTServer/pkg/commands"
-	"github.com/eshu0/RESTServer/pkg/config"
-	"github.com/eshu0/RESTServer/pkg/server"
+	RESTCommands "github.com/eshu0/RESTServer/pkg/commands"
+	RESTConfig "github.com/eshu0/RESTServer/pkg/config"
+	RESTServer "github.com/eshu0/RESTServer/pkg/server"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	server := RESTServer.NewRServer(conf)
 
 	//defer the close till the server has closed
-	defer server.Log.CloseAllChannels()
+	defer server.FinishLogging()
 
 	// load this first
 	server.ConfigFilePath = "./config.json"
@@ -33,8 +33,8 @@ func main() {
 	// this registers the custom structures
 	// in the JSON config the FunctionalClass is the name used for the map "TestAnother"
 	// if these are not public and spelt correctly the lookups will fail
-	server.Register("TestAnother",TestAnother{})
-	server.Register("TestStruct",TestStruct{})
+	server.Register("TestAnother", TestAnother{})
+	server.Register("TestStruct", TestStruct{})
 
 	// as a test save the updated config
 	server.ConfigFilePath = "./updated.json"
