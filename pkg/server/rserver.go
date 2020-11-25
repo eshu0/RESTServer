@@ -49,7 +49,7 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []r
 	for i, _ := range args {
 		val := reflect.ValueOf(args[i])
 		rs.LogDebugf("Invoke", "ValueOf of arg at [%d] ", i, val)
-		rs.LogDebugf("Invoke", "ValueOf of arg at  %v ", al)
+		rs.LogDebugf("Invoke", "ValueOf of arg at  %v ", val)
 		inputs[i] = val
 	}
 	val := reflect.ValueOf(any)
