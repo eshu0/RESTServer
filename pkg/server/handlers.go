@@ -84,7 +84,7 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 					rs.Invoke(any, handler.MethodName, Request.CreateServerPayloadRequest(w, r, data))
 				}
 			} else {
-				rs.LogErrorEf("MakeHandlerFunction","ReadJSONRequest Error : %s" jsonerr)
+				rs.LogErrorEf("MakeHandlerFunction", "ReadJSONRequest Error : %s", jsonerr)
 				return
 			}
 
