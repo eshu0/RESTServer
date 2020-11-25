@@ -22,3 +22,4 @@ updated.json
 .DS_Store
 cmd/restserver/restserver
 cmd/restserver/config.json
+*.log
