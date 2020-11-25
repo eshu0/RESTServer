@@ -48,14 +48,15 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []r
 	inputs := make([]reflect.Value, len(args))
 	for i, _ := range args {
 		val := reflect.ValueOf(args[i])
-		rs.LogDebugf("Invoke", "ValueOf of arg at [%d] = %v ", i, val)
+		rs.LogDebugf("Invoke", "ValueOf of arg at [%d] ", i, val)
+		rs.LogDebugf("Invoke", "ValueOf of arg at  %v ", al)
 		inputs[i] = val
 	}
 	val := reflect.ValueOf(any)
 	rs.LogDebugf("Invoke", "ValueOf %v ", val)
 	rs.LogDebugf("Invoke", "Looking up method by %s", name)
 	meth := val.MethodByName(name)
-	rs.LogDebugf("Invoke", "MethodByName %v ", meth)
+	rs.LogDebugf("Invoke", "MethodByName %v", meth)
 
 	if meth.IsValid() && !meth.IsNil() {
 		return meth.Call(inputs)
