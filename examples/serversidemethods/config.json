@@ -1,5 +1,6 @@
 {
 	"port": "666",
+	"templatefilepath": "./views/",	
 	"handlers": [
 		{
 			"url": "/test",
