@@ -135,7 +135,7 @@ func (rs *RServer) LoadTemplates() {
 		templates, terr := template.ParseFiles(allFiles...)
 		if terr != nil {
 			rs.Templates = nil
-			rs.LogErrorf("LoadTemplates", "ParseFiles - Error : %s", terr.Error())
+			rs.LogErrorEf("LoadTemplates", "ParseFiles - Error : %s", terr
 			return
 		}
 		rs.LogDebug("LoadTemplates", "Loaded Templates")
