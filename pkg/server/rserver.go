@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"net/http"
 	"reflect"
-	"strconv"
 
 	Config "github.com/eshu0/RESTServer/pkg/config"
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
@@ -19,8 +18,12 @@ var Server *http.Server
 
 type RServer struct {
 	sl.AppLogger
-	Config          Config.IRServerConfig   `json:"-"`
-	FunctionalMap   map[string]interface{}  `json:"-"`
+	Config Config.IRServerConfig `json:"-"`
+	// This map is designed for the functions were there is no types
+	// w http.ResponseWriter, r *http.Request
+	RawFunctions map[string]interface{} `json:"-"`
+	// This accepts Request.ServerRequest
+	TypedMap        map[string]interface{}  `json:"-"`
 	ConfigFilePath  string                  `json:"-"`
 	Templates       *template.Template      `json:"-"`
 	RequestHelper   *Helpers.RequestHelper  `json:"-"`
@@ -36,7 +39,8 @@ func NewRServerCustomLog(config Config.IRServerConfig, logger sli.ISimpleLogger)
 	server := RServer{}
 	server.Config = config
 	server.Log = logger
-	server.FunctionalMap = make(map[string]interface{})
+	server.RawFunctions = make(map[string]interface{})
+	server.TypedMap = make(map[string]interface{})
 	server.RequestHelper = Helpers.NewRequestHelper(server.Log)
 	server.ResponseHelper = Helpers.NewResponseHelper(server.Log)
 	return &server
@@ -53,18 +57,21 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []r
 		rs.LogDebugf("Invoke", "ValueOf of arg at  %v ", val)
 		inputs[i] = val
 	}
+
 	val := reflect.ValueOf(any)
 	rs.LogDebugf("Invoke", "ValueOf %v ", val)
 	rs.LogDebugf("Invoke", "Looking up method by %s", name)
 	meth := val.MethodByName(name)
 	rs.LogDebugf("Invoke", "MethodByName %v", meth)
+	/*
+		numIn := meth.NumIn() //Count inbound parameters
 
-	for i := 0; i < numIn; i++ {
-		inV := meth.In(i)
-		in_Kind := inV.Kind() //func
-		rs.LogDebugf("Parameter IN: "+strconv.Itoa(i)+"\nKind: %v\nName: %v\n-----------", in_Kind, inV.Name())
-	}
-
+		for i := 0; i < numIn; i++ {
+			inV := meth.In(i)
+			in_Kind := inV.Kind() //func
+			rs.LogDebugf("Parameter IN: "+strconv.Itoa(i)+"\nKind: %v\nName: %v\n-----------", in_Kind, inV.Name())
+		}
+	*/
 	if meth.IsValid() && !meth.IsNil() {
 		return meth.Call(inputs)
 	} else {
@@ -74,8 +81,14 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []r
 	return nil
 }
 
+//RegisterFunction Registers a func xyz (w http.ResponseWriter, r *http.Request) for processing
+func (rs *RServer) RegisterFunction(FunctionClass string, data interface{}) {
+	rs.RawFunctions[FunctionClass] = data
+}
+
+//Register Registers a func xyz (request Request.ServerRequest) for processing
 func (rs *RServer) Register(FunctionClass string, data interface{}) {
-	rs.FunctionalMap[FunctionClass] = data
+	rs.TypedMap[FunctionClass] = data
 }
 
 /// GENERAL OPERATIONS
