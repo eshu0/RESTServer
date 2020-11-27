@@ -25,6 +25,30 @@
 			"methodname": "CallSomething",
 			"httpmethod": "GET",
 			"functionalclass": "TestAnother"
+		},		
+		{
+			"url": "/typed/test",
+			"methodname": "GetSomething",
+			"httpmethod": "GET",
+			"functionalclass": "TypedTestStruct"
+		},
+		{
+			"url": "/typed/test/call",
+			"methodname": "CallSomething",
+			"httpmethod": "GET",
+			"functionalclass": "TypedTestStruct"
+		},		
+		{
+			"url": "/typed/anothertest/",
+			"methodname": "GetSomething",
+			"httpmethod": "GET",
+			"functionalclass": "TypedTestAnother"
+		},
+		{
+			"url": "/typed/anothertest/call",
+			"methodname": "CallSomething",
+			"httpmethod": "GET",
+			"functionalclass": "TypedTestAnother"
 		}
 	]
 }
