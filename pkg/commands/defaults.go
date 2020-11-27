@@ -60,7 +60,7 @@ func AddDefaults(server *Server.RServer) {
 	// These should be removed if not required
 	rsc := RServerCommand{Server: server}
 
-	server.FunctionalMap["RServerCommand"] = rsc
+	server.TypedMap["RServerCommand"] = rsc
 
 	server.Config.AddDefaultHandler(server.CreateFunctionHandler("/admin/shutdown", "ShutDown", "GET", "RServerCommand", false, false))
 	server.Config.AddDefaultHandler(server.CreateFunctionHandler("/admin/loadconfig", "LoadConfig", "GET", "RServerCommand", false, false))
