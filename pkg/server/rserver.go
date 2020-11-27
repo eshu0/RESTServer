@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"reflect"
+	"strconv"
 
 	Config "github.com/eshu0/RESTServer/pkg/config"
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
@@ -57,6 +58,12 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []r
 	rs.LogDebugf("Invoke", "Looking up method by %s", name)
 	meth := val.MethodByName(name)
 	rs.LogDebugf("Invoke", "MethodByName %v", meth)
+
+	for i := 0; i < numIn; i++ {
+		inV := meth.In(i)
+		in_Kind := inV.Kind() //func
+		rs.LogDebugf("Parameter IN: "+strconv.Itoa(i)+"\nKind: %v\nName: %v\n-----------", in_Kind, inV.Name())
+	}
 
 	if meth.IsValid() && !meth.IsNil() {
 		return meth.Call(inputs)
