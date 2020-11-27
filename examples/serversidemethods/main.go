@@ -33,8 +33,10 @@ func main() {
 	// this registers the custom structures
 	// in the JSON config the FunctionalClass is the name used for the map "TestAnother"
 	// if these are not public and spelt correctly the lookups will fail
-	server.Register("TestAnother", TestAnother{})
-	server.Register("TestStruct", TestStruct{})
+	server.RegisterFunction("TestAnother", TestAnother{})
+	server.RegisterFunction("TestStruct", TestStruct{})
+	server.Register("TypedTestAnother", TypedTestAnother{})
+	server.Register("TypedTestStruct", TypedTestStruct{})
 
 	// as a test save the updated config
 	server.ConfigFilePath = "./updated.json"
