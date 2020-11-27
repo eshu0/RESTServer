@@ -39,7 +39,7 @@ func CreateServerPayloadRequest(w http.ResponseWriter, r *http.Request, data int
 	return sr
 }
 
-func CreateServerTemaplatedPayloadRequest(w http.ResponseWriter, r *http.Request, t *template.Template, data interface{}) ServerRequest {
+func CreateServerTemplatedPayloadRequest(w http.ResponseWriter, r *http.Request, t *template.Template, data interface{}) ServerRequest {
 	sr := ServerRequest{}
 	sr.Writer = w
 	sr.Request = r

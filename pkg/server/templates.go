@@ -95,7 +95,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 			if handler.JSONRequest {
 				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r, handler.JSONRequestType)
 				if jsonerr != nil {
-					rs.Invoke(any, handler.MethodName, Request.CreateServerTemaplatedPayloadRequest(w, r, t, data))
+					rs.Invoke(any, handler.MethodName, Request.CreateServerTemplatedPayloadRequest(w, r, t, data))
 				} else {
 					rs.LogErrorf("MakeTemplateHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
 					return
