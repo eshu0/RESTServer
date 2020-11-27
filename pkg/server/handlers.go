@@ -69,8 +69,6 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 		} else {
 			rs.LogDebugf("MakeHandlerFunction", "Typed called")
 
-			rs.LogDebugf("MakeHandlerFunction", "Data: %v ", data)
-
 			// JSON request expected
 			if handler.JSONRequest {
 				// parse the JSON
@@ -151,12 +149,12 @@ func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler)
 	funcclass, ok := rs.RawFunctions[handl.FunctionalClass]
 
 	if ok {
-		regHandlerToRouter(r, handl, funcclass, false)
+		rs.regHandlerToRouter(r, handl, funcclass, false)
 	} else {
 
 		funcclass, ok = rs.TypedMap[handl.FunctionalClass]
 		if ok {
-			regHandlerToRouter(r, handl, funcclass, true)
+			rs.regHandlerToRouter(r, handl, funcclass, true)
 		} else {
 			if handl.StaticDir != "" {
 				rs.LogDebugf("addHandlertoRouter", "Handlers: Adding route %s for  static directory %s", handl.URL, handl.StaticDir)
