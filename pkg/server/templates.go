@@ -96,9 +96,9 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 			if handler.MethodName == "" {
 				rs.LogDebugf("MakeTemplateHandlerFunction", "No method so default to loading the template %s for %s", handler.TemplateBlob, handler.URL)
 				request := Request.CreateServerTemplateRequest(w, r, t)
-				terr := request.Template.Execute(request.Writer, rsc.Server.Config)
+				terr := request.Template.Execute(request.Writer, nil)
 				if terr != nil {
-					rs.LogErrorf("MakeTemplateHandlerFunction", "Template.Execute Error : %s", jsonerr.Error())
+					rs.LogErrorf("MakeTemplateHandlerFunction", "Template.Execute Error : %s", terr.Error())
 					return
 				}
 			} else {
