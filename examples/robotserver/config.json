@@ -1,0 +1,89 @@
+{
+	"port": "8080",
+	"templatefilepath": "./views/",	
+	"handlers": [
+		{
+			"url": "/Stop",
+			"methodname": "Stop",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},
+		{
+			"url": "/Forwards",
+			"methodname": "Forwards",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},
+		{
+			"url": "/Backwards",
+			"methodname": "Backwards",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},
+		{
+			"url": "/SpinLeft",
+			"methodname": "SpinLeft",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},		
+		{
+			"url": "/SpinRight",
+			"methodname": "SpinRight",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},
+		{
+			"url": "/Left",
+			"methodname": "TurnLeft",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},		
+		{
+			"url": "/Right",
+			"methodname": "TurnRight",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},
+		{
+			"url": "/Capture",
+			"methodname": "Capture",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},
+		{
+			"url": "/Flip/VR",
+			"methodname": "FlipVR",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},
+		{
+			"url": "/Flip/V",
+			"methodname": "FlipV",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},
+		{
+			"url": "/Flip/HR",
+			"methodname": "FlipHR",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},
+		{
+			"url": "/Flip/H",
+			"methodname": "FlipH",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},		
+		{
+			"url": "/Command",
+			"templatefilename": "command.html",
+			"methodname": "Command",
+			"httpmethod": "GET",
+			"functionalclass": "Rbot"
+		},				
+		{
+			"url": "/images/",
+			"staticdir": "./images/"
+		}		
+	]
+}

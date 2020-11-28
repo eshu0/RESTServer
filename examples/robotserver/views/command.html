@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+body {
+  font-family: Arial;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  vertical-align: middle;
+}
+
+/* Position the image container (needed to position the left and right arrows) */
+.container {
+  position: relative;
+}
+
+/* Hide the images by default */
+.mySlides {
+  display: none;
+}
+
+/* Add a pointer when hovering over the thumbnail images */
+.cursor {
+  cursor: pointer;
+}
+
+/* Next & previous buttons */
+.prev,
+.next {
+  cursor: pointer;
+  position: absolute;
+  top: 40%;
+  width: auto;
+  padding: 16px;
+  margin-top: -50px;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover,
+.next:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Number text (1/3 etc) */
+.numbertext {
+  color: #f2f2f2;
+  font-size: 12px;
+  padding: 8px 12px;
+  position: absolute;
+  top: 0;
+}
+
+/* Container for image text */
+.caption-container {
+  text-align: center;
+  background-color: #222;
+  padding: 2px 16px;
+  color: white;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Six columns side by side */
+.column {
+  float: left;
+  width: 16.66%;
+}
+
+/* Add a transparency effect for thumnbail images */
+.demo {
+  opacity: 0.6;
+}
+
+.active,
+.demo:hover {
+  opacity: 1;
+}
+
+#remote{
+    width:100%;
+}
+
+#canvasid{
+    width:480px;
+    height:270px;
+}
+
+</style>
+    
+</head>
+<body onload="startGame()">
+
+    <div id="remote">
+        <canvas id="canvasid">
+        </canvas>
+        <div style="text-align:center;width:480px;">
+        <button onclick="Stop()">STOP</button><br><br>    
+        <button onclick="moveup()">UP</button><br><br>
+        <button onclick="moveleft()">LEFT</button>
+        <button onclick="moveright()">RIGHT</button><br><br>
+        <button onclick="movedown()">DOWN</button><br><br>
+        <button onclick="Snap()">SNAP</button>  
+        </div>
+    </div>
+    <div>
+        <h2 style="text-align:center">Slideshow Gallery</h2>
+
+        <div class="container">
+          {{range $element := .}} 
+            <div class="mySlides">
+                <div class="numbertext">{{$element.Pos}} / {{$element.Total}}</div>
+                <img src="{{$element.FileName}}" style="width:100%">
+            </div>            
+          {{end}}
+
+
+          <a class="prev" onclick="plusSlides(-1)">❮</a>
+          <a class="next" onclick="plusSlides(1)">❯</a>
+        
+          <div class="caption-container">
+            <p id="caption"></p>
+          </div>
+        
+          <div class="row">
+            {{range $element := .}}        
+            <div class="column">
+                <img class="demo cursor" src="{{$element.FileName}}" style="width:100%" onclick="currentSlide({{$element.Pos}})" alt="{{$element.Alt}}">
+              </div>             
+            {{end}}              
+          </div>
+        </div>
+        
+    </div>
+
+    <script>
+
+        const KEY_UP = 38;
+        const KEY_DOWN = 40;
+        const KEY_LEFT = 37;
+        const KEY_RIGHT = 39;
+        
+        function SendCmd(cmd){
+            // Create a request variable and assign a new XMLHttpRequest object to it.
+            var request = new XMLHttpRequest()
+        
+            // Open a new connection, using the GET request on the URL endpoint
+            request.open('GET', '/'+cmd, true)
+        
+            // Send request
+            request.send()
+        }
+        
+        
+        
+        var myGamePiece;
+        
+        function startGame() {
+            myGamePiece = new component(30, 30, "red", 100, 150);
+            //myGamePiece = new component(30, 30, "t.png", 10, 150, "image");
+        
+            myGameArea.start();
+        }
+        
+        var myGameArea = {
+                canvas : document.getElementById("canvasid"), // document.createElement("canvas"),
+                start : function() {
+                    //this.canvas.width = 480;
+                    //this.canvas.height = 270;
+                    this.context = this.canvas.getContext("2d");
+                    document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+                    this.frameNo = 0;
+                    this.interval = setInterval(updateGameArea, 20);
+                    window.addEventListener('keydown', function (e) {
+                        e.preventDefault();
+                        myGameArea.keys = (myGameArea.keys || []);
+                        myGameArea.keys[e.keyCode] = (e.type == "keydown");
+                    })
+                    window.addEventListener('keyup', function (e) {
+                        myGameArea.keys[e.keyCode] = (e.type == "keydown");
+                    })
+                },
+                stop : function() {
+                    clearInterval(this.interval);
+                },    
+                clear : function() {
+                    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                }
+            }
+            
+        function component(width, height, color, x, y, type) {
+        
+            this.type = type;
+            if (type == "image") {
+                this.image = new Image();
+                this.image.src = color;
+            }
+            this.width = width;
+            this.height = height;
+            this.speed = 0;
+            this.angle = 0;
+            this.moveAngle = 0;
+            this.x = x;
+            this.y = y;    
+            this.update = function() {
+                ctx = myGameArea.context;
+        
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                //ctx.fillStyle = color;
+                //ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);    
+                if (type == "image") {
+                    ctx.drawImage(this.image, 
+                        this.width / -2, 
+                        this.height / -2,
+                        this.width, this.height);
+                } else {
+                    ctx.fillStyle = color;
+                    //ctx.fillRect(this.x, this.y, this.width, this.height);
+                    ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);    
+                }         
+                ctx.restore();    
+            }
+            this.newPos = function() {
+                this.angle += this.moveAngle * Math.PI / 180;
+                this.x += this.speed * Math.sin(this.angle);
+                this.y -= this.speed * Math.cos(this.angle);
+            }
+        }
+        
+        function updateGameArea() {
+            myGameArea.clear();
+            if (myGameArea.keys && myGameArea.keys[KEY_LEFT]) {
+                moveleft(); 
+            }
+            if (myGameArea.keys && myGameArea.keys[KEY_RIGHT]) 
+            {
+                moveright();
+            }
+            if (myGameArea.keys && myGameArea.keys[KEY_UP]) 
+            {
+                moveup();
+            }
+            if (myGameArea.keys && myGameArea.keys[KEY_DOWN]) 
+            {
+                movedown();
+            }
+            if (myGameArea.keys && myGameArea.keys[32]) 
+            {
+                Stop();
+            }
+            if (myGameArea.keys && myGameArea.keys[67]) 
+            {
+                Snap();
+            }    
+            myGamePiece.newPos();
+            myGamePiece.update();    
+        } 
+        
+        function Stop() {
+            SendCmd("Stop")
+            myGamePiece.speed =0; 
+            myGamePiece.moveAngle = 0;   
+        }
+        
+        function moveup() {
+            myGamePiece.speed = 1; 
+            SendCmd("Forwards")
+        }
+        
+        function movedown() {
+            myGamePiece.speed = -1; 
+            SendCmd("Backwards")
+        
+        }
+        
+        function moveleft() {
+            myGamePiece.moveAngle = -1;
+            myGamePiece.speed =0;    
+            SendCmd("SpinLeft")
+        
+        }
+        
+        function moveright() {
+            myGamePiece.moveAngle = 1;
+            myGamePiece.speed =0; 
+        
+            SendCmd("SpinRight")
+        }
+        
+        function Snap() {
+            SendCmd("Capture")
+        }
+        
+        var slideIndex = 1;
+        showSlides(slideIndex);
+    
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
+        }
+    
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+    
+        function showSlides(n) {
+
+            var i;
+            var slides = document.getElementsByClassName("mySlides");
+            var dots = document.getElementsByClassName("demo");
+            var captionText = document.getElementById("caption");
+
+            if (n > slides.length) {
+                slideIndex = 1
+            }
+            
+            if (n < 1) {
+                slideIndex = slides.length
+            }
+
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+
+            slides[slideIndex-1].style.display = "block";
+            dots[slideIndex-1].className += " active";
+            captionText.innerHTML = dots[slideIndex-1].alt;
+
+        }
+    
+        </script>
+
+</body>
+</html>
