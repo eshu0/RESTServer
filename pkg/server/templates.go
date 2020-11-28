@@ -92,17 +92,29 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 				rs.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
 				return
 			}
-			if handler.JSONRequest {
-				data, jsonerr := rs.RequestHelper.ReadJSONRequest(r, handler.JSONRequestType)
-				if jsonerr != nil {
-					rs.Invoke(any, handler.MethodName, Request.CreateServerTemplatedPayloadRequest(w, r, t, data))
-				} else {
-					rs.LogErrorf("MakeTemplateHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
+
+			if handler.MethodName == "" {
+				rs.LogDebugf("MakeTemplateHandlerFunction", "No method so default to loading the template %s for %s", handler.TemplateBlob, handler.URL)
+				request := Request.CreateServerTemplateRequest(w, r, t)
+				terr := request.Template.Execute(request.Writer, rsc.Server.Config)
+				if terr != nil {
+					rs.LogErrorf("MakeTemplateHandlerFunction", "Template.Execute Error : %s", jsonerr.Error())
 					return
 				}
 			} else {
-				rs.Invoke(any, handler.MethodName, Request.CreateServerTemplateRequest(w, r, t))
+				if handler.JSONRequest {
+					data, jsonerr := rs.RequestHelper.ReadJSONRequest(r, handler.JSONRequestType)
+					if jsonerr != nil {
+						rs.Invoke(any, handler.MethodName, Request.CreateServerTemplatedPayloadRequest(w, r, t, data))
+					} else {
+						rs.LogErrorf("MakeTemplateHandlerFunction", "ReadJSONRequest Error : %s", jsonerr.Error())
+						return
+					}
+				} else {
+					rs.Invoke(any, handler.MethodName, Request.CreateServerTemplateRequest(w, r, t))
+				}
 			}
+
 		}
 
 	}
