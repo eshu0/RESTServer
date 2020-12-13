@@ -68,7 +68,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 			rs.Invoke(any, handler.MethodName, Request.CreateServerTemplateRequest(w, r, t))
 		} else {
 
-			t, err := loadTemplate(handler)
+			t, err := loadTemplate(rs, handler)
 
 			if err != nil {
 				rs.LogErrorf("MakeTemplateHandlerFunction", "Error : %s", err.Error())
@@ -103,35 +103,35 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 
 }
 
-func loadTemplate(handler Handlers.RESTHandler) (*template.Template, error) {
+func loadTemplate(rs *RServer, handler Handlers.RESTHandler) (*template.Template, error) {
 	t := template.New(handler.TemplateName)
 	if handler.TemplatePath != "" {
 		rs.LogDebugf("loadTemplate", "We have a template path %s for %s", handler.TemplatePath, handler.URL)
-		t, err = template.ParseFiles(handler.TemplatePath)
+		t, err := template.ParseFiles(handler.TemplatePath)
 		if err != nil {
 			rs.LogErrorEf("loadTemplate", "Failed to load template path with err: %s (TemplatePath was %s)", err, handler.TemplatePath)
 			rs.LogDebugf("loadTemplate", "Failed loading template so trying blob for %s", handler.URL)
-			return loadBlobTemplate(handler)
+			return loadBlobTemplate(rs, handler)
 		}
 		return t, err
 	} else {
 		if handler.TemplateFileName != "" {
 			tfilepath := rs.Config.GetTemplatePath() + handler.TemplateFileName
 			rs.LogDebugf("loadTemplate", "We have a template filename %s for %s", tfilepath, handler.URL)
-			t, err = template.ParseFiles(tfilepath)
+			t, err := template.ParseFiles(tfilepath)
 			if err != nil {
 				rs.LogErrorEf("loadTemplate", "Failed to load template filename with err: %s (tfilepath was %s)", err, tfilepath)
 				rs.LogDebugf("loadTemplate", "Failed loading template so trying blob for %s", handler.URL)
-				return loadBlobTemplate(handler)
+				return loadBlobTemplate(rs, handler)
 			}
 			return t, err
 		} else {
-			return loadBlobTemplate(handler)
+			return loadBlobTemplate(rs, handler)
 		}
 	}
 }
 
-func loadBlobTemplate(handler Handlers.RESTHandler) (*template.Template, error) {
+func loadBlobTemplate(rs *RServer, handler Handlers.RESTHandler) (*template.Template, error) {
 
 	if handler.TemplateBlob != "" {
 		rs.LogDebugf("loadBlobTemplate", "We have a template blob %s for %s", handler.TemplateBlob, handler.URL)
