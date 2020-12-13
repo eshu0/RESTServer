@@ -104,7 +104,6 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 }
 
 func loadTemplate(rs *RServer, handler Handlers.RESTHandler) (*template.Template, error) {
-	t := template.New(handler.TemplateName)
 	if handler.TemplatePath != "" {
 		rs.LogDebugf("loadTemplate", "We have a template path %s for %s", handler.TemplatePath, handler.URL)
 		t, err := template.ParseFiles(handler.TemplatePath)
