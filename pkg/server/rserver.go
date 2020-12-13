@@ -153,20 +153,24 @@ func DefaultServer(ConfigFilePath *string) (rs *RServer) {
 	server := NewRServer(conf)
 
 	// has a conifg file been provided?
-	if ConfigFilePath != nil && *ConfigFilePath != "" {
+	if ConfigFilePath != nil && len(*ConfigFilePath) > 0 {
+		rs.LogDebugf("LoadConfig", "Custom config file path is %s", *ConfigFilePath)
 
 		// load this first
 		server.ConfigFilePath = *ConfigFilePath
-		ok := server.LoadConfig()
-
-		// we failed to load the configuration file
-		if !ok {
-			return
-		}
 
 	} else {
+		rs.LogDebugf("LoadConfig", "Default config file path is %s", Config.DefaultFilePath)
 		// load this first
-		server.ConfigFilePath = "./config.json"
+		server.ConfigFilePath = Config.DefaultFilePath
+	}
+
+	ok := server.LoadConfig()
+
+	// we failed to load the configuration file
+	if !ok {
+		rs.LogError("LoadConfig ", "failed to load configuration file")
+		return
 	}
 
 	return server
