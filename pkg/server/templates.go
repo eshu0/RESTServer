@@ -109,7 +109,8 @@ func loadTemplate(rs *RServer, handler Handlers.RESTHandler) (*template.Template
 		rs.LogDebugf("loadTemplate", "We have a template path %s for %s", handler.TemplatePath, handler.URL)
 		t, err := template.ParseFiles(handler.TemplatePath)
 		if err != nil {
-			rs.LogErrorEf("loadTemplate", "Failed to load template path with err: %s (TemplatePath was %s)", err, handler.TemplatePath)
+			rs.LogErrorf("loadTemplate", "Failed to load template path for %s", handler.TemplatePath)
+			rs.LogErrorEf("loadTemplate", "Load template path err: %s ", err)
 			rs.LogDebugf("loadTemplate", "Failed loading template so trying blob for %s", handler.URL)
 			return loadBlobTemplate(rs, handler)
 		}
@@ -120,7 +121,8 @@ func loadTemplate(rs *RServer, handler Handlers.RESTHandler) (*template.Template
 			rs.LogDebugf("loadTemplate", "We have a template filename %s for %s", tfilepath, handler.URL)
 			t, err := template.ParseFiles(tfilepath)
 			if err != nil {
-				rs.LogErrorEf("loadTemplate", "Failed to load template filename with err: %s (tfilepath was %s)", err, tfilepath)
+				rs.LogErrorf("loadTemplate", "Failed to load template filename for %s", tfilepath)
+				rs.LogErrorEf("loadTemplate", "Load template filename err: %s ", err)
 				rs.LogDebugf("loadTemplate", "Failed loading template so trying blob for %s", handler.URL)
 				return loadBlobTemplate(rs, handler)
 			}
