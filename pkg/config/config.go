@@ -9,6 +9,8 @@ import (
 	slinterfaces "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
+const string DefaultFilePath = "./config.json"
+
 //
 // Server configuration interface
 // Gets, Setters etc
