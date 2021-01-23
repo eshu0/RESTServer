@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	rsinterfaces "github.com/eshu0/RESTServer/pkg/handlers"
-	Handlers "github.com/eshu0/RESTServer/pkg/interfaces"
+	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
+	rsinterfaces "github.com/eshu0/RESTServer/pkg/interfaces"
 	slinterfaces "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
