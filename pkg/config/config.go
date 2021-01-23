@@ -23,69 +23,73 @@ type RServerConfig struct {
 	CacheTemplates    bool                   `json:"cachetemplates,omitempty"`
 }
 
+//NewRServerConfig creates a new server configuation with default settings
 func NewRServerConfig() rsinterfaces.IRServerConfig {
 	Config := RServerConfig{}
-	Config.DefaultHandlers = []Handlers.RESTHandler{}
-	Config.Handlers = []Handlers.RESTHandler{}
+	Config.DefaultHandlers = []*Handlers.RESTHandler{}
+	Config.Handlers = []*Handlers.RESTHandler{}
 	Config.Port = "7777"
 	Config.TemplateFileTypes = []string{".tmpl", ".html"}
 	Config.CacheTemplates = false
 	return &Config
 }
 
+//HasTemplate returns if a teplate path has been set
 func (rsc *RServerConfig) HasTemplate() bool {
-
-	if &rsc.TemplateFilepath == nil {
-		return false
-	}
-
-	if rsc.TemplateFilepath == "" {
-		return false
-	}
-
-	return true
+	return rsc.TemplateFilepath != nil && len(rsc.TemplateFilepath) > 0
 }
 
+//GetTemplatePath returns the template path
 func (rsc *RServerConfig) GetTemplatePath() string {
 	return rsc.TemplateFilepath
 }
 
+//GetCacheTemplates returns the cached template paths
 func (rsc *RServerConfig) GetCacheTemplates() bool {
 	return rsc.CacheTemplates
 }
 
+//GetTemplateFileTypes returns the file types for the templates, such as .tmpl, .html
 func (rsc *RServerConfig) GetTemplateFileTypes() []string {
 	return rsc.TemplateFileTypes
 }
 
+//GetHandlersLen this gets length handlers
 func (rsc *RServerConfig) GetHandlersLen() int {
 	return len(rsc.Handlers)
 }
 
+//GetHandlers this gets the handlers from the config
 func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
 	return rsc.Handlers
 }
 
+//GetDefaultHandlers this gets the default handlers
 func (rsc *RServerConfig) GetDefaultHandlers() []Handlers.RESTHandler {
 	return rsc.DefaultHandlers
 }
 
+//GetDefaultHandlersLen this gets length default handlers
 func (rsc *RServerConfig) GetDefaultHandlersLen() int {
 	return len(rsc.DefaultHandlers)
 }
 
+//GetAddress this gets the server address
 func (rsc *RServerConfig) GetAddress() string {
 	return ":" + rsc.Port
 }
 
+//AddDefaultHandler this adds a default handler to the configuration
 func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
 	rsc.DefaultHandlers = append(rsc.DefaultHandlers, Handler)
 }
 
+//AddHandler this adds a handler to the configuration
 func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
 	rsc.Handlers = append(rsc.Handlers, Handler)
 }
 
+//Save This saves the configuration from a file path
 func (rsc *RServerConfig) Save(ConfigFilePath string) error {
 	bytes, err1 := json.MarshalIndent(rsc, "", "\t") //json.Marshal(p)
 	if err1 != nil {
@@ -103,6 +107,7 @@ func (rsc *RServerConfig) Save(ConfigFilePath string) error {
 
 }
 
+//Load This loads the configuration from a file path
 func (rsc *RServerConfig) Load(ConfigFilePath string) (rsinterfaces.IRServerConfig, error) {
 	ok, err := rsc.checkFileExists(ConfigFilePath)
 	if ok {
@@ -124,7 +129,7 @@ func (rsc *RServerConfig) Load(ConfigFilePath string) (rsinterfaces.IRServerConf
 		//Log.LogDebugf("LoadFile()", "Read Port %s ", rserverconfig.Port)
 		//rs.Log.LogDebugf("LoadFile()", "Port in config %s ", rs.Config.Port)
 
-		return &rserverconfig, true
+		return &rserverconfig, nil
 	} else {
 		/*
 			if err != nil {
