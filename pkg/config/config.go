@@ -5,45 +5,26 @@ import (
 	"io/ioutil"
 	"os"
 
-	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
+	rsinterfaces "github.com/eshu0/RESTServer/pkg/handlers"
+	Handlers "github.com/eshu0/RESTServer/pkg/interfaces"
 	slinterfaces "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
+//DefaultFilePath is the default path for the server config
 const DefaultFilePath = "./config.json"
 
-//x
-// Server configuration interface
-// Gets, Setters etc
-//
-type IRServerConfig interface {
-	GetAddress() string
-	HasTemplate() bool
-	GetCacheTemplates() bool
-	GetTemplatePath() string
-	GetTemplateFileTypes() []string
-
-	Save(ConfigFilePath string, Log slinterfaces.ISimpleLogger) bool
-	Load(ConfigFilePath string, Log slinterfaces.ISimpleLogger) (IRServerConfig, bool)
-	AddHandler(Handler Handlers.RESTHandler)
-	AddDefaultHandler(Handler Handlers.RESTHandler)
-
-	GetHandlers() []Handlers.RESTHandler
-	GetHandlersLen() int
-
-	GetDefaultHandlers() []Handlers.RESTHandler
-	GetDefaultHandlersLen() int
-}
-
+//RServerConfig This struct is the configuration for the REST server
 type RServerConfig struct {
-	Port              string                 `json:"port"`
-	Handlers          []Handlers.RESTHandler `json:"handlers"`
-	DefaultHandlers   []Handlers.RESTHandler `json:"defaulthandlers"`
-	TemplateFilepath  string                 `json:"templatefilepath"`
-	TemplateFileTypes []string               `json:"templatefiletypes"`
-	CacheTemplates    bool                   `json:"cachetemplates"`
+	rsinterfaces.IRServerConfig
+	Port              string                 `json:"port,omitempty"`
+	Handlers          []Handlers.RESTHandler `json:"handlers,omitempty"`
+	DefaultHandlers   []Handlers.RESTHandler `json:"defaulthandlers,omitempty"`
+	TemplateFilepath  string                 `json:"templatefilepath,omitempty"`
+	TemplateFileTypes []string               `json:"templatefiletypes,omitempty"`
+	CacheTemplates    bool                   `json:"cachetemplates,omitempty"`
 }
 
-func NewRServerConfig() IRServerConfig {
+func NewRServerConfig() rsinterfaces.IRServerConfig {
 	Config := RServerConfig{}
 	Config.DefaultHandlers = []Handlers.RESTHandler{}
 	Config.Handlers = []Handlers.RESTHandler{}
@@ -123,7 +104,7 @@ func (rsc *RServerConfig) Save(ConfigFilePath string, Log slinterfaces.ISimpleLo
 
 }
 
-func (rsc *RServerConfig) Load(ConfigFilePath string, Log slinterfaces.ISimpleLogger) (IRServerConfig, bool) {
+func (rsc *RServerConfig) Load(ConfigFilePath string, Log slinterfaces.ISimpleLogger) (rsinterfaces.IRServerConfig, bool) {
 	ok, err := rsc.checkFileExists(ConfigFilePath)
 	if ok {
 		bytes, err1 := ioutil.ReadFile(ConfigFilePath) //ReadAll(jsonFile)
