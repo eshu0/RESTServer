@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"reflect"
 
-	Config "github.com/eshu0/RESTServer/pkg/config"
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
+	rsinterfaces "github.com/eshu0/RESTServer/pkg/interfaces"
 
 	sl "github.com/eshu0/simplelogger/pkg"
 	sli "github.com/eshu0/simplelogger/pkg/interfaces"
@@ -18,7 +18,7 @@ var Server *http.Server
 
 type RServer struct {
 	sl.AppLogger
-	Config Config.IRServerConfig `json:"-"`
+	Config rsinterfaces.IRServerConfig `json:"-"`
 	// This map is designed for the functions were there is no types
 	// w http.ResponseWriter, r *http.Request
 	RawFunctions map[string]interface{} `json:"-"`
