@@ -8,10 +8,12 @@ import (
 	sli "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
+//ResponseHelper helps with responses
 type ResponseHelper struct {
 	Log sli.ISimpleLogger `json:"-"`
 }
 
+//NewResponseHelper creates a response helper struct
 func NewResponseHelper(logger sli.ISimpleLogger) *ResponseHelper {
 
 	helper := ResponseHelper{}
@@ -20,6 +22,7 @@ func NewResponseHelper(logger sli.ISimpleLogger) *ResponseHelper {
 	return &helper
 }
 
+//WriteIndentJSON writes indented JSON as a response
 func (rh *ResponseHelper) WriteIndentJSON(w http.ResponseWriter, Data interface{}) (bool, error) {
 	bytes, err := json.MarshalIndent(Data, "", "\t")
 	if err != nil {
@@ -30,6 +33,7 @@ func (rh *ResponseHelper) WriteIndentJSON(w http.ResponseWriter, Data interface{
 	return true, nil
 }
 
+//WriteJSON writes JSON as a response
 func (rh *ResponseHelper) WriteJSON(w http.ResponseWriter, Data interface{}) (bool, error) {
 	bytes, err := json.Marshal(Data)
 	if err != nil {
@@ -38,5 +42,4 @@ func (rh *ResponseHelper) WriteJSON(w http.ResponseWriter, Data interface{}) (bo
 	}
 	fmt.Fprint(w, string(bytes))
 	return true, nil
-
 }
