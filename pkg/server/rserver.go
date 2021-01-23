@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"reflect"
 
-	Config "github.com/eshu0/RESTServer/pkg/config"
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 	rsinterfaces "github.com/eshu0/RESTServer/pkg/interfaces"
 
@@ -148,7 +147,7 @@ func (rs *RServer) LoadConfig() bool {
 
 func DefaultServer(ConfigFilePath *string) (rs *RServer) {
 
-	conf := Config.NewRServerConfig()
+	conf := NewRServerConfig()
 
 	// Create a new REST Server
 	server := NewRServer(conf)
