@@ -31,11 +31,11 @@ type RServer struct {
 	NotFoundHandler func(w http.ResponseWriter, r *http.Request)
 }
 
-func NewRServer(config Config.IRServerConfig) *RServer {
+func NewRServer(config rsinterfaces.IRServerConfig) *RServer {
 	return NewRServerCustomLog(config, sl.NewApplicationNowLogger())
 }
 
-func NewRServerCustomLog(config Config.IRServerConfig, logger sli.ISimpleLogger) *RServer {
+func NewRServerCustomLog(config rsinterfaces.IRServerConfig, logger sli.ISimpleLogger) *RServer {
 	server := RServer{}
 	server.Config = config
 	server.Log = logger
