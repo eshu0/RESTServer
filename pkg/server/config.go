@@ -2,6 +2,7 @@ package RESTServer
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -26,8 +27,8 @@ type RServerConfig struct {
 //NewRServerConfig creates a new server configuation with default settings
 func NewRServerConfig() rsinterfaces.IRServerConfig {
 	Config := RServerConfig{}
-	Config.DefaultHandlers = []*Handlers.RESTHandler{}
-	Config.Handlers = []*Handlers.RESTHandler{}
+	Config.DefaultHandlers = []Handlers.RESTHandler{}
+	Config.Handlers = []Handlers.RESTHandler{}
 	Config.Port = "7777"
 	Config.TemplateFileTypes = []string{".tmpl", ".html"}
 	Config.CacheTemplates = false
@@ -36,7 +37,7 @@ func NewRServerConfig() rsinterfaces.IRServerConfig {
 
 //HasTemplate returns if a teplate path has been set
 func (rsc *RServerConfig) HasTemplate() bool {
-	return rsc.TemplateFilepath != nil && len(rsc.TemplateFilepath) > 0
+	return &(rsc.TemplateFilepath) != nil && len(rsc.TemplateFilepath) > 0
 }
 
 //GetTemplatePath returns the template path
@@ -113,8 +114,7 @@ func (rsc *RServerConfig) Load(ConfigFilePath string) (rsinterfaces.IRServerConf
 	if ok {
 		bytes, err1 := ioutil.ReadFile(ConfigFilePath) //ReadAll(jsonFile)
 		if err1 != nil {
-			//Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", ConfigFilePath, err1.Error())
-			return nil, err1
+			return nil, fmt.Errorf("Reading '%s' failed with %s ", ConfigFilePath, err1.Error())
 		}
 
 		rserverconfig := RServerConfig{}
@@ -122,24 +122,19 @@ func (rsc *RServerConfig) Load(ConfigFilePath string) (rsinterfaces.IRServerConf
 		err2 := json.Unmarshal(bytes, &rserverconfig)
 
 		if err2 != nil {
-			//Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", ConfigFilePath, err2.Error())
-			return nil, err2
+			return nil, fmt.Errorf("Loading %s failed with %s ", ConfigFilePath, err2.Error())
 		}
 
 		//Log.LogDebugf("LoadFile()", "Read Port %s ", rserverconfig.Port)
 		//rs.Log.LogDebugf("LoadFile()", "Port in config %s ", rs.Config.Port)
-
 		return &rserverconfig, nil
-	} else {
-		/*
-			if err != nil {
-				Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", ConfigFilePath, err.Error())
-			} else {
-				Log.LogErrorf("LoadFile()", "'%s' was not found to load", ConfigFilePath)
-			}
-		*/
-		return nil, err
 	}
+
+	if err != nil {
+		return nil, fmt.Errorf("'%s' was not found to load with error: %s", ConfigFilePath, err.Error())
+	}
+
+	return nil, fmt.Errorf("'%s' was not found to load", ConfigFilePath)
 }
 
 func (rsc *RServerConfig) checkFileExists(filename string) (bool, error) {
