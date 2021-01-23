@@ -2,7 +2,6 @@ package rsinterfaces
 
 import (
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
-	slinterfaces "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
 // IRServerConfig  Server configuration interface
@@ -14,8 +13,8 @@ type IRServerConfig interface {
 	GetTemplatePath() string
 	GetTemplateFileTypes() []string
 
-	Save(ConfigFilePath string, Log slinterfaces.ISimpleLogger) bool
-	Load(ConfigFilePath string, Log slinterfaces.ISimpleLogger) (IRServerConfig, bool)
+	Save(ConfigFilePath string) error
+	Load(ConfigFilePath string) (IRServerConfig, error)
 	AddHandler(Handler Handlers.RESTHandler)
 	AddDefaultHandler(Handler Handlers.RESTHandler)
 

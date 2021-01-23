@@ -7,7 +7,6 @@ import (
 
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	rsinterfaces "github.com/eshu0/RESTServer/pkg/interfaces"
-	slinterfaces "github.com/eshu0/simplelogger/pkg/interfaces"
 )
 
 //DefaultFilePath is the default path for the server config
@@ -87,30 +86,30 @@ func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
 	rsc.Handlers = append(rsc.Handlers, Handler)
 }
 
-func (rsc *RServerConfig) Save(ConfigFilePath string, Log slinterfaces.ISimpleLogger) bool {
+func (rsc *RServerConfig) Save(ConfigFilePath string) error {
 	bytes, err1 := json.MarshalIndent(rsc, "", "\t") //json.Marshal(p)
 	if err1 != nil {
-		Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", ConfigFilePath, err1.Error())
-		return false
+		//Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", ConfigFilePath, err1.Error())
+		return err1
 	}
 
 	err2 := ioutil.WriteFile(ConfigFilePath, bytes, 0644)
 	if err2 != nil {
-		Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", ConfigFilePath, err2.Error())
-		return false
+		//Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", ConfigFilePath, err2.Error())
+		return err2
 	}
 
-	return true
+	return nil
 
 }
 
-func (rsc *RServerConfig) Load(ConfigFilePath string, Log slinterfaces.ISimpleLogger) (rsinterfaces.IRServerConfig, bool) {
+func (rsc *RServerConfig) Load(ConfigFilePath string) (rsinterfaces.IRServerConfig, error) {
 	ok, err := rsc.checkFileExists(ConfigFilePath)
 	if ok {
 		bytes, err1 := ioutil.ReadFile(ConfigFilePath) //ReadAll(jsonFile)
 		if err1 != nil {
-			Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", ConfigFilePath, err1.Error())
-			return nil, false
+			//Log.LogErrorf("LoadFile()", "Reading '%s' failed with %s ", ConfigFilePath, err1.Error())
+			return nil, err1
 		}
 
 		rserverconfig := RServerConfig{}
@@ -118,23 +117,23 @@ func (rsc *RServerConfig) Load(ConfigFilePath string, Log slinterfaces.ISimpleLo
 		err2 := json.Unmarshal(bytes, &rserverconfig)
 
 		if err2 != nil {
-			Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", ConfigFilePath, err2.Error())
-			return nil, false
+			//Log.LogErrorf("LoadFile()", " Loading %s failed with %s ", ConfigFilePath, err2.Error())
+			return nil, err2
 		}
 
-		Log.LogDebugf("LoadFile()", "Read Port %s ", rserverconfig.Port)
+		//Log.LogDebugf("LoadFile()", "Read Port %s ", rserverconfig.Port)
 		//rs.Log.LogDebugf("LoadFile()", "Port in config %s ", rs.Config.Port)
 
 		return &rserverconfig, true
 	} else {
-
-		if err != nil {
-			Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", ConfigFilePath, err.Error())
-		} else {
-			Log.LogErrorf("LoadFile()", "'%s' was not found to load", ConfigFilePath)
-		}
-
-		return nil, false
+		/*
+			if err != nil {
+				Log.LogErrorf("LoadFile()", "'%s' was not found to load with error: %s", ConfigFilePath, err.Error())
+			} else {
+				Log.LogErrorf("LoadFile()", "'%s' was not found to load", ConfigFilePath)
+			}
+		*/
+		return nil, err
 	}
 }
 
