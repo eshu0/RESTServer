@@ -40,11 +40,6 @@ func NewRServer(config *RServerConfig) *RServer {
 //NewRServerCustomLog if a different logger is wanted instead of the default one
 func NewRServerCustomLog(config *RServerConfig, logger sli.ISimpleLogger) *RServer {
 	server := RServer{}
-	if config == nil {
-		// this creates a new server config with defaults
-		config = NewRServerConfig()
-	}
-
 	server.Config = config
 	server.Log = logger
 	server.RawFunctions = make(map[string]interface{})
