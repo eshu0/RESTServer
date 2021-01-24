@@ -169,7 +169,7 @@ func (rs *RServer) LoadConfig() bool {
 		return false
 	}
 
-	rs.Config = newconfig
+	rs.Config.Parent = newconfig
 	return true
 }
 
