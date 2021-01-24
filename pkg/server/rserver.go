@@ -131,20 +131,23 @@ func (rs *RServer) ListenAndServe() {
 }
 
 func (rs *RServer) SaveConfig() bool {
-	if err := rs.Config.Save(rs.ConfigFilePath); err == nil {
-		return true
+
+	if err := rs.Config.Save(rs.ConfigFilePath); err != nil {
+		rs.LogErrorEf("SaveConfig", "SaveConfig - %v", err)
 	}
-	rs.LogErrorEf("SaveConfig", "SaveConfig - %v", err)
-	return false
+	return true
 }
 
 func (rs *RServer) LoadConfig() bool {
-	if newconfig, err := rs.Config.Load(rs.ConfigFilePath); err == nil {
-		rs.Config = newconfig
-		return true
+
+	var newconfig *RServerConfig
+	if newconfig, err := rs.Config.Load(rs.ConfigFilePath); err != nil ; newconfig == nil {
+		rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
+		return false
 	}
-	rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
-	return false
+
+	rs.Config = newconfig
+	return true
 }
 
 func DefaultServer(ConfigFilePath *string) (rs *RServer) {
