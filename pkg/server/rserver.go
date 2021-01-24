@@ -149,12 +149,17 @@ func (rs *RServer) ListenAndServe() {
 //SaveConfig saves server config to disk
 func (rs *RServer) SaveConfig() bool {
 
-	if rs.Helper == nil {
+	if rs.Config == nil {
+		rs.LogError("SaveConfig", "Config was nil")
+		return false
+	}
+
+	if rs.Config.Helper == nil {
 		rs.LogError("SaveConfig", "Helper was nil")
 		return false
 	}
 
-	if err := rs.Helper.Save(); err != nil {
+	if err := rs.Config.Helper.Save(); err != nil {
 		rs.LogErrorEf("SaveConfig", "SaveConfig - %v", err)
 		return false
 	}
@@ -164,12 +169,17 @@ func (rs *RServer) SaveConfig() bool {
 //LoadConfig loads server config from disk
 func (rs *RServer) LoadConfig() bool {
 
-	if rs.Helper == nil {
-		rs.LogError("LoadConfig", "Helper was nil")
+	if rs.Config == nil {
+		rs.LogError("LoadConfig", "Config was nil")
 		return false
 	}
 
-	if err := rs.Helper.Load(); err != nil {
+	if rs.Config.Helper == nil {
+		rs.LogError("SaveConfig", "Helper was nil")
+		return false
+	}
+
+	if err := rs.Config.Helper.Load(); err != nil {
 		rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
 		return false
 	}
@@ -179,6 +189,7 @@ func (rs *RServer) LoadConfig() bool {
 
 //DefaultServer Creates a default server
 func DefaultServer(ConfigFilePath *string) *RServer {
+
 	// Create a new REST Server
 	server := NewRServer(nil)
 
