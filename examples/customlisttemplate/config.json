@@ -1,4 +1,7 @@
 {
-	"port": "666",
-	"templatefilepath": "./views/"
+	"Data" : {
+		"port": "666",
+		"templatefilepath": "./views/",
+		"templatefiletypes":[".tmpl", ".html"]
+	}
 }
