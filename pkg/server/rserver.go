@@ -189,19 +189,18 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 		server.LogDebugf("LoadConfig", "Custom config file path is %s", *ConfigFilePath)
 
 		// load this first
-		server.ConfigFilePath = *ConfigFilePath
+		server.Config.ConfigFilePath = *ConfigFilePath
 
 	} else {
 		server.LogDebugf("LoadConfig", "Default config file path is %s", appconf.DefaultFilePath)
 		// load this first
-		server.ConfigFilePath = appconf.DefaultFilePath
+		server.Config.ConfigFilePath = appconf.DefaultFilePath
 	}
-
 	ok := server.LoadConfig()
 
 	// we failed to load the configuration file
 	if !ok {
-		server.LogError("LoadConfig ", "failed to load configuration file putting defaults")
+		server.LogError("LoadConfig ", "failed to load configuration file")
 		server.Config = defaultconfig
 	}
 
