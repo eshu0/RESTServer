@@ -130,6 +130,7 @@ func (rs *RServer) ListenAndServe() {
 	}
 }
 
+//SaveConfig saves server config to disk
 func (rs *RServer) SaveConfig() bool {
 
 	if err := rs.Config.Save(rs.ConfigFilePath); err != nil {
@@ -138,11 +139,11 @@ func (rs *RServer) SaveConfig() bool {
 	return true
 }
 
+//LoadConfig loads server config from disk
 func (rs *RServer) LoadConfig() bool {
 
-	var newconfig *RServerConfig
-	var err error
-	if newconfig, err = rs.Config.Load(rs.ConfigFilePath); err != nil ; newconfig == nil {
+	newconfig, err := rs.Config.Load(rs.ConfigFilePath)
+	if err != nil || newconfig == nil {
 		rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
 		return false
 	}
@@ -151,6 +152,7 @@ func (rs *RServer) LoadConfig() bool {
 	return true
 }
 
+//DefaultServer Creates a default server
 func DefaultServer(ConfigFilePath *string) (rs *RServer) {
 
 	conf := NewRServerConfig()
