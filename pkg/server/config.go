@@ -75,12 +75,20 @@ func (rsc *RServerConfig) GetConfigData() *ConfigData {
 		fmt.Println("cache is nil")
 		data := rsc.Helper.LoadedConfig.GetItem("Data")
 		fmt.Printf("data %v\n", data)
-		Config, ok := data.(map[string]*ConfigData)
+		Config, ok := data.(*ConfigData) //(map[string]*ConfigData)
 		if ok {
 			fmt.Printf("cast ok %v\n", Config)
-			rsc.cache = Config["Data"]
-			return Config["Data"]
+			rsc.cache = Config
+			return Config
 		}
+
+		Config, ok = (&data).(*ConfigData) //(map[string]*ConfigData)
+		if ok {
+			fmt.Printf("cast ok %v\n", Config)
+			rsc.cache = Config
+			return Config
+		}
+
 		fmt.Printf("cast failed %v\n", Config)
 		return nil
 
