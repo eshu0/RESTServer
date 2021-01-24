@@ -226,9 +226,9 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 
 func (rs *RServer) PrintDetails() {
 
-	rs.LogInfof("PrintDetails", "Address: ", rs.Config.GetAddress())
-	rs.LogInfof("PrintDetails", "Template Filepath: ", rs.Config.GetTemplatePath())
-	rs.LogInfof("PrintDetails", "Template FileTypes: ", strings.Join(rs.Config.GetTemplateFileTypes(), ","))
+	rs.LogInfof("PrintDetails", "Address: %s", rs.Config.GetAddress())
+	rs.LogInfof("PrintDetails", "Template Filepath: %s", rs.Config.GetTemplatePath())
+	rs.LogInfof("PrintDetails", "Template FileTypes: %s", strings.Join(rs.Config.GetTemplateFileTypes(), ","))
 
 	/*rs.LogInfof("PrintDetails", "Port: ", rs.Config.GetPort())
 
