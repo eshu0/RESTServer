@@ -1,34 +1,23 @@
 package main
 
 import (
+	"flag"
+
 	RESTCommands "github.com/eshu0/RESTServer/pkg/commands"
-	RESTConfig "github.com/eshu0/RESTServer/pkg/config"
 	RESTServer "github.com/eshu0/RESTServer/pkg/server"
 )
 
 func main() {
 
-	// create a new server
-	conf := RESTConfig.NewRServerConfig()
+	ConfigFilePath := flag.String("config", "", "Filepath to config file")
 
-	// Create a new REST Server
-	server := RESTServer.NewRServer(conf)
-
-	//defer the close till the server has closed
-	defer server.FinishLogging()
-
-	// load this first
-	server.ConfigFilePath = "./config.json"
-
-	ok := server.LoadConfig()
-
-	if !ok {
-		return
-	}
+	// create a new server - don't pass in a load path
+	server := RESTServer.DefaultServer(ConfigFilePath)
 
 	// add the defaults here
 	RESTCommands.AddDefaults(server)
 	RESTCommands.SetDefaultFunctionalMap(server)
+
 	// as a test save the updated config
 	server.ConfigFilePath = "./updated.json"
 	server.SaveConfig()
