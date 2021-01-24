@@ -19,7 +19,7 @@ func main() {
 	RESTCommands.SetDefaultFunctionalMap(server)
 
 	// as a test save the updated config
-	server.Config.ConfigFilePath = "./updated.json"
+	server.Config.Helper.FilePath = "./updated.json"
 	server.SaveConfig()
 
 	// start Listen Server, this build the mapping and creates Handler/
