@@ -185,7 +185,7 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 	defaultconfig := NewRServerConfig()
 
 	// Create a new REST Server
-	server := NewRServer(conf)
+	server := NewRServer(defaultconfig)
 
 	// has a conifg file been provided?
 	if ConfigFilePath != nil && len(*ConfigFilePath) > 0 {
