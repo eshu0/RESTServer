@@ -102,6 +102,13 @@ func (rsc *RServerConfig) GetConfigData() *ConfigData {
 		Config3, ok3 := data.((map[string]interface{}))
 		if ok3 {
 			fmt.Printf("cast3 ok %v\n", Config3)
+
+			Config4, ok4 := Config3["Data"].(*ConfigData)
+			if ok4 {
+				fmt.Printf("cast4 ok %v\n", Config4)
+				rsc.cache = Config4
+				return Config4
+			}
 		}
 
 		fmt.Printf("cast failed %v\n", Config)
