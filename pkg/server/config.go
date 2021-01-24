@@ -212,7 +212,7 @@ func (rsc *RServerConfig) GetDefaultHandlersLen() int {
 func (rsc *RServerConfig) GetAddress() string {
 	d := rsc.GetConfigData()
 	if d == nil {
-		panic("config data was nil")
+		//panic("config data was nil")
 		return ":7777"
 	}
 	return ":" + d.Port
