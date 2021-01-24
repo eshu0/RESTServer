@@ -153,7 +153,7 @@ func (rsc *RServerConfig) GetAddress() string {
 //AddDefaultHandler this adds a default handler to the configuration
 func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
 	d := rsc.getConfigData()
-	if d == nil {
+	if d != nil {
 		d.DefaultHandlers = append(d.DefaultHandlers, Handler)
 	}
 }
@@ -161,7 +161,7 @@ func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
 //AddHandler this adds a handler to the configuration
 func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
 	d := rsc.getConfigData()
-	if d == nil {
+	if d != nil {
 		d.Handlers = append(d.Handlers, Handler)
 	}
 }
