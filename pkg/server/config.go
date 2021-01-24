@@ -41,17 +41,22 @@ func NewRServerConfig(filepath string) *RServerConfig {
 
 //Loads the config from disk
 func (rsc *RServerConfig) Load() error {
+	fmt.Printf("conf before load %v\n", rsc.Helper.LoadedConfig)
 
 	// load the data
 	if err := rsc.Helper.Load(); err != nil {
 		return err
 	}
 
+	fmt.Printf("conf after load %v\n", rsc.Helper.LoadedConfig)
+
 	// reset the cache
 	rsc.cache = nil
 
 	// this rebuilds the cache
 	rsc.GetConfigData()
+
+	fmt.Printf("conf after data config %v\n", rsc.Helper.LoadedConfig)
 
 	return nil
 }
@@ -87,6 +92,13 @@ func (rsc *RServerConfig) GetConfigData() *ConfigData {
 			fmt.Printf("cast1 ok %v\n", Config1)
 			rsc.cache = &Config1
 			return &Config1
+		}
+
+		Config2, ok2 := data.(map[interface{}]nil) //(map[string]*ConfigData)
+		if ok2 {
+			fmt.Printf("cast1 ok %v\n", Config2)
+			rsc.cache = &Config2
+			return &Config2
 		}
 
 		fmt.Printf("cast failed %v\n", Config)
