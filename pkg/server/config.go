@@ -117,12 +117,13 @@ func (rsc *RServerConfig) SetConfigData(data *ConfigData) {
 
 	// reset the cache
 	rsc.cache = nil
+	fmt.Printf("before %v\n", rsc.Helper.LoadedConfig)
 
 	// set the data ietm
 	rsc.Helper.LoadedConfig.SetItem("Data", data)
 
-	// this rebuilds the cache
-	rsc.GetConfigData()
+	fmt.Printf("after %v\n", rsc.Helper.LoadedConfig)
+
 }
 
 //HasTemplate returns if a teplate path has been set
