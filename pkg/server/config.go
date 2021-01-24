@@ -94,11 +94,14 @@ func (rsc *RServerConfig) GetConfigData() *ConfigData {
 			return &Config1
 		}
 
-		Config2, ok2 := data.(map[interface{}]nil) //(map[string]*ConfigData)
+		Config2, ok2 := data.((map[string]*ConfigData))
 		if ok2 {
-			fmt.Printf("cast1 ok %v\n", Config2)
-			rsc.cache = &Config2
-			return &Config2
+			fmt.Printf("cast2 ok %v\n", Config2)
+		}
+
+		Config3, ok3 := data.((map[string]interface{}))
+		if ok3 {
+			fmt.Printf("cast3 ok %v\n", Config3)
 		}
 
 		fmt.Printf("cast failed %v\n", Config)
