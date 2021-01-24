@@ -55,8 +55,9 @@ func SetServerDefaultConfig(Config appconfint.IAppConfig) {
 	Data.TemplateFileTypes = []string{".tmpl", ".html"}
 	Data.CacheTemplates = false
 
-	Config.SetItem("Data", Data)
+	SetConfigData(Data)
 }
+
 func (rsc *RServerConfig) GetConfigData() *ConfigData {
 	data := rsc.Parent.GetItem("Data")
 	Config, ok := data.(*ConfigData)
@@ -65,6 +66,10 @@ func (rsc *RServerConfig) GetConfigData() *ConfigData {
 		return Config
 	}
 	return nil
+}
+
+func (rsc *RServerConfig) SetConfigData(data *ConfigData) {
+	rsc.Parent.SetItem("Data", data)
 }
 
 //HasTemplate returns if a teplate path has been set
@@ -153,14 +158,20 @@ func (rsc *RServerConfig) GetAddress() string {
 func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
 	d := rsc.GetConfigData()
 	if d != nil {
-		d.DefaultHandlers = append(d.DefaultHandlers, Handler)
+		handlers := d.DefaultHandlers
+		handlers = append(handlers, Handler)
+		d.DefaultHandlers = handlers
+		rsc.SetConfigData(d)
 	}
 }
 
 //AddHandler this adds a handler to the configuration
 func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
 	d := rsc.GetConfigData()
-	if d = nil {
-		d.Handlers = append(d.Handlers, Handler)
+	if d != nil {
+		handlers := d.Handlers
+		handlers = append(handlers, Handler)
+		d.Handlers = handlers
+		rsc.SetConfigData(d)
 	}
 }
