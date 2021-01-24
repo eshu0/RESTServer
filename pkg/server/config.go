@@ -39,7 +39,7 @@ func NewRServerConfig(filepath string) *RServerConfig {
 
 }
 
-//Loads the config from disk
+//Load Loads the config from disk
 func (rsc *RServerConfig) Load() error {
 	fmt.Printf("conf before load %v\n", rsc.Helper.LoadedConfig)
 
@@ -78,7 +78,7 @@ func (rsc *RServerConfig) SetServerDefaultConfig(Config appconfint.IAppConfig) {
 func (rsc *RServerConfig) GetConfigData() *ConfigData {
 	if rsc.cache == nil {
 		fmt.Println("cache is nil")
-		data := rsc.Helper.LoadedConfig.GetItem("Data")
+		data := rsc.Helper.LoadedConfig.GetData()
 		fmt.Printf("data %v\n", data)
 		Config, ok := data.(*ConfigData) //(map[string]*ConfigData)
 		if ok {
@@ -129,7 +129,7 @@ func (rsc *RServerConfig) SetConfigData(data *ConfigData) {
 	fmt.Printf("before %v\n", rsc.Helper.LoadedConfig)
 
 	// set the data ietm
-	rsc.Helper.LoadedConfig.SetItem("Data", data)
+	rsc.Helper.LoadedConfig.SetData(data)
 
 	fmt.Printf("after %v\n", rsc.Helper.LoadedConfig)
 
