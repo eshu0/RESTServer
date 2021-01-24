@@ -176,11 +176,11 @@ func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 	r := mux.NewRouter()
 
 	for _, handl := range rs.Config.GetHandlers() {
-		rs.addHandlerToRouter(r, *handl)
+		rs.addHandlerToRouter(r, handl)
 	}
 
 	for _, handl := range rs.Config.GetDefaultHandlers() {
-		rs.addHandlerToRouter(r, *handl)
+		rs.addHandlerToRouter(r, handl)
 	}
 
 	r.Use(mux.CORSMethodMiddleware(r))
