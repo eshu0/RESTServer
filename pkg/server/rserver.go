@@ -180,7 +180,7 @@ func (rs *RServer) LoadConfig() bool {
 }
 
 //DefaultServer Creates a default server
-func DefaultServer(ConfigFilePath *string) (rs *RServer) {
+func DefaultServer(ConfigFilePath *string) *RServer {
 
 	conf := NewRServerConfig()
 
@@ -204,7 +204,7 @@ func DefaultServer(ConfigFilePath *string) (rs *RServer) {
 
 	// we failed to load the configuration file
 	if !ok {
-		rs.LogError("LoadConfig ", "failed to load configuration file")
+		server.LogError("LoadConfig ", "failed to load configuration file")
 		return
 	}
 
