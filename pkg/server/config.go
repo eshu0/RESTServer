@@ -17,12 +17,12 @@ type RServerConfig struct {
 
 //ConfigData the data to be stored
 type ConfigData struct {
-	Port              string                  `json:"port,omitempty"`
-	Handlers          []*Handlers.RESTHandler `json:"handlers,omitempty"`
-	DefaultHandlers   []*Handlers.RESTHandler `json:"defaulthandlers,omitempty"`
-	TemplateFilepath  string                  `json:"templatefilepath,omitempty"`
-	TemplateFileTypes []string                `json:"templatefiletypes,omitempty"`
-	CacheTemplates    bool                    `json:"cachetemplates,omitempty"`
+	Port              string                 `json:"port,omitempty"`
+	Handlers          []Handlers.RESTHandler `json:"handlers,omitempty"`
+	DefaultHandlers   []Handlers.RESTHandler `json:"defaulthandlers,omitempty"`
+	TemplateFilepath  string                 `json:"templatefilepath,omitempty"`
+	TemplateFileTypes []string               `json:"templatefiletypes,omitempty"`
+	CacheTemplates    bool                   `json:"cachetemplates,omitempty"`
 }
 
 //NewRServerConfig creates new server config
@@ -50,8 +50,8 @@ func SetServerDefaultConfig(Config appconfint.IAppConfig) {
 	//Config.SetItem("CacheTemplates", false)
 
 	Data := &ConfigData{}
-	Data.DefaultHandlers = []*Handlers.RESTHandler{}
-	Data.Handlers = []*Handlers.RESTHandler{}
+	Data.DefaultHandlers = []Handlers.RESTHandler{}
+	Data.Handlers = []Handlers.RESTHandler{}
 	Data.Port = "7777"
 	Data.TemplateFileTypes = []string{".tmpl", ".html"}
 	Data.CacheTemplates = false
@@ -115,19 +115,19 @@ func (rsc *RServerConfig) GetHandlersLen() int {
 }
 
 //GetHandlers this gets the handlers from the config
-func (rsc *RServerConfig) GetHandlers() []*Handlers.RESTHandler {
+func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
 	d := rsc.getConfigData()
 	if d == nil {
-		return nil
+		return []Handlers.RESTHandler{}
 	}
 	return d.Handlers
 }
 
 //GetDefaultHandlers this gets the default handlers
-func (rsc *RServerConfig) GetDefaultHandlers() []*Handlers.RESTHandler {
+func (rsc *RServerConfig) GetDefaultHandlers() []Handlers.RESTHandler {
 	d := rsc.getConfigData()
 	if d == nil {
-		return nil
+		return []Handlers.RESTHandler{}
 	}
 	return d.DefaultHandlers
 }
@@ -154,7 +154,7 @@ func (rsc *RServerConfig) GetAddress() string {
 func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
 	d := rsc.getConfigData()
 	if d == nil {
-		d.DefaultHandlers = append(d.DefaultHandlers, &Handler)
+		d.DefaultHandlers = append(d.DefaultHandlers, Handler)
 	}
 }
 
@@ -162,6 +162,6 @@ func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
 func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
 	d := rsc.getConfigData()
 	if d == nil {
-		d.Handlers = append(d.Handlers, &Handler)
+		d.Handlers = append(d.Handlers, Handler)
 	}
 }
