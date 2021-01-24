@@ -4,7 +4,6 @@ import (
 	"os"
 
 	RESTCommands "github.com/eshu0/RESTServer/pkg/commands"
-	RESTConfig "github.com/eshu0/RESTServer/pkg/config"
 	RESTServer "github.com/eshu0/RESTServer/pkg/server"
 )
 

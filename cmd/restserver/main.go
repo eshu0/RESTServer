@@ -23,7 +23,7 @@ func main() {
 	// also fires the "http listen and server method"
 	server.ListenAndServe()
 
-	// has a conifg file been provided?
+	// has a config file been provided?
 	if UpdatedConfigFilePath != nil && *UpdatedConfigFilePath != "" {
 
 		// as a test save the updated config
