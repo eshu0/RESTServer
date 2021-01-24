@@ -1,17 +1,17 @@
 package RESTServer
 
 import (
+	"fmt"
+
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	appconf "github.com/eshu0/appconfig/pkg"
 	appconfint "github.com/eshu0/appconfig/pkg/interfaces"
 )
 
-//DefaultFilePath is the default path for the server config
-const DefaultFilePath = "./config.json"
-
 //RServerConfig This struct is the configuration for the REST server
 type RServerConfig struct {
-	Parent *appconf.AppConfig
+	Parent         *appconf.AppConfig
+	ConfigFilePath string `json:"-"`
 }
 
 //ConfigData the data to be stored
@@ -170,4 +170,45 @@ func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
 		d.Handlers = handlers
 		rsc.SetConfigData(d)
 	}
+}
+
+//Save saves server config to disk
+func (rsc *RServerConfig) Save() error {
+
+	if rsc.Parent == nil {
+		return fmt.Errorf("Config Parent was nil")
+	}
+
+	if len(rsc.ConfigFilePath) <= 0 {
+		return fmt.Errorf("Config File Path was not set could not save")
+	}
+
+	if err := rsc.Parent.Save(rsc.ConfigFilePath); err != nil {
+		return err
+	}
+	return nil
+}
+
+//Load loads server config from disk
+func (rsc *RServerConfig) Load() error {
+
+	if rsc.Parent == nil {
+		return fmt.Errorf("Config Parent was nil")
+	}
+
+	newconfig, err := rsc.Parent.Load(rsc.ConfigFilePath)
+	if err != nil {
+		return err
+	}
+
+	if newconfig == nil {
+		return fmt.Errorf("Loading resulted with a nil")
+	}
+
+	ccat, ok := newconfig.(*appconf.AppConfig)
+	if ok {
+		rsc.Parent = ccat
+		return nil
+	}
+	return fmt.Errorf("Cast failed")
 }
