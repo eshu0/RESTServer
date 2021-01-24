@@ -141,7 +141,8 @@ func (rs *RServer) SaveConfig() bool {
 func (rs *RServer) LoadConfig() bool {
 
 	var newconfig *RServerConfig
-	if newconfig, err := rs.Config.Load(rs.ConfigFilePath); err != nil ; newconfig == nil {
+	var err error
+	if newconfig, err = rs.Config.Load(rs.ConfigFilePath); err != nil ; newconfig == nil {
 		rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
 		return false
 	}
