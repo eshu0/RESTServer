@@ -11,7 +11,12 @@ const DefaultFilePath = "./config.json"
 
 //RServerConfig This struct is the configuration for the REST server
 type RServerConfig struct {
-	Parent            *appconf.AppConfig
+	Parent *appconf.AppConfig
+	Data   *ConfigData
+}
+
+//ConfigData the data to be stored
+type ConfigData struct {
 	Port              string                 `json:"port,omitempty"`
 	Handlers          []Handlers.RESTHandler `json:"handlers,omitempty"`
 	DefaultHandlers   []Handlers.RESTHandler `json:"defaulthandlers,omitempty"`
@@ -38,56 +43,113 @@ func NewRServerConfig() *RServerConfig {
 
 //SetServerDefaultConfig ets the defult items
 func SetServerDefaultConfig(Config appconfint.IAppConfig) {
-	Config.SetItem("DefaultHandlers", []Handlers.RESTHandler{})
-	Config.SetItem("Handlers", []Handlers.RESTHandler{})
-	Config.SetItem("Port", "7777")
-	Config.SetItem("TemplateFileTypes", []string{".tmpl", ".html"})
-	Config.SetItem("CacheTemplates", false)
+	//Config.SetItem("DefaultHandlers", []Handlers.RESTHandler{})
+	//Config.SetItem("Handlers", []Handlers.RESTHandler{})
+	//Config.SetItem("Port", "7777")
+	//Config.SetItem("TemplateFileTypes", []string{".tmpl", ".html"})
+	//Config.SetItem("CacheTemplates", false)
+
+	Data := &ConfigData{}
+	Data.DefaultHandlers = []Handlers.RESTHandler{}
+	Data.Handlers = []Handlers.RESTHandler{}
+	Data.DefaultHandlers = []*Handlers.RESTHandler{}
+	Data.Handlers = []*Handlers.RESTHandler{}
+	Data.Port = "7777"
+	Data.TemplateFileTypes = []string{".tmpl", ".html"}
+	Data.CacheTemplates = false
+
+	Config.SetItem("Data", Data)
+}
+func (rsc *RServerConfig) getConfigData() *ConfigData {
+
+	data := rsc.Parent.GetItem("Data")
+	Config, ok := conf.(*ConfigData)
+	if ok {
+		return Config
+	}
+	return nil
 }
 
 //HasTemplate returns if a teplate path has been set
 func (rsc *RServerConfig) HasTemplate() bool {
-	return &(rsc.TemplateFilepath) != nil && len(rsc.TemplateFilepath) > 0
+	d := rsc.getConfigData()
+	if d == nil {
+		return false
+	}
+
+	return &(d.TemplateFilepath) != nil && len(d.TemplateFilepath) > 0
 }
 
 //GetTemplatePath returns the template path
 func (rsc *RServerConfig) GetTemplatePath() string {
-	return rsc.TemplateFilepath
+	d := rsc.getConfigData()
+	if d == nil {
+		return ""
+	}
+	return d.TemplateFilepath
 }
 
 //GetCacheTemplates returns the cached template paths
 func (rsc *RServerConfig) GetCacheTemplates() bool {
-	return rsc.CacheTemplates
+	d := rsc.getConfigData()
+	if d == nil {
+		return false
+	}
+	return d.CacheTemplates
 }
 
 //GetTemplateFileTypes returns the file types for the templates, such as .tmpl, .html
 func (rsc *RServerConfig) GetTemplateFileTypes() []string {
-	return rsc.TemplateFileTypes
+	d := rsc.getConfigData()
+	if d == nil {
+		return []string{}
+	}
+	return d.TemplateFileTypes
 }
 
 //GetHandlersLen this gets length handlers
 func (rsc *RServerConfig) GetHandlersLen() int {
-	return len(rsc.Handlers)
+	d := rsc.getConfigData()
+	if d == nil {
+		return -1
+	}
+	return len(d.Handlers)
 }
 
 //GetHandlers this gets the handlers from the config
 func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
-	return rsc.Handlers
+	d := rsc.getConfigData()
+	if d == nil {
+		return nil
+	}
+	return d.Handlers
 }
 
 //GetDefaultHandlers this gets the default handlers
 func (rsc *RServerConfig) GetDefaultHandlers() []Handlers.RESTHandler {
-	return rsc.DefaultHandlers
+	d := rsc.getConfigData()
+	if d == nil {
+		return nil
+	}
+	return d.DefaultHandlers
 }
 
 //GetDefaultHandlersLen this gets length default handlers
 func (rsc *RServerConfig) GetDefaultHandlersLen() int {
-	return len(rsc.DefaultHandlers)
+	d := rsc.getConfigData()
+	if d == nil {
+		return -1
+	}
+	return len(d.DefaultHandlers)
 }
 
 //GetAddress this gets the server address
 func (rsc *RServerConfig) GetAddress() string {
-	return ":" + rsc.Port
+	d := rsc.getConfigData()
+	if d == nil {
+		return ":7777"
+	}
+	return ":" + d.Port
 }
 
 //AddDefaultHandler this adds a default handler to the configuration
