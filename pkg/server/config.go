@@ -55,14 +55,13 @@ func SetServerDefaultConfig(Config appconfint.IAppConfig) {
 	Data.TemplateFileTypes = []string{".tmpl", ".html"}
 	Data.CacheTemplates = false
 
-	SetConfigData(Data)
+	rsc.SetConfigData(Data)
 }
 
 func (rsc *RServerConfig) GetConfigData() *ConfigData {
 	data := rsc.Parent.GetItem("Data")
 	Config, ok := data.(*ConfigData)
 	if ok {
-		rsc.Data = Config
 		return Config
 	}
 	return nil
