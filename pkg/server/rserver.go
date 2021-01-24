@@ -179,6 +179,7 @@ func (rs *RServer) LoadConfig() bool {
 	}
 
 	rs.LogDebugf("LoadConfig", "Updated from file path %s", rs.Config.Helper.FilePath)
+	rs.PrintDetails()
 	return true
 }
 
