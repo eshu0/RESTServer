@@ -31,7 +31,7 @@ func NewRServerConfig() *RServerConfig {
 	Config, ok := conf.(*appconf.AppConfig)
 	if ok {
 		dc.Parent = Config
-		dc.Parent.SetDefaultFunc(SetServerDefaultConfig)
+		dc.Parent.SetDefaultFunc(dc.SetServerDefaultConfig)
 		dc.Parent.SetDefaults()
 		return dc
 	}
@@ -41,7 +41,7 @@ func NewRServerConfig() *RServerConfig {
 }
 
 //SetServerDefaultConfig ets the defult items
-func SetServerDefaultConfig(Config appconfint.IAppConfig) {
+func (rsc *RServerConfig) SetServerDefaultConfig(Config appconfint.IAppConfig) {
 	//Config.SetItem("DefaultHandlers", []Handlers.RESTHandler{})
 	//Config.SetItem("Handlers", []Handlers.RESTHandler{})
 	//Config.SetItem("Port", "7777")
@@ -55,7 +55,7 @@ func SetServerDefaultConfig(Config appconfint.IAppConfig) {
 	Data.TemplateFileTypes = []string{".tmpl", ".html"}
 	Data.CacheTemplates = false
 
-	rsc.SetConfigData(Data)
+	rsc.SetConfigData(data)
 }
 
 func (rsc *RServerConfig) GetConfigData() *ConfigData {
