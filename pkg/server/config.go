@@ -9,7 +9,7 @@ import (
 //RServerConfig This struct is the configuration for the REST server
 type RServerConfig struct {
 	Helper *appconf.AppConfigHelper `json:"-"`
-	data   *ConfigData              `json:"-"`
+	cache  *ConfigData              `json:"-"`
 }
 
 //ConfigData the data to be stored
@@ -29,7 +29,8 @@ func NewRServerConfig(filepath string) *RServerConfig {
 
 	if helper != nil {
 		dc.Helper = helper
-		dc.Helper.Config.SetDefaults()
+		// we call this after the helper has been set!
+		dc.Helper.LoadedConfig.SetDefaults()
 	}
 
 	return dc
@@ -51,24 +52,31 @@ func (rsc *RServerConfig) SetServerDefaultConfig(Config appconfint.IAppConfig) {
 
 //GetConfigData returns the config data from the store
 func (rsc *RServerConfig) GetConfigData() *ConfigData {
-	if rsc.data == nil {
-		data := rsc.Helper.Config.GetItem("Data")
+	if rsc.cache == nil {
+		data := rsc.Helper.LoadedConfig.GetItem("Data")
 		Config, ok := data.(*ConfigData)
 		if ok {
-			rsc.data = Config
+			rsc.cache = Config
 			return Config
 		}
 		return nil
 
 	}
-	return rsc.data
+	return rsc.cache
 
 }
 
 //SetConfigData sets the config data to the store
 func (rsc *RServerConfig) SetConfigData(data *ConfigData) {
-	rsc.Helper.Config.SetItem("Data", data)
-	rsc.data = nil
+
+	// reset the cache
+	rsc.cache = nil
+
+	// set the data ietm
+	rsc.Helper.LoadedConfig.SetItem("Data", data)
+
+	// this rebuilds the cache
+	rsc.GetConfigData()
 }
 
 //HasTemplate returns if a teplate path has been set
