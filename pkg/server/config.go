@@ -26,7 +26,12 @@ type ConfigData struct {
 func NewRServerConfig(filepath string) *RServerConfig {
 	dc := &RServerConfig{}
 	helper := appconf.NewAppConfigHelperWithDefault(filepath, dc.SetServerDefaultConfig)
-	dc.Helper = helper
+
+	if helper != nil {
+		dc.Helper = helper
+		dc.Helper.Config.SetDefaults()
+	}
+
 	return dc
 
 }
