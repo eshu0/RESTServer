@@ -37,6 +37,23 @@ func NewRServerConfig(filepath string) *RServerConfig {
 
 }
 
+//Loads the config from disk
+func (rsc *RServerConfig) Load() error {
+
+	// load the data
+	if err := rsc.Helper.Load(); err != nil {
+		return err
+	}
+
+	// reset the cache
+	rsc.cache = nil
+
+	// this rebuilds the cache
+	rsc.GetConfigData()
+
+	return nil
+}
+
 //SetServerDefaultConfig ets the defult items
 func (rsc *RServerConfig) SetServerDefaultConfig(Config appconfint.IAppConfig) {
 
