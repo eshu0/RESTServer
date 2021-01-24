@@ -13,8 +13,6 @@ type IRServerConfig interface {
 	GetTemplatePath() string
 	GetTemplateFileTypes() []string
 
-	Save(ConfigFilePath string) error
-	Load(ConfigFilePath string) (IRServerConfig, error)
 	AddHandler(Handler Handlers.RESTHandler)
 	AddDefaultHandler(Handler Handlers.RESTHandler)
 
