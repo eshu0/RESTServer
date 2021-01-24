@@ -2,14 +2,12 @@ package RESTServer
 
 import (
 	"context"
-	"fmt"
 	"html/template"
 	"net/http"
 	"reflect"
 	"strings"
 
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
-	appconf "github.com/eshu0/appconfig/pkg"
 
 	sl "github.com/eshu0/simplelogger/pkg"
 	sli "github.com/eshu0/simplelogger/pkg/interfaces"
@@ -186,24 +184,10 @@ func (rs *RServer) LoadConfig() bool {
 //DefaultServer Creates a default server
 func DefaultServer(ConfigFilePath *string) *RServer {
 
-	path := ""
-	msg := ""
-	// has a conifg file been provided?
-	if ConfigFilePath != nil && len(*ConfigFilePath) > 0 {
-		// load this first
-		path = *ConfigFilePath
-		msg = fmt.Sprintf("Custom config file path is %s", path)
-	} else {
-		// load this first
-		path = appconf.DefaultFilePath
-		msg = fmt.Sprintf("Default config file path is %s", path)
-
-	}
-
-	conf := NewRServerConfig(path)
+	conf := NewRServerConfig(*ConfigFilePath)
 	// Create a new REST Server
 	server := NewRServer(conf)
-	server.LogDebug("DefaultServer", msg)
+	server.LogDebugf("DefaultServer", "config file path is %s", conf.Helper.Filepath)
 
 	ok := server.LoadConfig()
 	// we failed to load the configuration file
@@ -211,7 +195,7 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 		server.LogError("DefaultServer ", "failed to load configuration file")
 	}
 
-	server.LogDebugf("DefaultServer", "Loaded config from %s", path)
+	server.LogDebugf("DefaultServer", "Loaded config from %s", conf.Helper.Filepath)
 
 	return server
 }
