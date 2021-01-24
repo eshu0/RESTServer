@@ -173,7 +173,7 @@ func (rs *RServer) LoadConfig() bool {
 		return false
 	}
 
-	if err := rs.Config.Helper.Load(); err != nil {
+	if err := rs.Config.Load(); err != nil {
 		rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
 		return false
 	}
