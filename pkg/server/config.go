@@ -64,9 +64,9 @@ func (rsc *RServerConfig) GetConfigData() *ConfigData {
 		}
 		return nil
 
-	} else {
-		return rsc.data
 	}
+
+	return rsc.data
 
 }
 
