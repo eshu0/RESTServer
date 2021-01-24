@@ -25,7 +25,6 @@ type RServer struct {
 	RawFunctions map[string]interface{} `json:"-"`
 	// This accepts Request.ServerRequest
 	TypedMap        map[string]interface{}  `json:"-"`
-	ConfigFilePath  string                  `json:"-"`
 	Templates       *template.Template      `json:"-"`
 	RequestHelper   *Helpers.RequestHelper  `json:"-"`
 	ResponseHelper  *Helpers.ResponseHelper `json:"-"`
@@ -60,7 +59,7 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []r
 	rs.LogDebugf("Invoke", "Method: Looking up %s ", name)
 
 	inputs := make([]reflect.Value, len(args))
-	for i, _ := range args {
+	for i := range args {
 		val := reflect.ValueOf(args[i])
 		rs.LogDebugf("Invoke", "ValueOf of arg at [%d] ", i, val)
 		rs.LogDebugf("Invoke", "ValueOf of arg at  %v ", val)
@@ -150,16 +149,11 @@ func (rs *RServer) ListenAndServe() {
 func (rs *RServer) SaveConfig() bool {
 
 	if rs.Config == nil {
-		rs.LogError("SaveConfig", "Config was null")
+		rs.LogError("SaveConfig", "Config was nil")
 		return false
 	}
 
-	if rs.Config != nil && rs.Config.Parent == nil {
-		rs.LogError("SaveConfig", "Config Parent was null")
-		return false
-	}
-
-	if err := rs.Config.Parent.Save(rs.ConfigFilePath); err != nil {
+	if err := rs.Config.Save(); err != nil {
 		rs.LogErrorEf("SaveConfig", "SaveConfig - %v", err)
 		return false
 	}
@@ -170,28 +164,16 @@ func (rs *RServer) SaveConfig() bool {
 func (rs *RServer) LoadConfig() bool {
 
 	if rs.Config == nil {
-		rs.LogError("LoadConfig", "Config was null")
+		rs.LogError("LoadConfig", "Config was nil")
 		return false
 	}
 
-	if rs.Config != nil && rs.Config.Parent == nil {
-		rs.LogError("LoadConfig", "Config Parent was null")
-		return false
-	}
-
-	newconfig, err := rs.Config.Parent.Load(rs.ConfigFilePath)
-	if err != nil || newconfig == nil {
+	if err := rs.Config.Load(); err != nil {
 		rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
 		return false
 	}
-	ccat, ok := newconfig.(*appconf.AppConfig)
-	if ok {
-		rs.Config.Parent = ccat
-		return true
-	}
 
-	rs.LogError("LoadConfig", "Cast failed")
-	return false
+	return true
 }
 
 //DefaultServer Creates a default server
@@ -229,9 +211,9 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 func (rs *RServer) PrintDetails() {
 
 	rs.LogInfof("PrintDetails", "Address: %s", rs.Config.GetAddress())
-	rs.LogInfof("PrintDetails", "Cache Templates: %b", rs.Config.GetCacheTemplates())
 	rs.LogInfof("PrintDetails", "Template Filepath: %s", rs.Config.GetTemplatePath())
 	rs.LogInfof("PrintDetails", "Template FileTypes: %s", strings.Join(rs.Config.GetTemplateFileTypes(), ","))
+	rs.LogInfof("PrintDetails", "Cache Templates: %t", rs.Config.GetCacheTemplates())
 	rs.LogInfo("PrintDetails", "Handlers: ")
 	for _, handl := range rs.Config.GetHandlers() {
 		rs.LogInfof("PrintDetails", "Handler: %s", handl.MethodName)
