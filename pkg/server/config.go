@@ -42,11 +42,6 @@ func NewRServerConfig() *RServerConfig {
 
 //SetServerDefaultConfig ets the defult items
 func (rsc *RServerConfig) SetServerDefaultConfig(Config appconfint.IAppConfig) {
-	//Config.SetItem("DefaultHandlers", []Handlers.RESTHandler{})
-	//Config.SetItem("Handlers", []Handlers.RESTHandler{})
-	//Config.SetItem("Port", "7777")
-	//Config.SetItem("TemplateFileTypes", []string{".tmpl", ".html"})
-	//Config.SetItem("CacheTemplates", false)
 
 	Data := &ConfigData{}
 	Data.DefaultHandlers = []Handlers.RESTHandler{}
@@ -58,6 +53,7 @@ func (rsc *RServerConfig) SetServerDefaultConfig(Config appconfint.IAppConfig) {
 	rsc.SetConfigData(Data)
 }
 
+//GetConfigData returns the config data from the store
 func (rsc *RServerConfig) GetConfigData() *ConfigData {
 	data := rsc.Parent.GetItem("Data")
 	Config, ok := data.(*ConfigData)
@@ -67,6 +63,7 @@ func (rsc *RServerConfig) GetConfigData() *ConfigData {
 	return nil
 }
 
+//SetConfigData sets the config data to the store
 func (rsc *RServerConfig) SetConfigData(data *ConfigData) {
 	rsc.Parent.SetItem("Data", data)
 }
