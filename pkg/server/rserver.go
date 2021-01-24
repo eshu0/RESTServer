@@ -178,7 +178,7 @@ func (rs *RServer) LoadConfig() bool {
 		return false
 	}
 
-	rs.LogDebugf("LoadConfig", "Updated from file path %s", rs.Config.Helper.Filepath)
+	rs.LogDebugf("LoadConfig", "Updated from file path %s", rs.Config.Helper.FilePath)
 	return true
 }
 
