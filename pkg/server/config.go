@@ -1,6 +1,8 @@
 package RESTServer
 
 import (
+	"fmt"
+
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	appconf "github.com/eshu0/appconfig/pkg"
 	appconfint "github.com/eshu0/appconfig/pkg/interfaces"
@@ -70,12 +72,16 @@ func (rsc *RServerConfig) SetServerDefaultConfig(Config appconfint.IAppConfig) {
 //GetConfigData returns the config data from the store
 func (rsc *RServerConfig) GetConfigData() *ConfigData {
 	if rsc.cache == nil {
+		fmt.Println("cache is nil")
 		data := rsc.Helper.LoadedConfig.GetItem("Data")
+		fmt.Printf("data %v\n", data)
 		Config, ok := data.(*ConfigData)
 		if ok {
+			fmt.Printf("cast ok %v\n", Config)
 			rsc.cache = Config
 			return Config
 		}
+		fmt.Printf("cast failed %v\n", Config)
 		return nil
 
 	}
