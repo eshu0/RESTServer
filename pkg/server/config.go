@@ -2,9 +2,8 @@ package RESTServer
 
 import (
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
-	appconfint "github.com/eshu0/appconfig/pkg/interfaces"
 	appconf "github.com/eshu0/appconfig/pkg"
-
+	appconfint "github.com/eshu0/appconfig/pkg/interfaces"
 )
 
 //DefaultFilePath is the default path for the server config
@@ -12,7 +11,6 @@ const DefaultFilePath = "./config.json"
 
 //RServerConfig This struct is the configuration for the REST server
 type RServerConfig struct {
-
 	Parent            *appconf.AppConfig
 	Port              string                 `json:"port,omitempty"`
 	Handlers          []Handlers.RESTHandler `json:"handlers,omitempty"`
@@ -37,13 +35,13 @@ func NewRServerConfig() *RServerConfig {
 
 }
 
-//NewRServerConfig creates a new server configuation with default settings
+//SetServerDefaultConfig ets the defult items
 func SetServerDefaultConfig(Config appconfint.IAppConfig) {
-	Config.SetItem("DefaultHandlers",[]Handlers.RESTHandler{})
-	Config.SetItem("Handlers",[]Handlers.RESTHandler{})
+	Config.SetItem("DefaultHandlers", []Handlers.RESTHandler{})
+	Config.SetItem("Handlers", []Handlers.RESTHandler{})
 	Config.SetItem("Port", "7777")
-	Config.SetItem("TemplateFileTypes",[]string{".tmpl", ".html"})
-	Config.SetItem("CacheTemplates", = false)
+	Config.SetItem("TemplateFileTypes", []string{".tmpl", ".html"})
+	Config.SetItem("CacheTemplates", false)
 }
 
 //HasTemplate returns if a teplate path has been set
