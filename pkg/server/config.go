@@ -1,13 +1,10 @@
 package RESTServer
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"os"
-
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
-	rsinterfaces "github.com/eshu0/RESTServer/pkg/interfaces"
+	appconfint "github.com/eshu0/appconfig/pkg/interfaces"
+	appconf "github.com/eshu0/appconfig/pkg"
+
 )
 
 //DefaultFilePath is the default path for the server config
@@ -15,7 +12,8 @@ const DefaultFilePath = "./config.json"
 
 //RServerConfig This struct is the configuration for the REST server
 type RServerConfig struct {
-	rsinterfaces.IRServerConfig
+
+	Parent            *appconf.AppConfig
 	Port              string                 `json:"port,omitempty"`
 	Handlers          []Handlers.RESTHandler `json:"handlers,omitempty"`
 	DefaultHandlers   []Handlers.RESTHandler `json:"defaulthandlers,omitempty"`
@@ -24,15 +22,28 @@ type RServerConfig struct {
 	CacheTemplates    bool                   `json:"cachetemplates,omitempty"`
 }
 
+func NewRServerConfig() *RServerConfig {
+	conf := NewAppConfig()
+	dc := &DummyConfig{}
+	Config, ok := conf.(*RServerConfig)
+	if ok {
+		dc.Parent = Config
+		dc.Parent.SetDefaultFunc(SetServerDefaultConfig)
+		dc.Parent.SetDefaults()
+		return dc
+	}
+
+	return nil
+
+}
+
 //NewRServerConfig creates a new server configuation with default settings
-func NewRServerConfig() rsinterfaces.IRServerConfig {
-	Config := RServerConfig{}
-	Config.DefaultHandlers = []Handlers.RESTHandler{}
-	Config.Handlers = []Handlers.RESTHandler{}
-	Config.Port = "7777"
-	Config.TemplateFileTypes = []string{".tmpl", ".html"}
-	Config.CacheTemplates = false
-	return &Config
+func SetServerDefaultConfig(Config appconfint.IAppConfig) {
+	Config.SetItem("DefaultHandlers",[]Handlers.RESTHandler{})
+	Config.SetItem("Handlers",[]Handlers.RESTHandler{})
+	Config.SetItem("Port", "7777")
+	Config.SetItem("TemplateFileTypes",[]string{".tmpl", ".html"})
+	Config.SetItem("CacheTemplates", = false)
 }
 
 //HasTemplate returns if a teplate path has been set
@@ -88,59 +99,4 @@ func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
 //AddHandler this adds a handler to the configuration
 func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
 	rsc.Handlers = append(rsc.Handlers, Handler)
-}
-
-//Save This saves the configuration from a file path
-func (rsc *RServerConfig) Save(ConfigFilePath string) error {
-	bytes, err1 := json.MarshalIndent(rsc, "", "\t") //json.Marshal(p)
-	if err1 != nil {
-		//Log.LogErrorf("SaveToFile()", "Marshal json for %s failed with %s ", ConfigFilePath, err1.Error())
-		return err1
-	}
-
-	err2 := ioutil.WriteFile(ConfigFilePath, bytes, 0644)
-	if err2 != nil {
-		//Log.LogErrorf("SaveToFile()", "Saving %s failed with %s ", ConfigFilePath, err2.Error())
-		return err2
-	}
-
-	return nil
-
-}
-
-//Load This loads the configuration from a file path
-func (rsc *RServerConfig) Load(ConfigFilePath string) (rsinterfaces.IRServerConfig, error) {
-	ok, err := rsc.checkFileExists(ConfigFilePath)
-	if ok {
-		bytes, err1 := ioutil.ReadFile(ConfigFilePath) //ReadAll(jsonFile)
-		if err1 != nil {
-			return nil, fmt.Errorf("Reading '%s' failed with %s ", ConfigFilePath, err1.Error())
-		}
-
-		rserverconfig := RServerConfig{}
-
-		err2 := json.Unmarshal(bytes, &rserverconfig)
-
-		if err2 != nil {
-			return nil, fmt.Errorf("Loading %s failed with %s ", ConfigFilePath, err2.Error())
-		}
-
-		//Log.LogDebugf("LoadFile()", "Read Port %s ", rserverconfig.Port)
-		//rs.Log.LogDebugf("LoadFile()", "Port in config %s ", rs.Config.Port)
-		return &rserverconfig, nil
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("'%s' was not found to load with error: %s", ConfigFilePath, err.Error())
-	}
-
-	return nil, fmt.Errorf("'%s' was not found to load", ConfigFilePath)
-}
-
-func (rsc *RServerConfig) checkFileExists(filename string) (bool, error) {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false, err
-	}
-	return !info.IsDir(), nil
 }
