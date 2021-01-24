@@ -1,8 +1,6 @@
 package RESTServer
 
 import (
-	"fmt"
-
 	Handlers "github.com/eshu0/RESTServer/pkg/handlers"
 	appconf "github.com/eshu0/appconfig/pkg"
 	appconfint "github.com/eshu0/appconfig/pkg/interfaces"
@@ -10,9 +8,8 @@ import (
 
 //RServerConfig This struct is the configuration for the REST server
 type RServerConfig struct {
-	Parent         *appconf.AppConfig `json:"-"`
-	ConfigFilePath string             `json:"-"`
-	data           *ConfigData        `json:"-"`
+	Helper *appconf.AppConfigHelper `json:"-"`
+	data   *ConfigData              `json:"-"`
 }
 
 //ConfigData the data to be stored
@@ -27,17 +24,9 @@ type ConfigData struct {
 
 //NewRServerConfig creates new server config
 func NewRServerConfig() *RServerConfig {
-	conf := appconf.NewAppConfig()
 	dc := &RServerConfig{}
-	Config, ok := conf.(*appconf.AppConfig)
-	if ok {
-		dc.Parent = Config
-		dc.Parent.SetDefaultFunc(dc.SetServerDefaultConfig)
-		dc.Parent.SetDefaults()
-		return dc
-	}
-
-	return nil
+	dc.Helper = appconf.NewAppConfigHelperWithDefault(dc.SetServerDefaultConfig)
+	return dc
 
 }
 
@@ -57,22 +46,22 @@ func (rsc *RServerConfig) SetServerDefaultConfig(Config appconfint.IAppConfig) {
 //GetConfigData returns the config data from the store
 func (rsc *RServerConfig) GetConfigData() *ConfigData {
 	if rsc.data == nil {
-		data := rsc.Parent.GetItem("Data")
+		data := rsc.Helper.Config.GetItem("Data")
 		Config, ok := data.(*ConfigData)
 		if ok {
+			rsc.data = Config
 			return Config
 		}
 		return nil
 
 	}
-
 	return rsc.data
 
 }
 
 //SetConfigData sets the config data to the store
 func (rsc *RServerConfig) SetConfigData(data *ConfigData) {
-	rsc.Parent.SetItem("Data", data)
+	rsc.Helper.Config.SetItem("Data", data)
 	rsc.data = nil
 }
 
@@ -178,49 +167,4 @@ func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
 		d.Handlers = handlers
 		rsc.SetConfigData(d)
 	}
-}
-
-//Save saves server config to disk
-func (rsc *RServerConfig) Save() error {
-
-	if rsc.Parent == nil {
-		return fmt.Errorf("Config Parent was nil")
-	}
-
-	if len(rsc.ConfigFilePath) <= 0 {
-		return fmt.Errorf("Config File Path was not set could not save")
-	}
-
-	if err := rsc.Parent.Save(rsc.ConfigFilePath); err != nil {
-		return err
-	}
-	return nil
-}
-
-//Load loads server config from disk
-func (rsc *RServerConfig) Load() error {
-
-	if rsc.Parent == nil {
-		return fmt.Errorf("Config Parent was nil")
-	}
-
-	if len(rsc.ConfigFilePath) <= 0 {
-		return fmt.Errorf("Config File Path was not set could not load")
-	}
-
-	newconfig, err := rsc.Parent.Load(rsc.ConfigFilePath)
-	if err != nil {
-		return err
-	}
-
-	if newconfig == nil {
-		return fmt.Errorf("Loading resulted with a nil")
-	}
-
-	ccat, ok := newconfig.(*appconf.AppConfig)
-	if ok {
-		rsc.Parent = ccat
-		return nil
-	}
-	return fmt.Errorf("Cast failed")
 }
