@@ -139,6 +139,8 @@ func (rs *RServer) ListenAndServe() {
 	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: httphandler}
 
 	rs.PrintDetails()
+	rs.LogInfo("ListenAndServe", "Starting.....")
+
 	if err := Server.ListenAndServe(); err != http.ErrServerClosed {
 		rs.LogErrorEf("ListenAndServe", "HTTP server ListenAndServe %v", err)
 	}
@@ -227,10 +229,10 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 func (rs *RServer) PrintDetails() {
 
 	rs.LogInfof("PrintDetails", "Address: %s", rs.Config.GetAddress())
+	rs.LogInfof("PrintDetails", "Cache Templates: %b", rs.Config.GetCacheTemplates())
 	rs.LogInfof("PrintDetails", "Template Filepath: %s", rs.Config.GetTemplatePath())
 	rs.LogInfof("PrintDetails", "Template FileTypes: %s", strings.Join(rs.Config.GetTemplateFileTypes(), ","))
 	rs.LogInfo("PrintDetails", "Handlers: ")
-	rs.LogInfof("PrintDetails", "Handlers: %s", "abbb")
 	for _, handl := range rs.Config.GetHandlers() {
 		rs.LogInfof("PrintDetails", "Handler: %s", handl.MethodName)
 	}
