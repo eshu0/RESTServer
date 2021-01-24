@@ -7,7 +7,6 @@ import (
 	"reflect"
 
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
-	rsinterfaces "github.com/eshu0/RESTServer/pkg/interfaces"
 
 	sl "github.com/eshu0/simplelogger/pkg"
 	sli "github.com/eshu0/simplelogger/pkg/interfaces"
@@ -18,7 +17,7 @@ var Server *http.Server
 
 type RServer struct {
 	sl.AppLogger
-	Config rsinterfaces.IRServerConfig `json:"-"`
+	Config *RServerConfig `json:"-"`
 	// This map is designed for the functions were there is no types
 	// w http.ResponseWriter, r *http.Request
 	RawFunctions map[string]interface{} `json:"-"`
@@ -31,11 +30,11 @@ type RServer struct {
 	NotFoundHandler func(w http.ResponseWriter, r *http.Request)
 }
 
-func NewRServer(config rsinterfaces.IRServerConfig) *RServer {
+func NewRServer(config *RServerConfig) *RServer {
 	return NewRServerCustomLog(config, sl.NewApplicationNowLogger())
 }
 
-func NewRServerCustomLog(config rsinterfaces.IRServerConfig, logger sli.ISimpleLogger) *RServer {
+func NewRServerCustomLog(config *RServerConfig, logger sli.ISimpleLogger) *RServer {
 	server := RServer{}
 	server.Config = config
 	server.Log = logger
@@ -127,22 +126,25 @@ func (rs *RServer) ListenAndServe() {
 	rs.LogInfof("ListenAndServe", "Listening on: %s", rs.Config.GetAddress())
 
 	if err := Server.ListenAndServe(); err != http.ErrServerClosed {
-		rs.LogErrorf("HTTP server ListenAndServe", "%v", err)
+		rs.LogErrorEf("ListenAndServe", "HTTP server ListenAndServe %v", err)
 	}
 }
 
 func (rs *RServer) SaveConfig() bool {
-	ok := rs.Config.Save(rs.ConfigFilePath, rs.Log)
-	return ok
+	if err := rs.Config.Save(rs.ConfigFilePath); err == nil {
+		return true
+	}
+	rs.LogErrorEf("SaveConfig", "SaveConfig - %v", err)
+	return false
 }
 
 func (rs *RServer) LoadConfig() bool {
-	newconfig, ok := rs.Config.Load(rs.ConfigFilePath, rs.Log)
-	if ok {
+	if newconfig, err := rs.Config.Load(rs.ConfigFilePath); err == nil {
 		rs.Config = newconfig
+		return true
 	}
-
-	return ok
+	rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
+	return false
 }
 
 func DefaultServer(ConfigFilePath *string) (rs *RServer) {
