@@ -127,18 +127,19 @@ func (rs *RServer) ListenAndServe() {
 	httphandler := rs.MapFunctionsToHandlers()
 
 	if rs.NotFoundHandler != nil {
-		rs.LogInfo("ListenAndServe", "NotFoundHandler is set")
+		rs.LogInfo("ListenAndServe", "Not Found (404) Handler is set")
 		httphandler.NotFoundHandler = http.HandlerFunc(rs.NotFoundHandler)
 	}
 
 	rs.LogDebug("ListenAndServe", "LoadTemplates started")
 	rs.LoadTemplates()
 	rs.LogDebug("ListenAndServe", "LoadTemplates finished")
+	address := rs.Config.GetAddress()
 
-	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: httphandler}
+	Server = &http.Server{Addr: address, Handler: httphandler}
 
 	rs.PrintDetails()
-	rs.LogInfo("ListenAndServe", "Starting.....")
+	rs.LogInfo("ListenAndServe", address+" Starting.....")
 
 	if err := Server.ListenAndServe(); err != http.ErrServerClosed {
 		rs.LogErrorEf("ListenAndServe", "HTTP server ListenAndServe %v", err)
