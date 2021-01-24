@@ -5,6 +5,7 @@ import (
 	Server "github.com/eshu0/RESTServer/pkg/server"
 )
 
+//RServerCommand this is commands to the server - these are default examples
 type RServerCommand struct {
 	Server *Server.RServer
 }
@@ -17,6 +18,7 @@ func checkRCommand(rsc RServerCommand) bool {
 	return true
 }
 
+//ShutDown this shutdowns the webserver
 func (rsc RServerCommand) ShutDown(request Request.ServerRequest) {
 	if rsc.Server != nil {
 		rsc.Server.LogDebug("RServerCommand", "HTTP server shutdown called")
@@ -24,6 +26,7 @@ func (rsc RServerCommand) ShutDown(request Request.ServerRequest) {
 	}
 }
 
+//ListCommands this list commands
 func (rsc RServerCommand) ListCommands(request Request.ServerRequest) {
 	if rsc.Server != nil {
 		err := request.Template.Execute(request.Writer, rsc.Server.Config.Data)
@@ -34,6 +37,7 @@ func (rsc RServerCommand) ListCommands(request Request.ServerRequest) {
 	}
 }
 
+//LoadConfig loads the server config from disk
 func (rsc RServerCommand) LoadConfig(request Request.ServerRequest) {
 	if rsc.Server != nil {
 		rsc.Server.LogDebug("RServerCommand", "Load Config called")
@@ -41,6 +45,7 @@ func (rsc RServerCommand) LoadConfig(request Request.ServerRequest) {
 	}
 }
 
+//SaveConfig saves the server config from disk
 func (rsc RServerCommand) SaveConfig(request Request.ServerRequest) {
 	if rsc.Server != nil {
 		rsc.Server.LogDebug("RServerCommand", "Save Config called")
@@ -48,6 +53,7 @@ func (rsc RServerCommand) SaveConfig(request Request.ServerRequest) {
 	}
 }
 
+//AddDefaults adds defaults
 func AddDefaults(server *Server.RServer) {
 
 	dhlen := server.Config.GetDefaultHandlersLen()
@@ -72,6 +78,7 @@ func AddDefaults(server *Server.RServer) {
 	}
 }
 
+//SetDefaultFunctionalMap this sets the defaults
 func SetDefaultFunctionalMap(server *Server.RServer) {
 	server.Register("RServerCommand", RServerCommand{Server: server})
 }
