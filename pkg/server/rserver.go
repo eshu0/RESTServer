@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"reflect"
+	"strings"
 
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
 	appconf "github.com/eshu0/appconfig/pkg"
@@ -31,12 +32,19 @@ type RServer struct {
 	NotFoundHandler func(w http.ResponseWriter, r *http.Request)
 }
 
+//NewRServer a config is needed
 func NewRServer(config *RServerConfig) *RServer {
 	return NewRServerCustomLog(config, sl.NewApplicationNowLogger())
 }
 
+//NewRServerCustomLog if a different logger is wanted instead of the default one
 func NewRServerCustomLog(config *RServerConfig, logger sli.ISimpleLogger) *RServer {
 	server := RServer{}
+	if config == nil {
+		// this creates a new server config with defaults
+		config = NewRServerConfig()
+	}
+
 	server.Config = config
 	server.Log = logger
 	server.RawFunctions = make(map[string]interface{})
@@ -46,6 +54,7 @@ func NewRServerCustomLog(config *RServerConfig, logger sli.ISimpleLogger) *RServ
 	return &server
 }
 
+//Invoke this invokes the func based on the config
 func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []reflect.Value {
 
 	rs.LogDebugf("Invoke", "Method: Looking up %s ", name)
@@ -74,10 +83,9 @@ func (rs *RServer) Invoke(any interface{}, name string, args ...interface{}) []r
 	*/
 	if meth.IsValid() && !meth.IsNil() {
 		return meth.Call(inputs)
-	} else {
-		rs.LogErrorf("Invoke", "Method: %s could not be found", name)
 	}
 
+	rs.LogErrorf("Invoke", "Method: %s could not be found", name)
 	return nil
 }
 
@@ -93,6 +101,7 @@ func (rs *RServer) Register(FunctionClass string, data interface{}) {
 
 /// GENERAL OPERATIONS
 
+//ShutDown this shutsdown the server
 func (rs *RServer) ShutDown() {
 	if Server != nil {
 		backg := context.Background()
@@ -103,6 +112,7 @@ func (rs *RServer) ShutDown() {
 				// Error from closing listeners, or context timeout:
 				rs.LogErrorf("Shutdown", "HTTP server Shutdown: %v", err)
 			}
+
 		} else {
 			rs.LogError("Shutdown", "Called but context.Background() was nil")
 		}
@@ -110,22 +120,25 @@ func (rs *RServer) ShutDown() {
 	} else {
 		rs.LogError("Shutdown", "Called but server was nil")
 	}
-
 }
 
+//ListenAndServe This starts the Server, runs the mapping, loads templates and hosts on the port and arddress set in the config
 func (rs *RServer) ListenAndServe() {
-	r := rs.MapFunctionsToHandlers()
+
+	httphandler := rs.MapFunctionsToHandlers()
 
 	if rs.NotFoundHandler != nil {
 		rs.LogInfo("ListenAndServe", "NotFoundHandler is set")
-		r.NotFoundHandler = http.HandlerFunc(rs.NotFoundHandler)
+		httphandler.NotFoundHandler = http.HandlerFunc(rs.NotFoundHandler)
 	}
 
+	rs.LogDebug("ListenAndServe", "LoadTemplates started")
 	rs.LoadTemplates()
-	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: r}
+	rs.LogDebug("ListenAndServe", "LoadTemplates finished")
 
-	rs.LogInfof("ListenAndServe", "Listening on: %s", rs.Config.GetAddress())
+	Server = &http.Server{Addr: rs.Config.GetAddress(), Handler: httphandler}
 
+	rs.PrintDetails()
 	if err := Server.ListenAndServe(); err != http.ErrServerClosed {
 		rs.LogErrorEf("ListenAndServe", "HTTP server ListenAndServe %v", err)
 	}
@@ -209,4 +222,20 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 	}
 
 	return server
+}
+
+func (rs *RServer) PrintDetails() {
+
+	rs.LogInfof("PrintDetails", "Address: ", rs.Config.GetAddress())
+	rs.LogInfof("PrintDetails", "Template Filepath: ", rs.Config.GetTemplatePath())
+	rs.LogInfof("PrintDetails", "Template FileTypes: ", strings.Join(rs.Config.GetTemplateFileTypes(), ","))
+
+	/*rs.LogInfof("PrintDetails", "Port: ", rs.Config.GetPort())
+
+	Handlers          []Handlers.RESTHandler `json:"handlers,omitempty"`
+	DefaultHandlers   []Handlers.RESTHandler `json:"defaulthandlers,omitempty"`
+	TemplateFilepath  string                 `json:"templatefilepath,omitempty"`
+	TemplateFileTypes []string               `json:"templatefiletypes,omitempty"`
+	CacheTemplates    bool                   `json:"cachetemplates,omitempty"`
+	*/
 }
