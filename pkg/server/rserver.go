@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	Helpers "github.com/eshu0/RESTServer/pkg/helpers"
+	appconf "github.com/eshu0/appconfig/pkg"
 
 	sl "github.com/eshu0/simplelogger/pkg"
 	sli "github.com/eshu0/simplelogger/pkg/interfaces"
@@ -189,7 +190,7 @@ func DefaultServer(ConfigFilePath *string) (rs *RServer) {
 		server.ConfigFilePath = *ConfigFilePath
 
 	} else {
-		rs.LogDebugf("LoadConfig", "Default config file path is %s", Config.DefaultFilePath)
+		rs.LogDebugf("LoadConfig", "Default config file path is %s", appconf.DefaultFilePath)
 		// load this first
 		server.ConfigFilePath = Config.DefaultFilePath
 	}
