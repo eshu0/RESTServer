@@ -61,7 +61,7 @@ func SetServerDefaultConfig(Config appconfint.IAppConfig) {
 func (rsc *RServerConfig) getConfigData() *ConfigData {
 
 	data := rsc.Parent.GetItem("Data")
-	Config, ok := conf.(*ConfigData)
+	Config, ok := data.(*ConfigData)
 	if ok {
 		return Config
 	}
