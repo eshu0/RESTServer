@@ -78,8 +78,8 @@ func (rsc *RServerConfig) GetConfigData() *ConfigData {
 		Config, ok := data.(map[string]*ConfigData)
 		if ok {
 			fmt.Printf("cast ok %v\n", Config)
-			rsc.cache = Config
-			return Config
+			rsc.cache = Config["Data"]
+			return Config["Data"]
 		}
 		fmt.Printf("cast failed %v\n", Config)
 		return nil
