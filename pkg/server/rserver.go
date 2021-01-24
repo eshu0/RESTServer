@@ -169,9 +169,14 @@ func (rs *RServer) LoadConfig() bool {
 		rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
 		return false
 	}
+	ccat, ok := conf.(*appconf.AppConfig)
+	if ok {
+		rs.Config.Parent = ccat
+		return true
+	}
 
-	rs.Config.Parent = newconfig
-	return true
+	rs.LogError("LoadConfig", "Cast failed")
+	return false
 }
 
 //DefaultServer Creates a default server
@@ -192,7 +197,7 @@ func DefaultServer(ConfigFilePath *string) (rs *RServer) {
 	} else {
 		rs.LogDebugf("LoadConfig", "Default config file path is %s", appconf.DefaultFilePath)
 		// load this first
-		server.ConfigFilePath = Config.DefaultFilePath
+		server.ConfigFilePath = appconf.DefaultFilePath
 	}
 
 	ok := server.LoadConfig()
