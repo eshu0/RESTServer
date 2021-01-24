@@ -169,7 +169,7 @@ func (rs *RServer) LoadConfig() bool {
 		rs.LogErrorEf("LoadConfig", "LoadConfig - %v", err)
 		return false
 	}
-	ccat, ok := conf.(*appconf.AppConfig)
+	ccat, ok := newconfig.(*appconf.AppConfig)
 	if ok {
 		rs.Config.Parent = ccat
 		return true
