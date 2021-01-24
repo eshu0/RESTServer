@@ -138,7 +138,7 @@ func (rs *RServer) SaveConfig() bool {
 		return false
 	}
 
-	if rs.Config != nil && rs.Config.Parent {
+	if rs.Config != nil && rs.Config.Parent != nil {
 		rs.LogError("SaveConfig", "Config Parent was null")
 		return false
 	}
@@ -158,7 +158,7 @@ func (rs *RServer) LoadConfig() bool {
 		return false
 	}
 
-	if rs.Config != nil && rs.Config.Parent {
+	if rs.Config != nil && rs.Config.Parent != nil {
 		rs.LogError("LoadConfig", "Config Parent was null")
 		return false
 	}
