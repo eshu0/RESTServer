@@ -229,20 +229,16 @@ func (rs *RServer) PrintDetails() {
 	rs.LogInfof("PrintDetails", "Address: %s", rs.Config.GetAddress())
 	rs.LogInfof("PrintDetails", "Template Filepath: %s", rs.Config.GetTemplatePath())
 	rs.LogInfof("PrintDetails", "Template FileTypes: %s", strings.Join(rs.Config.GetTemplateFileTypes(), ","))
+	rs.LogInfo("PrintDetails", "Handlers: ")
 
 	for _, handl := range rs.Config.GetHandlers() {
 		rs.LogInfof("PrintDetails", "Handler: %s", handl.MethodName)
 	}
 
+	rs.LogInfo("PrintDetails", "DefaultHandlers: ")
+
 	for _, handl := range rs.Config.GetDefaultHandlers() {
 		rs.LogInfof("PrintDetails", "Default Handler: %s", handl.MethodName)
 	}
-	/*rs.LogInfof("PrintDetails", "Port: ", rs.Config.GetPort())
 
-	Handlers          []Handlers.RESTHandler `json:"handlers,omitempty"`
-	DefaultHandlers   []Handlers.RESTHandler `json:"defaulthandlers,omitempty"`
-	TemplateFilepath  string                 `json:"templatefilepath,omitempty"`
-	TemplateFileTypes []string               `json:"templatefiletypes,omitempty"`
-	CacheTemplates    bool                   `json:"cachetemplates,omitempty"`
-	*/
 }
