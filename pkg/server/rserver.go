@@ -187,7 +187,7 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 	conf := NewRServerConfig(*ConfigFilePath)
 	// Create a new REST Server
 	server := NewRServer(conf)
-	server.LogDebugf("DefaultServer", "config file path is %s", conf.Helper.Filepath)
+	server.LogDebugf("DefaultServer", "config file path is %s", conf.Helper.FilePath)
 
 	ok := server.LoadConfig()
 	// we failed to load the configuration file
@@ -195,7 +195,7 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 		server.LogError("DefaultServer ", "failed to load configuration file")
 	}
 
-	server.LogDebugf("DefaultServer", "Loaded config from %s", conf.Helper.Filepath)
+	server.LogDebugf("DefaultServer", "Loaded config from %s", conf.Helper.FilePath)
 
 	return server
 }
