@@ -2,6 +2,7 @@ package RESTServer
 
 import (
 	"context"
+	"fmt"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -190,29 +191,32 @@ func (rs *RServer) LoadConfig() bool {
 //DefaultServer Creates a default server
 func DefaultServer(ConfigFilePath *string) *RServer {
 
-	// Create a new REST Server
-	server := NewRServer(nil)
-
+	path := ""
+	msg := ""
 	// has a conifg file been provided?
 	if ConfigFilePath != nil && len(*ConfigFilePath) > 0 {
-		server.LogDebugf("DefaultServer", "Custom config file path is %s", *ConfigFilePath)
-
 		// load this first
-		server.Config.ConfigFilePath = *ConfigFilePath
-
+		path = *ConfigFilePath
+		msg = fmt.Sprintf("Custom config file path is %s", path)
 	} else {
-		server.LogDebugf("DefaultServer", "Default config file path is %s", appconf.DefaultFilePath)
 		// load this first
-		server.Config.ConfigFilePath = appconf.DefaultFilePath
-	}
-	ok := server.LoadConfig()
+		path = appconf.DefaultFilePath
+		msg = fmt.Sprintf("Default config file path is %s", path)
 
+	}
+
+	conf := NewRServerConfig(path)
+	// Create a new REST Server
+	server := NewRServer(conf)
+	server.LogDebug("DefaultServer", msg)
+
+	ok := server.LoadConfig()
 	// we failed to load the configuration file
 	if !ok {
 		server.LogError("DefaultServer ", "failed to load configuration file")
 	}
 
-	server.LogDebugf("DefaultServer", "Loaded config from %s", server.Config.ConfigFilePath)
+	server.LogDebugf("DefaultServer", "Loaded config from %s", path)
 
 	return server
 }
