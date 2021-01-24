@@ -29,7 +29,7 @@ func (rsc RServerCommand) ShutDown(request Request.ServerRequest) {
 //ListCommands this list commands
 func (rsc RServerCommand) ListCommands(request Request.ServerRequest) {
 	if rsc.Server != nil {
-		err := request.Template.Execute(request.Writer, rsc.Server.Config.Data)
+		err := request.Template.Execute(request.Writer, rsc.Server.Config.GetConfigData())
 		if err != nil {
 			rsc.Server.LogErrorf("ListCommands", "Error : %s", err.Error())
 			return

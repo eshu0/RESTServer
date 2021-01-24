@@ -12,7 +12,6 @@ const DefaultFilePath = "./config.json"
 //RServerConfig This struct is the configuration for the REST server
 type RServerConfig struct {
 	Parent *appconf.AppConfig
-	Data   *ConfigData
 }
 
 //ConfigData the data to be stored
@@ -58,11 +57,11 @@ func SetServerDefaultConfig(Config appconfint.IAppConfig) {
 
 	Config.SetItem("Data", Data)
 }
-func (rsc *RServerConfig) getConfigData() *ConfigData {
-
+func (rsc *RServerConfig) GetConfigData() *ConfigData {
 	data := rsc.Parent.GetItem("Data")
 	Config, ok := data.(*ConfigData)
 	if ok {
+		rsc.Data = Config
 		return Config
 	}
 	return nil
@@ -70,7 +69,7 @@ func (rsc *RServerConfig) getConfigData() *ConfigData {
 
 //HasTemplate returns if a teplate path has been set
 func (rsc *RServerConfig) HasTemplate() bool {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d == nil {
 		return false
 	}
@@ -80,7 +79,7 @@ func (rsc *RServerConfig) HasTemplate() bool {
 
 //GetTemplatePath returns the template path
 func (rsc *RServerConfig) GetTemplatePath() string {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d == nil {
 		return ""
 	}
@@ -89,7 +88,7 @@ func (rsc *RServerConfig) GetTemplatePath() string {
 
 //GetCacheTemplates returns the cached template paths
 func (rsc *RServerConfig) GetCacheTemplates() bool {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d == nil {
 		return false
 	}
@@ -98,7 +97,7 @@ func (rsc *RServerConfig) GetCacheTemplates() bool {
 
 //GetTemplateFileTypes returns the file types for the templates, such as .tmpl, .html
 func (rsc *RServerConfig) GetTemplateFileTypes() []string {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d == nil {
 		return []string{}
 	}
@@ -107,7 +106,7 @@ func (rsc *RServerConfig) GetTemplateFileTypes() []string {
 
 //GetHandlersLen this gets length handlers
 func (rsc *RServerConfig) GetHandlersLen() int {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d == nil {
 		return -1
 	}
@@ -116,7 +115,7 @@ func (rsc *RServerConfig) GetHandlersLen() int {
 
 //GetHandlers this gets the handlers from the config
 func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d == nil {
 		return []Handlers.RESTHandler{}
 	}
@@ -125,7 +124,7 @@ func (rsc *RServerConfig) GetHandlers() []Handlers.RESTHandler {
 
 //GetDefaultHandlers this gets the default handlers
 func (rsc *RServerConfig) GetDefaultHandlers() []Handlers.RESTHandler {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d == nil {
 		return []Handlers.RESTHandler{}
 	}
@@ -134,7 +133,7 @@ func (rsc *RServerConfig) GetDefaultHandlers() []Handlers.RESTHandler {
 
 //GetDefaultHandlersLen this gets length default handlers
 func (rsc *RServerConfig) GetDefaultHandlersLen() int {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d == nil {
 		return -1
 	}
@@ -143,7 +142,7 @@ func (rsc *RServerConfig) GetDefaultHandlersLen() int {
 
 //GetAddress this gets the server address
 func (rsc *RServerConfig) GetAddress() string {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d == nil {
 		return ":7777"
 	}
@@ -152,7 +151,7 @@ func (rsc *RServerConfig) GetAddress() string {
 
 //AddDefaultHandler this adds a default handler to the configuration
 func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
-	d := rsc.getConfigData()
+	d := rsc.GetConfigData()
 	if d != nil {
 		d.DefaultHandlers = append(d.DefaultHandlers, Handler)
 	}
@@ -160,8 +159,8 @@ func (rsc *RServerConfig) AddDefaultHandler(Handler Handlers.RESTHandler) {
 
 //AddHandler this adds a handler to the configuration
 func (rsc *RServerConfig) AddHandler(Handler Handlers.RESTHandler) {
-	d := rsc.getConfigData()
-	if d != nil {
+	d := rsc.GetConfigData()
+	if d = nil {
 		d.Handlers = append(d.Handlers, Handler)
 	}
 }
