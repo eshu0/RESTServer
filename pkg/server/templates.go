@@ -11,14 +11,17 @@ import (
 	Request "github.com/eshu0/RESTServer/pkg/request"
 )
 
-// Create Handlers helper functions
+//CreateTemplateHandler helper functions
 func (rs *RServer) CreateTemplateHandler(URL string, MethodName string, HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string) Handlers.RESTHandler {
 	return rs.CreateJSONTemplateHandler(URL, MethodName, HTTPMethod, FunctionalClass, TemplateName, Blob, Filename, false, false)
 }
 
+//CreateSpecificTemplateHandler create a template handler with no JSON support
 func (rs *RServer) CreateSpecificTemplateHandler(URL string, MethodName string, HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string) Handlers.RESTHandler {
 	return rs.CreateJSONSpecificTemplateHandler(URL, MethodName, HTTPMethod, FunctionalClass, TemplateName, Blob, Path, false, false)
 }
+
+//CreateJSONTemplateHandler creates a JSON handler
 func (rs *RServer) CreateJSONTemplateHandler(URL string, MethodName string, HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Filename string, HandleJSONRequest bool, HandleJSONResponse bool) Handlers.RESTHandler {
 	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass, HandleJSONRequest, HandleJSONResponse)
 	drhr.TemplateBlob = Blob
@@ -27,6 +30,7 @@ func (rs *RServer) CreateJSONTemplateHandler(URL string, MethodName string, HTTP
 	return drhr
 }
 
+//CreateJSONSpecificTemplateHandler creates a sepcific JSON handler
 func (rs *RServer) CreateJSONSpecificTemplateHandler(URL string, MethodName string, HTTPMethod string, FunctionalClass string, TemplateName string, Blob string, Path string, HandleJSONRequest bool, HandleJSONResponse bool) Handlers.RESTHandler {
 	drhr := rs.CreateFunctionHandler(URL, MethodName, HTTPMethod, FunctionalClass, HandleJSONRequest, HandleJSONResponse)
 	drhr.TemplateBlob = Blob
@@ -63,7 +67,7 @@ func (rs *RServer) MakeTemplateHandlerFunction(handler Handlers.RESTHandler, any
 		rs.LogDebug("MakeTemplateHandlerFunction", "MakeTemplateHandlerFunction called")
 
 		if rs.Config.GetCacheTemplates() {
-			rs.LogDebugf("MakeTemplateHandlerFunction", "Looking up template %s for %s ", handler.TemplateName, handler.URL)
+			rs.LogDebugf("MakeTemplateHandlerFunction", "GetCacheTemplates - Looking up template %s for %s ", handler.TemplateName, handler.URL)
 			t := rs.Templates.Lookup(handler.TemplateName)
 			rs.Invoke(any, handler.MethodName, Request.CreateServerTemplateRequest(w, r, t))
 		} else {

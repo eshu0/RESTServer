@@ -63,11 +63,11 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		if !istyped {
-			rs.LogDebugf("MakeHandlerFunction", "Untyped called")
+			rs.LogDebug("MakeHandlerFunction", "Untyped called")
 			sr := Request.CreateServerRawRequest(w, r)
 			rs.Invoke(any, handler.MethodName, sr.Writer, sr.Request)
 		} else {
-			rs.LogDebugf("MakeHandlerFunction", "Typed called")
+			rs.LogDebug("MakeHandlerFunction", "Typed called")
 
 			// JSON request expected
 			if handler.JSONRequest {
@@ -116,29 +116,33 @@ func (rs *RServer) MakeHandlerFunction(handler Handlers.RESTHandler, any interfa
 }
 
 func (rs *RServer) regHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler, funcclass interface{}, istyped bool) {
-	if handl.TemplatePath != "" || handl.TemplateFileName != "" || handl.TemplateBlob != "" {
+	if len(handl.TemplatePath) > 0 || len(handl.TemplateFileName) > 0 || len(handl.TemplateBlob) > 0 {
 		rs.LogDebugf("regHandlerToRouter", "Handlers: Adding Template function %s - %s", handl.HTTPMethod, handl.MethodName)
 
 		if handl.HTTPMethod != "" {
 			if strings.Contains(handl.HTTPMethod, ",") {
-				rs.LogDebugf("regHandlerToRouter", "Method is multiple")
+				rs.LogDebugf("regHandlerToRouter", "Template Method is multiple")
 				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(strings.Split(handl.HTTPMethod, ",")...)
 			} else {
+				rs.LogDebug("regHandlerToRouter", "Template Method is a single HTTP Verb")
 				r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass)).Methods(handl.HTTPMethod)
 			}
 		} else {
+			rs.LogDebug("regHandlerToRouter", "Template Method does not have a HTTP Verb")
 			r.HandleFunc(handl.URL, rs.MakeTemplateHandlerFunction(handl, funcclass))
 		}
 	} else {
 		rs.LogDebugf("regHandlerToRouter", "Handlers: Adding %s - %s", handl.HTTPMethod, handl.MethodName)
 		if handl.HTTPMethod != "" {
 			if strings.Contains(handl.HTTPMethod, ",") {
-				rs.LogDebugf("regHandlerToRouter", "Method is multiple")
+				rs.LogDebug("regHandlerToRouter", "Method is multiple HTTP Verbs")
 				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass, istyped)).Methods(strings.Split(handl.HTTPMethod, ",")...)
 			} else {
+				rs.LogDebug("regHandlerToRouter", "Method is a single HTTP Verb")
 				r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass, istyped)).Methods(handl.HTTPMethod)
 			}
 		} else {
+			rs.LogDebug("regHandlerToRouter", "Method does not have a HTTP Verb")
 			r.HandleFunc(handl.URL, rs.MakeHandlerFunction(handl, funcclass, istyped))
 		}
 	}
@@ -159,18 +163,20 @@ func (rs *RServer) addHandlerToRouter(r *mux.Router, handl Handlers.RESTHandler)
 			if handl.StaticDir != "" {
 				rs.LogDebugf("addHandlertoRouter", "Handlers: Adding route %s for  static directory %s", handl.URL, handl.StaticDir)
 				r.PathPrefix(handl.URL).Handler(http.StripPrefix(handl.URL, http.FileServer(http.Dir(handl.StaticDir))))
-
 			} else {
 				rs.LogErrorf("addHandlertoRouter", "Handlers Error FunctionalClass (%s) doesn't have a function %s mapped", handl.FunctionalClass, handl.MethodName)
 			}
 		}
 	}
+
+	// this handles the func
 	r.HandleFunc(handl.URL, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Max-Age", "86400")
 	}).Methods(http.MethodOptions)
 }
 
+//MapFunctionsToHandlers Maps functions to the handlers
 func (rs *RServer) MapFunctionsToHandlers() *mux.Router {
 
 	r := mux.NewRouter()
