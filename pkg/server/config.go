@@ -24,7 +24,7 @@ type RServerConfig struct {
 func NewRServerConfig() *RServerConfig {
 	conf := appconf.NewAppConfig()
 	dc := &RServerConfig{}
-	Config, ok := conf.(*RServerConfig)
+	Config, ok := conf.(*appconf.AppConfig)
 	if ok {
 		dc.Parent = Config
 		dc.Parent.SetDefaultFunc(SetServerDefaultConfig)
