@@ -20,6 +20,7 @@ type RServerConfig struct {
 	CacheTemplates    bool                   `json:"cachetemplates,omitempty"`
 }
 
+//NewRServerConfig creates new server config
 func NewRServerConfig() *RServerConfig {
 	conf := appconf.NewAppConfig()
 	dc := &RServerConfig{}
