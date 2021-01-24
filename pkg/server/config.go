@@ -23,9 +23,9 @@ type ConfigData struct {
 }
 
 //NewRServerConfig creates new server config
-func NewRServerConfig() *RServerConfig {
+func NewRServerConfig(filepath string) *RServerConfig {
 	dc := &RServerConfig{}
-	dc.Helper = appconf.NewAppConfigHelperWithDefault(dc.SetServerDefaultConfig)
+	dc.Helper = appconf.NewAppConfigHelperWithDefault(filepath, dc.SetServerDefaultConfig)
 	return dc
 
 }
