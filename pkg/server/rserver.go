@@ -133,14 +133,35 @@ func (rs *RServer) ListenAndServe() {
 //SaveConfig saves server config to disk
 func (rs *RServer) SaveConfig() bool {
 
+	if rs.Config == nil {
+		rs.LogError("SaveConfig", "Config was null")
+		return false
+	}
+
+	if rs.Config != nil && rs.Config.Parent {
+		rs.LogError("SaveConfig", "Config Parent was null")
+		return false
+	}
+
 	if err := rs.Config.Parent.Save(rs.ConfigFilePath); err != nil {
 		rs.LogErrorEf("SaveConfig", "SaveConfig - %v", err)
+		return false
 	}
 	return true
 }
 
 //LoadConfig loads server config from disk
 func (rs *RServer) LoadConfig() bool {
+
+	if rs.Config == nil {
+		rs.LogError("LoadConfig", "Config was null")
+		return false
+	}
+
+	if rs.Config != nil && rs.Config.Parent {
+		rs.LogError("LoadConfig", "Config Parent was null")
+		return false
+	}
 
 	newconfig, err := rs.Config.Parent.Load(rs.ConfigFilePath)
 	if err != nil || newconfig == nil {
