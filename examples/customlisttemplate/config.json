@@ -1,7 +1,9 @@
 {
-	"Data" : {
-		"port": "666",
-		"templatefilepath": "./views/",
-		"templatefiletypes":[".tmpl", ".html"]
+	"Items": {
+		"Data" : {
+			"port": "666",
+			"templatefilepath": "./views/",
+			"templatefiletypes":[".tmpl", ".html"]
+		}
 	}
 }

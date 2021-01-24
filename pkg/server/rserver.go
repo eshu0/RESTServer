@@ -178,21 +178,18 @@ func (rs *RServer) LoadConfig() bool {
 
 //DefaultServer Creates a default server
 func DefaultServer(ConfigFilePath *string) *RServer {
-
-	defaultconfig := NewRServerConfig()
-
 	// Create a new REST Server
-	server := NewRServer(defaultconfig)
+	server := NewRServer(nil)
 
 	// has a conifg file been provided?
 	if ConfigFilePath != nil && len(*ConfigFilePath) > 0 {
-		server.LogDebugf("LoadConfig", "Custom config file path is %s", *ConfigFilePath)
+		server.LogDebugf("DefaultServer", "Custom config file path is %s", *ConfigFilePath)
 
 		// load this first
 		server.Config.ConfigFilePath = *ConfigFilePath
 
 	} else {
-		server.LogDebugf("LoadConfig", "Default config file path is %s", appconf.DefaultFilePath)
+		server.LogDebugf("DefaultServer", "Default config file path is %s", appconf.DefaultFilePath)
 		// load this first
 		server.Config.ConfigFilePath = appconf.DefaultFilePath
 	}
@@ -200,9 +197,10 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 
 	// we failed to load the configuration file
 	if !ok {
-		server.LogError("LoadConfig ", "failed to load configuration file")
-		server.Config = defaultconfig
+		server.LogError("DefaultServer ", "failed to load configuration file")
 	}
+
+	server.LogDebugf("DefaultServer", "Loaded config from %s", server.Config.ConfigFilePath)
 
 	return server
 }

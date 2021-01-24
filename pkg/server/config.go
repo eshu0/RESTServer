@@ -10,8 +10,9 @@ import (
 
 //RServerConfig This struct is the configuration for the REST server
 type RServerConfig struct {
-	Parent         *appconf.AppConfig
-	ConfigFilePath string `json:"-"`
+	Parent         *appconf.AppConfig `json:"-"`
+	ConfigFilePath string             `json:"-"`
+	data           *ConfigData        `json:"-"`
 }
 
 //ConfigData the data to be stored
@@ -55,17 +56,24 @@ func (rsc *RServerConfig) SetServerDefaultConfig(Config appconfint.IAppConfig) {
 
 //GetConfigData returns the config data from the store
 func (rsc *RServerConfig) GetConfigData() *ConfigData {
-	data := rsc.Parent.GetItem("Data")
-	Config, ok := data.(*ConfigData)
-	if ok {
-		return Config
+	if rsc.data == nil {
+		data := rsc.Parent.GetItem("Data")
+		Config, ok := data.(*ConfigData)
+		if ok {
+			return Config
+		}
+		return nil
+
+	} else {
+		return rsc.data
 	}
-	return nil
+
 }
 
 //SetConfigData sets the config data to the store
 func (rsc *RServerConfig) SetConfigData(data *ConfigData) {
 	rsc.Parent.SetItem("Data", data)
+	rsc.data = nil
 }
 
 //HasTemplate returns if a teplate path has been set
@@ -194,6 +202,10 @@ func (rsc *RServerConfig) Load() error {
 
 	if rsc.Parent == nil {
 		return fmt.Errorf("Config Parent was nil")
+	}
+
+	if len(rsc.ConfigFilePath) <= 0 {
+		return fmt.Errorf("Config File Path was not set could not load")
 	}
 
 	newconfig, err := rsc.Parent.Load(rsc.ConfigFilePath)
