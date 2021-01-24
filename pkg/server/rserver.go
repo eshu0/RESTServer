@@ -189,13 +189,13 @@ func DefaultServer(ConfigFilePath *string) (rs *RServer) {
 
 	// has a conifg file been provided?
 	if ConfigFilePath != nil && len(*ConfigFilePath) > 0 {
-		rs.LogDebugf("LoadConfig", "Custom config file path is %s", *ConfigFilePath)
+		server.LogDebugf("LoadConfig", "Custom config file path is %s", *ConfigFilePath)
 
 		// load this first
 		server.ConfigFilePath = *ConfigFilePath
 
 	} else {
-		rs.LogDebugf("LoadConfig", "Default config file path is %s", appconf.DefaultFilePath)
+		server.LogDebugf("LoadConfig", "Default config file path is %s", appconf.DefaultFilePath)
 		// load this first
 		server.ConfigFilePath = appconf.DefaultFilePath
 	}
