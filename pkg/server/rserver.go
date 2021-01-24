@@ -205,7 +205,7 @@ func DefaultServer(ConfigFilePath *string) *RServer {
 	// we failed to load the configuration file
 	if !ok {
 		server.LogError("LoadConfig ", "failed to load configuration file")
-		return
+		return nil
 	}
 
 	return server
