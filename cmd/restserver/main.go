@@ -24,10 +24,10 @@ func main() {
 	server.ListenAndServe()
 
 	// has a config file been provided?
-	if UpdatedConfigFilePath != nil && *UpdatedConfigFilePath != "" {
+	if UpdatedConfigFilePath != nil && len(*UpdatedConfigFilePath) > 0 {
 
 		// as a test save the updated config
-		server.ConfigFilePath = *UpdatedConfigFilePath
+		server.Config.Helper.FilePath = *UpdatedConfigFilePath
 		server.SaveConfig()
 	}
 
