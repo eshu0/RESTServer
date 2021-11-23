@@ -11,14 +11,16 @@ import (
 
 	sl "github.com/eshu0/simplelogger/pkg"
 	sli "github.com/eshu0/simplelogger/pkg/interfaces"
+	utility "github.com/tdrip/utility/pkg"
 )
 
 // This is the http Server that will host the HTTP requests
 var Server *http.Server
 
 type RServer struct {
-	sl.AppLogger
-	Config *RServerConfig `json:"-"`
+	//sl.AppLogger
+	//Config *RServerConfig `json:"-"`
+	utility.Utility
 	// This map is designed for the functions were there is no types
 	// w http.ResponseWriter, r *http.Request
 	RawFunctions map[string]interface{} `json:"-"`
@@ -32,6 +34,7 @@ type RServer struct {
 
 //NewRServer a config is needed
 func NewRServer(config *RServerConfig) *RServer {
+
 	return NewRServerCustomLog(config, sl.NewApplicationNowLogger())
 }
 
